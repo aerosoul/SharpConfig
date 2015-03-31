@@ -36,8 +36,8 @@ namespace SharpConfig
         /// </summary>
         ///
         /// <param name="name">The name of the section.</param>
-        public Section( string name )
-            : base( name )
+        public Section(string name)
+            : base(name)
         {
             mSettings = new List<Setting>();
         }
@@ -55,21 +55,21 @@ namespace SharpConfig
         /// </remarks>
         public T CreateObject<T>() where T : class
         {
-            Type type = typeof( T );
+            Type type = typeof(T);
 
             try
             {
                 T obj = Activator.CreateInstance<T>();
 
-                MapTo( obj );
+                MapTo(obj);
 
                 return obj;
             }
             catch (Exception)
             {
-                throw new ArgumentException( string.Format(
+                throw new ArgumentException(string.Format(
                     "The type '{0}' does not have a default public constructor.",
-                    type.Name ) );
+                    type.Name));
             }
         }
 
@@ -78,12 +78,12 @@ namespace SharpConfig
         /// </summary>
         /// 
         /// <param name="obj">The object that is modified based on the section.</param>
-        public void MapTo<T>( T obj ) where T : class
+        public void MapTo<T>(T obj) where T : class
         {
             if (obj == null)
-                throw new ArgumentNullException( "obj" );
+                throw new ArgumentNullException("obj");
 
-            Type type = typeof( T );
+            Type type = typeof(T);
 
             var properties = type.GetProperties();
 
@@ -92,13 +92,13 @@ namespace SharpConfig
                 if (!prop.CanWrite)
                     continue;
 
-                var setting = GetSetting( prop.Name );
+                var setting = GetSetting(prop.Name);
 
                 if (setting != null)
                 {
-                    object value = setting.GetValue( prop.PropertyType );
+                    object value = setting.GetValue(prop.PropertyType);
 
-                    prop.SetValue( obj, value, null );
+                    prop.SetValue(obj, value, null);
                 }
             }
         }
@@ -123,18 +123,18 @@ namespace SharpConfig
         /// Adds a setting to the section.
         /// </summary>
         /// <param name="setting">The setting to add.</param>
-        public void Add( Setting setting )
+        public void Add(Setting setting)
         {
             if (setting == null)
-                throw new ArgumentNullException( "setting" );
+                throw new ArgumentNullException("setting");
 
-            if (Contains( setting ))
+            if (Contains(setting))
             {
                 throw new ArgumentException(
-                    "The specified setting already exists in the section." );
+                    "The specified setting already exists in the section.");
             }
 
-            mSettings.Add( setting );
+            mSettings.Add(setting);
         }
 
         /// <summary>
@@ -150,9 +150,9 @@ namespace SharpConfig
         /// </summary>
         /// <param name="setting">The setting to check for containment.</param>
         /// <returns>True if the setting is contained in the section; false otherwise.</returns>
-        public bool Contains( Setting setting )
+        public bool Contains(Setting setting)
         {
-            return mSettings.Contains( setting );
+            return mSettings.Contains(setting);
         }
 
         /// <summary>
@@ -160,46 +160,46 @@ namespace SharpConfig
         /// </summary>
         /// <param name="settingName">The name of the setting.</param>
         /// <returns>True if the setting is contained in the section; false otherwise.</returns>
-        public bool Contains( string settingName )
+        public bool Contains(string settingName)
         {
-            return GetSetting( settingName ) != null;
+            return GetSetting(settingName) != null;
         }
 
         /// <summary>
         /// Removes a setting from this section by its name.
         /// </summary>
-        public void Remove( string settingName )
+        public void Remove(string settingName)
         {
-            if (string.IsNullOrEmpty( settingName ))
-                throw new ArgumentNullException( "settingName" );
+            if (string.IsNullOrEmpty(settingName))
+                throw new ArgumentNullException("settingName");
 
-            var setting = GetSetting( settingName );
+            var setting = GetSetting(settingName);
 
             if (setting == null)
             {
                 throw new ArgumentException(
-                    "The specified setting does not exist in the section." );
+                    "The specified setting does not exist in the section.");
             }
 
-            mSettings.Remove( setting );
+            mSettings.Remove(setting);
         }
 
         /// <summary>
         /// Removes a setting from the section.
         /// </summary>
         /// <param name="setting">The setting to remove.</param>
-        public void Remove( Setting setting )
+        public void Remove(Setting setting)
         {
             if (setting == null)
-                throw new ArgumentNullException( "setting" );
+                throw new ArgumentNullException("setting");
 
-            if (!Contains( setting ))
+            if (!Contains(setting))
             {
                 throw new ArgumentException(
-                    "The specified setting does not exist in the section." );
+                    "The specified setting does not exist in the section.");
             }
 
-            mSettings.Remove( setting );
+            mSettings.Remove(setting);
         }
 
         /// <summary>
@@ -219,14 +219,14 @@ namespace SharpConfig
             get
             {
                 if (index < 0 || index >= mSettings.Count)
-                    throw new ArgumentOutOfRangeException( "index" );
+                    throw new ArgumentOutOfRangeException("index");
 
                 return mSettings[index];
             }
             set
             {
                 if (index < 0 || index >= mSettings.Count)
-                    throw new ArgumentOutOfRangeException( "index" );
+                    throw new ArgumentOutOfRangeException("index");
 
                 mSettings[index] = value;
             }
@@ -246,12 +246,12 @@ namespace SharpConfig
         {
             get
             {
-                var setting = GetSetting( name );
+                var setting = GetSetting(name);
 
                 if (setting == null)
                 {
-                    setting = new Setting( name );
-                    Add( setting );
+                    setting = new Setting(name);
+                    Add(setting);
                 }
 
                 return setting;
@@ -259,14 +259,14 @@ namespace SharpConfig
             set
             {
                 // Check if there already is a setting by that name.
-                var setting = GetSetting( name );
+                var setting = GetSetting(name);
 
-                int settingIndex = setting != null ? mSettings.IndexOf( setting ) : -1;
+                int settingIndex = setting != null ? mSettings.IndexOf(setting) : -1;
 
                 if (settingIndex < 0)
                 {
                     // A setting with that name does not exist yet; add it.
-                    mSettings.Add( setting );
+                    mSettings.Add(setting);
                 }
                 else
                 {
@@ -276,11 +276,11 @@ namespace SharpConfig
             }
         }
 
-        private Setting GetSetting( string name )
+        private Setting GetSetting(string name)
         {
             foreach (var setting in mSettings)
             {
-                if (string.Equals( setting.Name, name, StringComparison.OrdinalIgnoreCase ))
+                if (string.Equals(setting.Name, name, StringComparison.OrdinalIgnoreCase))
                     return setting;
             }
 
@@ -296,7 +296,7 @@ namespace SharpConfig
         /// </returns>
         public override string ToString()
         {
-            return ToString( false );
+            return ToString(false);
         }
 
         /// <summary>
@@ -308,37 +308,37 @@ namespace SharpConfig
         /// <returns>
         /// A string that represents the current object.
         /// </returns>
-        public string ToString( bool includeComment )
+        public string ToString(bool includeComment)
         {
             if (includeComment)
             {
                 bool hasPreComments = mPreComments != null && mPreComments.Count > 0;
 
                 string[] preCommentStrings = hasPreComments ?
-                    mPreComments.ConvertAll<string>( Comment.ConvertToString ).ToArray() : null;
+                    mPreComments.ConvertAll<string>(Comment.ConvertToString).ToArray() : null;
 
                 if (Comment != null && hasPreComments)
                 {
                     // Include inline comment and pre-comments.
-                    return string.Format( "{0}\n[{1}] {2}",
-                        string.Join( Environment.NewLine, preCommentStrings ),
-                        Name, Comment.ToString() );
+                    return string.Format("{0}\n[{1}] {2}",
+                        string.Join(Environment.NewLine, preCommentStrings),
+                        Name, Comment.ToString());
                 }
                 else if (Comment != null)
                 {
                     // Include only the inline comment.
-                    return string.Format( "[{0}] {1}", Name, Comment.ToString() );
+                    return string.Format("[{0}] {1}", Name, Comment.ToString());
                 }
                 else if (hasPreComments)
                 {
                     // Include only the pre-comments.
-                    return string.Format( "{0}\n[{1}]",
-                        string.Join( Environment.NewLine, preCommentStrings ),
-                        Name );
+                    return string.Format("{0}\n[{1}]",
+                        string.Join(Environment.NewLine, preCommentStrings),
+                        Name);
                 }
             }
 
-            return string.Format( "[{0}]", Name );
+            return string.Format("[{0}]", Name);
         }
     }
 }

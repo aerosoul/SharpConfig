@@ -26,8 +26,8 @@ namespace SharpConfig
     [Serializable]
     internal sealed class SettingValueCastException : Exception
     {
-        public SettingValueCastException( string stringValue, Type destType ) :
-            base( string.Format( "Failed to convert value '{0}' to type {1}.", stringValue, destType.FullName ) )
+        public SettingValueCastException(string stringValue, Type destType) :
+            base(string.Format("Failed to convert value '{0}' to type {1}.", stringValue, destType.FullName))
         { }
     }
 }

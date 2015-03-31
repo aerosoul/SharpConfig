@@ -36,10 +36,10 @@ namespace SharpConfig
         /// </summary>
         /// <param name="value"> The string value of the comment.</param>
         /// <param name="symbol">The delimiting symbol of the comment.</param>
-        public Comment( string value, char symbol )
+        public Comment(string value, char symbol)
         {
-            if ( symbol == '\0' )
-                throw new ArgumentNullException( "symbol" );
+            if (symbol == '\0')
+                throw new ArgumentNullException("symbol");
 
             mValue = value;
             mSymbol = symbol;
@@ -62,8 +62,8 @@ namespace SharpConfig
             get { return mSymbol; }
             set
             {
-                if ( value == '\0' )
-                    throw new ArgumentNullException( "value" );
+                if (value == '\0')
+                    throw new ArgumentNullException("value");
 
                 mSymbol = value;
             }
@@ -78,11 +78,11 @@ namespace SharpConfig
         /// </returns>
         public override string ToString()
         {
-            return string.Format( "{0} {1}", Symbol, Value ?? string.Empty );
+            return string.Format("{0} {1}", Symbol, Value ?? string.Empty);
         }
 
         // Used by Setting and Section in ToString().
-        internal static string ConvertToString( Comment comment )
+        internal static string ConvertToString(Comment comment)
         {
             return comment.ToString();
         }

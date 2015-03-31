@@ -35,18 +35,18 @@
             this.mainSplitter = new System.Windows.Forms.Splitter();
             this.trViewCfg = new System.Windows.Forms.TreeView();
             this.mainTimer = new System.Windows.Forms.Timer(this.components);
-            this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.txtCommentChars = new System.Windows.Forms.TextBox();
             this.picBoxLogo = new System.Windows.Forms.PictureBox();
             this.toolStrip = new System.Windows.Forms.ToolStrip();
             this.btnOpenConfig = new System.Windows.Forms.ToolStripButton();
-            this.btnSaveConfig = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.btnSaveConfig = new System.Windows.Forms.ToolStripButton();
+            this.txtCommentChars = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.mainPanel.SuspendLayout();
-            this.tableLayoutPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picBoxLogo)).BeginInit();
             this.toolStrip.SuspendLayout();
+            this.tableLayoutPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // mainPanel
@@ -96,44 +96,6 @@
             this.mainTimer.Interval = 500;
             this.mainTimer.Tick += new System.EventHandler(this.mainTimer_Tick);
             // 
-            // tableLayoutPanel
-            // 
-            this.tableLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.tableLayoutPanel.ColumnCount = 2;
-            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 315F));
-            this.tableLayoutPanel.Controls.Add(this.label1, 0, 0);
-            this.tableLayoutPanel.Controls.Add(this.txtCommentChars, 1, 0);
-            this.tableLayoutPanel.Location = new System.Drawing.Point(15, 512);
-            this.tableLayoutPanel.Name = "tableLayoutPanel";
-            this.tableLayoutPanel.RowCount = 2;
-            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel.Size = new System.Drawing.Size(405, 48);
-            this.tableLayoutPanel.TabIndex = 5;
-            // 
-            // label1
-            // 
-            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.label1.AutoSize = true;
-            this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(3, 5);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(87, 13);
-            this.label1.TabIndex = 6;
-            this.label1.Text = "Comment Chars:";
-            // 
-            // txtCommentChars
-            // 
-            this.txtCommentChars.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.txtCommentChars.Location = new System.Drawing.Point(96, 3);
-            this.txtCommentChars.Name = "txtCommentChars";
-            this.txtCommentChars.Size = new System.Drawing.Size(103, 21);
-            this.txtCommentChars.TabIndex = 7;
-            this.txtCommentChars.TabStop = false;
-            this.txtCommentChars.Text = "#;\'";
-            this.txtCommentChars.TextChanged += new System.EventHandler(this.OnConfigChanged);
-            // 
             // picBoxLogo
             // 
             this.picBoxLogo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -169,6 +131,11 @@
             this.btnOpenConfig.Text = "Open a file";
             this.btnOpenConfig.Click += new System.EventHandler(this.btnOpenConfig_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            // 
             // btnSaveConfig
             // 
             this.btnSaveConfig.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -179,10 +146,42 @@
             this.btnSaveConfig.Text = "Save to a file";
             this.btnSaveConfig.Click += new System.EventHandler(this.btnSaveConfig_Click);
             // 
-            // toolStripSeparator1
+            // txtCommentChars
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            this.txtCommentChars.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.txtCommentChars.Location = new System.Drawing.Point(96, 3);
+            this.txtCommentChars.Name = "txtCommentChars";
+            this.txtCommentChars.Size = new System.Drawing.Size(103, 21);
+            this.txtCommentChars.TabIndex = 7;
+            this.txtCommentChars.TabStop = false;
+            this.txtCommentChars.TextChanged += new System.EventHandler(this.OnConfigChanged);
+            // 
+            // label1
+            // 
+            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.label1.AutoSize = true;
+            this.label1.ForeColor = System.Drawing.Color.White;
+            this.label1.Location = new System.Drawing.Point(3, 5);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(87, 13);
+            this.label1.TabIndex = 6;
+            this.label1.Text = "Comment Chars:";
+            // 
+            // tableLayoutPanel
+            // 
+            this.tableLayoutPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.tableLayoutPanel.ColumnCount = 2;
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 315F));
+            this.tableLayoutPanel.Controls.Add(this.label1, 0, 0);
+            this.tableLayoutPanel.Controls.Add(this.txtCommentChars, 1, 0);
+            this.tableLayoutPanel.Location = new System.Drawing.Point(15, 512);
+            this.tableLayoutPanel.Name = "tableLayoutPanel";
+            this.tableLayoutPanel.RowCount = 2;
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel.Size = new System.Drawing.Size(405, 48);
+            this.tableLayoutPanel.TabIndex = 5;
             // 
             // MainForm
             // 
@@ -203,11 +202,11 @@
             this.Text = "SharpConfig Sample";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.mainPanel.ResumeLayout(false);
-            this.tableLayoutPanel.ResumeLayout(false);
-            this.tableLayoutPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picBoxLogo)).EndInit();
             this.toolStrip.ResumeLayout(false);
             this.toolStrip.PerformLayout();
+            this.tableLayoutPanel.ResumeLayout(false);
+            this.tableLayoutPanel.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -220,14 +219,14 @@
         private System.Windows.Forms.Splitter mainSplitter;
         private System.Windows.Forms.Timer mainTimer;
         private System.Windows.Forms.Panel pnlTxtBox;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox txtCommentChars;
         private System.Windows.Forms.PictureBox picBoxLogo;
         private System.Windows.Forms.ToolStrip toolStrip;
         private System.Windows.Forms.ToolStripButton btnOpenConfig;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton btnSaveConfig;
+        private System.Windows.Forms.TextBox txtCommentChars;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;
     }
 }
 

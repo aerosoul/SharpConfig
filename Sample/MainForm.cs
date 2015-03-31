@@ -34,8 +34,8 @@ namespace Sample
             if ( string.IsNullOrEmpty( txtBox.Text ) )
                 return;
 
-            try
-            {
+            //try
+            //{
                 // We want to measure how long SharpConfig needs to parse the configuration.
                 var watch = Stopwatch.StartNew();
 
@@ -94,12 +94,12 @@ namespace Sample
                 }
 
                 trViewCfg.ExpandAll();
-            }
-            catch ( Exception ex )
-            {
-                // Some error occurred! Notify the user.
-                LogMessage( ex.Message, Color.Red );
-            }
+            //}
+            //catch ( Exception ex )
+            //{
+            //    // Some error occurred! Notify the user.
+            //    LogMessage( ex.Message, Color.Red );
+            //}
         }
 
         // -----------------------------------------------------------
@@ -119,6 +119,9 @@ namespace Sample
             txtBox.ConfigurationManager.Configure();
 
             txtBox.Text = Properties.Resources.SampleCfg;
+
+            foreach (var ch in Configuration.ValidCommentChars)
+                txtCommentChars.Text += ch;
 
             // HACK: parse the sample config, so the Stopwatch won't report any JIT time.
             ParseConfig();

@@ -41,6 +41,8 @@ namespace SharpConfig
 
         private static NumberFormatInfo mNumberFormat;
         private static char[] mValidCommentChars;
+        private static bool mIgnoreInlineComments;
+        private static bool mIgnorePreComments;
 
         private List<Section> mSections;
 
@@ -52,6 +54,8 @@ namespace SharpConfig
         {
             mNumberFormat = CultureInfo.InvariantCulture.NumberFormat;
             mValidCommentChars = new[] { '#', ';', '\'' };
+            mIgnoreInlineComments = false;
+            mIgnorePreComments = false;
         }
 
         /// <summary>
@@ -86,18 +90,18 @@ namespace SharpConfig
         /// Adds a section to the configuration.
         /// </summary>
         /// <param name="section">The section to add.</param>
-        public void Add( Section section )
+        public void Add(Section section)
         {
-            if ( section == null )
-                throw new ArgumentNullException( "section" );
+            if (section == null)
+                throw new ArgumentNullException("section");
 
-            if ( Contains( section ) )
+            if (Contains(section))
             {
                 throw new ArgumentException(
-                    "The specified section already exists in the configuration." );
+                    "The specified section already exists in the configuration.");
             }
 
-            mSections.Add( section );
+            mSections.Add(section);
         }
 
         /// <summary>
@@ -113,9 +117,9 @@ namespace SharpConfig
         /// </summary>
         /// <param name="section">The section to check for containment.</param>
         /// <returns>True if the section is contained in the configuration; false otherwise.</returns>
-        public bool Contains( Section section )
+        public bool Contains(Section section)
         {
-            return mSections.Contains( section );
+            return mSections.Contains(section);
         }
 
         /// <summary>
@@ -123,47 +127,47 @@ namespace SharpConfig
         /// </summary>
         /// <param name="sectionName">The name of the section.</param>
         /// <returns>True if the setting is contained in the section; false otherwise.</returns>
-        public bool Contains( string sectionName )
+        public bool Contains(string sectionName)
         {
-            return GetSection( sectionName ) != null;
+            return GetSection(sectionName) != null;
         }
 
         /// <summary>
         /// Removes a section from this section by its name.
         /// </summary>
         /// <param name="sectionName">The case-sensitive name of the section to remove.</param>
-        public void Remove( string sectionName )
+        public void Remove(string sectionName)
         {
-            if ( string.IsNullOrEmpty( sectionName ) )
-                throw new ArgumentNullException( "sectionName" );
+            if (string.IsNullOrEmpty(sectionName))
+                throw new ArgumentNullException("sectionName");
 
-            var section = GetSection( sectionName );
+            var section = GetSection(sectionName);
 
-            if ( section == null )
+            if (section == null)
             {
                 throw new ArgumentException(
-                    "The specified section does not exist in the section." );
+                    "The specified section does not exist in the section.");
             }
 
-            Remove( section );
+            Remove(section);
         }
 
         /// <summary>
         /// Removes a section from the configuration.
         /// </summary>
         /// <param name="section">The section to remove.</param>
-        public void Remove( Section section )
+        public void Remove(Section section)
         {
-            if ( section == null )
-                throw new ArgumentNullException( "section" );
+            if (section == null)
+                throw new ArgumentNullException("section");
 
-            if ( !Contains( section ) )
+            if (!Contains(section))
             {
                 throw new ArgumentException(
-                    "The specified section does not exist in the section." );
+                    "The specified section does not exist in the section.");
             }
 
-            mSections.Remove( section );
+            mSections.Remove(section);
         }
 
         #endregion
@@ -180,9 +184,9 @@ namespace SharpConfig
         /// <returns>
         /// The loaded <see cref="Configuration"/> object.
         /// </returns>
-        public static Configuration LoadFromFile( string filename )
+        public static Configuration LoadFromFile(string filename)
         {
-            return LoadFromFile( filename, null );
+            return LoadFromFile(filename, null);
         }
 
         /// <summary>
@@ -195,17 +199,17 @@ namespace SharpConfig
         /// <returns>
         /// The loaded <see cref="Configuration"/> object.
         /// </returns>
-        public static Configuration LoadFromFile( string filename, Encoding encoding )
+        public static Configuration LoadFromFile(string filename, Encoding encoding)
         {
-            if ( !File.Exists( filename ) )
-                throw new FileNotFoundException( "Configuration file not found.", filename );
+            if (!File.Exists(filename))
+                throw new FileNotFoundException("Configuration file not found.", filename);
 
             Configuration cfg = null;
 
-            if ( encoding == null )
-                cfg = LoadFromText( File.ReadAllText( filename ) );
+            if (encoding == null)
+                cfg = LoadFromText(File.ReadAllText(filename));
             else
-                cfg = LoadFromText( File.ReadAllText( filename, encoding ) );
+                cfg = LoadFromText(File.ReadAllText(filename, encoding));
 
             return cfg;
         }
@@ -220,9 +224,9 @@ namespace SharpConfig
         /// <returns>
         /// The loaded <see cref="Configuration"/> object.
         /// </returns>
-        public static Configuration LoadFromStream( Stream stream )
+        public static Configuration LoadFromStream(Stream stream)
         {
-            return LoadFromStream( stream, null );
+            return LoadFromStream(stream, null);
         }
 
         /// <summary>
@@ -235,23 +239,23 @@ namespace SharpConfig
         /// <returns>
         /// The loaded <see cref="Configuration"/> object.
         /// </returns>
-        public static Configuration LoadFromStream( Stream stream, Encoding encoding )
+        public static Configuration LoadFromStream(Stream stream, Encoding encoding)
         {
-            if ( stream == null )
-                throw new ArgumentNullException( "stream" );
+            if (stream == null)
+                throw new ArgumentNullException("stream");
 
             string source = null;
 
             var reader = encoding == null ?
-                new StreamReader( stream ) : new StreamReader( stream, encoding );
+                new StreamReader(stream) : new StreamReader(stream, encoding);
 
-            using ( reader )
+            using (reader)
             {
                 source = reader.ReadToEnd();
                 reader.Close();
             }
 
-            return LoadFromText( source );
+            return LoadFromText(source);
         }
 
         /// <summary>
@@ -263,12 +267,12 @@ namespace SharpConfig
         /// <returns>
         /// The loaded <see cref="Configuration"/> object.
         /// </returns>
-        public static Configuration LoadFromText( string source )
+        public static Configuration LoadFromText(string source)
         {
-            if ( string.IsNullOrEmpty( source ) )
-                throw new ArgumentNullException( "source" );
+            if (string.IsNullOrEmpty(source))
+                throw new ArgumentNullException("source");
 
-            return Parse( source );
+            return Parse(source);
         }
 
         #endregion
@@ -284,12 +288,12 @@ namespace SharpConfig
         /// <returns>
         /// The loaded configuration.
         /// </returns>
-        public static Configuration LoadBinary( string filename )
+        public static Configuration LoadBinary(string filename)
         {
-            if (string.IsNullOrEmpty( filename ))
-                throw new ArgumentNullException( "filename" );
+            if (string.IsNullOrEmpty(filename))
+                throw new ArgumentNullException("filename");
 
-            return DeserializeBinary( null, filename );
+            return DeserializeBinary(null, filename);
         }
 
         /// <summary>
@@ -302,12 +306,12 @@ namespace SharpConfig
         /// <returns>
         /// The loaded configuration.
         /// </returns>
-        public static Configuration LoadBinary( string filename, BinaryReader reader )
+        public static Configuration LoadBinary(string filename, BinaryReader reader)
         {
-            if ( string.IsNullOrEmpty( filename ) )
-                throw new ArgumentNullException( "filename" );
-            
-            return DeserializeBinary( reader, filename );
+            if (string.IsNullOrEmpty(filename))
+                throw new ArgumentNullException("filename");
+
+            return DeserializeBinary(reader, filename);
         }
 
         /// <summary>
@@ -319,12 +323,12 @@ namespace SharpConfig
         /// <returns>
         /// The loaded configuration.
         /// </returns>
-        public static Configuration LoadBinary( Stream stream )
+        public static Configuration LoadBinary(Stream stream)
         {
             if (stream == null)
-                throw new ArgumentNullException( "stream" );
+                throw new ArgumentNullException("stream");
 
-            return DeserializeBinary( null, stream );
+            return DeserializeBinary(null, stream);
         }
 
         /// <summary>
@@ -337,12 +341,12 @@ namespace SharpConfig
         /// <returns>
         /// The loaded configuration.
         /// </returns>
-        public static Configuration LoadBinary( Stream stream, BinaryReader reader )
+        public static Configuration LoadBinary(Stream stream, BinaryReader reader)
         {
-            if ( stream == null )
-                throw new ArgumentNullException( "stream" );
+            if (stream == null)
+                throw new ArgumentNullException("stream");
 
-            return DeserializeBinary( reader, stream );
+            return DeserializeBinary(reader, stream);
         }
 
         #endregion
@@ -354,9 +358,9 @@ namespace SharpConfig
         /// </summary>
         ///
         /// <param name="filename">The location of the configuration file.</param>
-        public void Save( string filename )
+        public void Save(string filename)
         {
-            Save( filename, null );
+            Save(filename, null);
         }
 
         /// <summary>
@@ -365,12 +369,12 @@ namespace SharpConfig
         ///
         /// <param name="filename">The location of the configuration file.</param>
         /// <param name="encoding">The character encoding to use. Specify null to use the default encoding, which is UTF8.</param>
-        public void Save( string filename, Encoding encoding )
+        public void Save(string filename, Encoding encoding)
         {
-            if ( string.IsNullOrEmpty( filename ) )
-                throw new ArgumentNullException( "filename" );
+            if (string.IsNullOrEmpty(filename))
+                throw new ArgumentNullException("filename");
 
-            Serialize( filename, encoding );
+            Serialize(filename, encoding);
         }
 
         /// <summary>
@@ -378,9 +382,9 @@ namespace SharpConfig
         /// </summary>
         ///
         /// <param name="stream">The stream to save the configuration to.</param>
-        public void Save( Stream stream )
+        public void Save(Stream stream)
         {
-            Save( stream, null );
+            Save(stream, null);
         }
 
         /// <summary>
@@ -389,12 +393,12 @@ namespace SharpConfig
         ///
         /// <param name="stream">The stream to save the configuration to.</param>
         /// <param name="encoding">The character encoding to use. Specify null to use the default encoding, which is UTF8.</param>
-        public void Save( Stream stream, Encoding encoding )
+        public void Save(Stream stream, Encoding encoding)
         {
-            if ( stream == null )
-                throw new ArgumentNullException( "stream" );
+            if (stream == null)
+                throw new ArgumentNullException("stream");
 
-            Serialize( stream, encoding );
+            Serialize(stream, encoding);
         }
 
         #endregion
@@ -406,9 +410,9 @@ namespace SharpConfig
         /// </summary>
         ///
         /// <param name="filename">The location of the configuration file.</param>
-        public void SaveBinary( string filename )
+        public void SaveBinary(string filename)
         {
-            SaveBinary( filename, null );
+            SaveBinary(filename, null);
         }
 
         /// <summary>
@@ -417,12 +421,12 @@ namespace SharpConfig
         ///
         /// <param name="filename">The location of the configuration file.</param>
         /// <param name="writer">  The writer to use. Specify null to use the default writer.</param>
-        public void SaveBinary( string filename, BinaryWriter writer )
+        public void SaveBinary(string filename, BinaryWriter writer)
         {
-            if ( string.IsNullOrEmpty( filename ) )
-                throw new ArgumentNullException( "filename" );
+            if (string.IsNullOrEmpty(filename))
+                throw new ArgumentNullException("filename");
 
-            SerializeBinary( writer, filename );
+            SerializeBinary(writer, filename);
         }
 
         /// <summary>
@@ -430,9 +434,9 @@ namespace SharpConfig
         /// </summary>
         ///
         /// <param name="stream">The stream to save the configuration to.</param>
-        public void SaveBinary( Stream stream )
+        public void SaveBinary(Stream stream)
         {
-            SaveBinary( stream, null );
+            SaveBinary(stream, null);
         }
 
         /// <summary>
@@ -441,12 +445,12 @@ namespace SharpConfig
         ///
         /// <param name="stream">The stream to save the configuration to.</param>
         /// <param name="writer">The writer to use. Specify null to use the default writer.</param>
-        public void SaveBinary( Stream stream, BinaryWriter writer )
+        public void SaveBinary(Stream stream, BinaryWriter writer)
         {
-            if ( stream == null )
-                throw new ArgumentNullException( "stream" );
+            if (stream == null)
+                throw new ArgumentNullException("stream");
 
-            SerializeBinary( writer, stream );
+            SerializeBinary(writer, stream);
         }
 
         #endregion
@@ -463,7 +467,7 @@ namespace SharpConfig
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException( "value" );
+                    throw new ArgumentNullException("value");
 
                 mNumberFormat = value;
             }
@@ -477,18 +481,38 @@ namespace SharpConfig
             get { return mValidCommentChars; }
             set
             {
-                if ( value == null )
-                    throw new ArgumentNullException( "value" );
+                if (value == null)
+                    throw new ArgumentNullException("value");
 
-                if ( value.Length == 0 )
+                if (value.Length == 0)
                 {
                     throw new ArgumentException(
                         "The comment chars array must not be empty.",
-                        "value" );
+                        "value");
                 }
 
                 mValidCommentChars = value;
             }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether inline-comments
+        /// should be ignored when parsing a configuration.
+        /// </summary>
+        public static bool IgnoreInlineComments
+        {
+            get { return mIgnoreInlineComments; }
+            set { mIgnoreInlineComments = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether pre-comments
+        /// should be ignored when parsing a configuration.
+        /// </summary>
+        public static bool IgnorePreComments
+        {
+            get { return mIgnorePreComments; }
+            set { mIgnorePreComments = value; }
         }
 
         /// <summary>
@@ -507,15 +531,15 @@ namespace SharpConfig
         {
             get
             {
-                if ( index < 0 || index >= mSections.Count )
-                    throw new ArgumentOutOfRangeException( "index" );
+                if (index < 0 || index >= mSections.Count)
+                    throw new ArgumentOutOfRangeException("index");
 
                 return mSections[index];
             }
             set
             {
-                if ( index < 0 || index >= mSections.Count )
-                    throw new ArgumentOutOfRangeException( "index" );
+                if (index < 0 || index >= mSections.Count)
+                    throw new ArgumentOutOfRangeException("index");
 
                 mSections[index] = value;
             }
@@ -535,30 +559,30 @@ namespace SharpConfig
         {
             get
             {
-                var section = GetSection( name );
+                var section = GetSection(name);
 
-                if ( section == null )
+                if (section == null)
                 {
-                    section = new Section( name );
-                    Add( section );
+                    section = new Section(name);
+                    Add(section);
                 }
 
                 return section;
             }
             set
             {
-                if ( value == null )
-                    throw new ArgumentNullException( "value" );
+                if (value == null)
+                    throw new ArgumentNullException("value");
 
                 // Check if there already is a section by that name.
-                var section = GetSection( name );
+                var section = GetSection(name);
 
-                int settingIndex = section != null ? mSections.IndexOf( section ) : -1;
+                int settingIndex = section != null ? mSections.IndexOf(section) : -1;
 
-                if ( settingIndex < 0 )
+                if (settingIndex < 0)
                 {
                     // A section with that name does not exist yet; add it.
-                    mSections.Add( section );
+                    mSections.Add(section);
                 }
                 else
                 {
@@ -568,11 +592,11 @@ namespace SharpConfig
             }
         }
 
-        private Section GetSection( string name )
+        private Section GetSection(string name)
         {
-            foreach ( var section in mSections )
+            foreach (var section in mSections)
             {
-                if ( string.Equals( section.Name, name, StringComparison.OrdinalIgnoreCase ) )
+                if (string.Equals(section.Name, name, StringComparison.OrdinalIgnoreCase))
                     return section;
             }
 

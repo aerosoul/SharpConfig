@@ -34,10 +34,10 @@ namespace SharpConfig
         private Comment mComment;
         internal List<Comment> mPreComments;
 
-        internal ConfigurationElement( string name )
+        internal ConfigurationElement(string name)
         {
-            if ( string.IsNullOrEmpty( name ) )
-                throw new ArgumentNullException( "name" );
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException("name");
 
             mName = name;
         }
@@ -50,8 +50,8 @@ namespace SharpConfig
             get { return mName; }
             set
             {
-                if ( string.IsNullOrEmpty( value ) )
-                    throw new ArgumentNullException( "value" );
+                if (string.IsNullOrEmpty(value))
+                    throw new ArgumentNullException("value");
 
                 mName = value;
             }

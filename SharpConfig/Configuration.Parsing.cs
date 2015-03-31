@@ -30,7 +30,7 @@ namespace SharpConfig
 
         // Parses a configuration from a source string.
         // This is the core parsing function.
-        private static Configuration Parse( string source )
+        private static Configuration Parse(string source)
         {
             // Reset temporary fields.
             mLineNumber = 0;
@@ -39,7 +39,7 @@ namespace SharpConfig
             Section currentSection = null;
             var preComments = new List<Comment>();
 
-            using (var reader = new StringReader( source ))
+            using (var reader = new StringReader(source))
             {
                 string line = null;
 
@@ -56,68 +56,72 @@ namespace SharpConfig
                         continue;
 
                     int commentIndex = 0;
-                    var comment = ParseComment( line, out commentIndex );
+                    var comment = ParseComment(line, out commentIndex);
 
-                    if (commentIndex == 0)
+                    if (!mIgnorePreComments && commentIndex == 0)
                     {
                         // This is a comment line (pre-comment).
                         // Add it to the list of pre-comments.
-                        preComments.Add( comment );
+                        preComments.Add(comment);
                         continue;
                     }
-                    else if (commentIndex > 0)
+                    else if (!mIgnoreInlineComments && commentIndex > 0)
                     {
                         // Strip away the comments of this line.
-                        line = line.Remove( commentIndex ).Trim();
+                        line = line.Remove(commentIndex).Trim();
                     }
 
                     // Sections start with a '['.
-                    if (line.StartsWith( "[" ))
+                    if (line.StartsWith("["))
                     {
-                        currentSection = ParseSection( line );
-                        currentSection.Comment = comment;
-                        
+                        currentSection = ParseSection(line);
+
+                        if (!mIgnoreInlineComments)
+                            currentSection.Comment = comment;
+
                         if (config.Contains(currentSection.Name))
                         {
-                            throw new ParserException( string.Format(
+                            throw new ParserException(string.Format(
                                 "The section '{0}' was already declared in the configuration.",
-                                currentSection.Name ), mLineNumber );
+                                currentSection.Name), mLineNumber);
                         }
 
-                        if (preComments.Count > 0)
+                        if (!mIgnorePreComments && preComments.Count > 0)
                         {
-                            currentSection.mPreComments = new List<Comment>( preComments );
+                            currentSection.mPreComments = new List<Comment>(preComments);
                             preComments.Clear();
                         }
 
-                        config.mSections.Add( currentSection );
+                        config.mSections.Add(currentSection);
                     }
                     else
                     {
-                        Setting setting = ParseSetting( line );
-                        setting.Comment = comment;
-                        
+                        Setting setting = ParseSetting(line);
+
+                        if (!mIgnoreInlineComments)
+                            setting.Comment = comment;
+
                         if (currentSection == null)
                         {
-                            throw new ParserException( string.Format(
+                            throw new ParserException(string.Format(
                                 "The setting '{0}' has to be in a section.",
-                                setting.Name ), mLineNumber );
+                                setting.Name), mLineNumber);
                         }
 
-                        if (currentSection.Contains( setting.Name ))
+                        if (currentSection.Contains(setting.Name))
                         {
-                            throw new ParserException( string.Format(
+                            throw new ParserException(string.Format(
                                 "The setting '{0}' was already declared in the section.",
-                                setting.Name ), mLineNumber );
+                                setting.Name), mLineNumber);
                         }
 
-                        if (preComments.Count > 0)
+                        if (!mIgnorePreComments && preComments.Count > 0)
                         {
-                            setting.mPreComments = new List<Comment>( preComments );
+                            setting.mPreComments = new List<Comment>(preComments);
                             preComments.Clear();
                         }
 
-                        currentSection.Add( setting );
+                        currentSection.Add(setting);
                     }
 
                 }
@@ -126,7 +130,7 @@ namespace SharpConfig
             return config;
         }
 
-        private static bool IsInQuoteMarks( string line, int startIndex )
+        private static bool IsInQuoteMarks(string line, int startIndex)
         {
             // Check for quote marks.
             // Note: the way it's done here is pretty primitive.
@@ -135,109 +139,104 @@ namespace SharpConfig
             int i = startIndex;
             bool left = false;
 
-            while ( --i >= 0 )
+            while (--i >= 0)
             {
-                if ( line[i] == '\"' )
+                if (line[i] == '\"')
                 {
                     left = true;
                     break;
                 }
             }
 
-            bool right = ( line.IndexOf( '\"', startIndex ) > 0 );
+            bool right = (line.IndexOf('\"', startIndex) > 0);
 
-            if ( left && right )
-                return true;
-
-            return false;
+            return left && right;
         }
 
-        private static Comment ParseComment( string line, out int commentIndex )
+        private static Comment ParseComment(string line, out int commentIndex)
         {
-            commentIndex = line.IndexOfAny( Configuration.ValidCommentChars );
+            Comment comment = null;
+            commentIndex = -1;
 
-            if ( commentIndex < 0 )
-                return null; // This line does not contain a comment.
-
-            // Tip from MarkAJones:
-            // Database connection strings can contain semicolons, which should not be
-            // treated as comments, but rather separators.
-            // To avoid this, we have to check for two things:
-            // 1. Is the comment inside a string? If so, ignore.
-            // 2. Is the comment symbol backslashed (an escaping value)? If so, ignore also.
-
-            // If the char before the comment is a backslash, it's not a comment.
-            if ( commentIndex >= 1 && line[commentIndex - 1] == '\\' )
-                return null;
-
-            if ( IsInQuoteMarks( line, commentIndex ) )
-                return null;
-
-            var comment = new Comment(
-                value:  line.Substring( commentIndex + 1 ).Trim(),
-                symbol: ';' );
-
-            foreach ( var commentChar in Configuration.ValidCommentChars )
+            do
             {
-                if ( line[commentIndex] == commentChar )
-                {
-                    comment.Symbol = commentChar;
+                commentIndex = line.IndexOfAny(Configuration.ValidCommentChars, commentIndex+1);
+
+                if (commentIndex < 0)
                     break;
-                }
+
+                // Tip from MarkAJones:
+                // Database connection strings can contain semicolons, which should not be
+                // treated as comments, but rather separators.
+                // To avoid this, we have to check for two things:
+                // 1. Is the comment inside a string? If so, ignore.
+                // 2. Is the comment symbol backslashed (an escaping value)? If so, ignore also.
+
+                // If the char before the comment is a backslash, it's not a comment.
+                if (commentIndex >= 1 && line[commentIndex - 1] == '\\')
+                    return null;
+
+                if (IsInQuoteMarks(line, commentIndex))
+                    continue;
+
+                comment = new Comment(
+                    value: line.Substring(commentIndex + 1).Trim(),
+                    symbol: line[commentIndex]);
+
+                break;
             }
+            while (commentIndex >= 0);
 
             return comment;
         }
 
-        private static Section ParseSection( string line )
+        private static Section ParseSection(string line)
         {
             line = line.Trim();
 
-            int closingBracketIndex = line.IndexOf( ']' );
+            int closingBracketIndex = line.IndexOf(']');
 
-            if ( closingBracketIndex < 0 )
-                throw new ParserException( "closing bracket missing.", mLineNumber );
+            if (closingBracketIndex < 0)
+                throw new ParserException("closing bracket missing.", mLineNumber);
 
             // See if there are unwanted chars after the closing bracket.
-            if ( ( line.Length - 1 ) > closingBracketIndex )
+            if ((line.Length - 1) > closingBracketIndex)
             {
-                string unwantedToken = line.Substring( closingBracketIndex + 1 );
+                string unwantedToken = line.Substring(closingBracketIndex + 1);
 
-                throw new ParserException( string.Format(
-                    "unexpected token '{0}'", unwantedToken ),
-                    mLineNumber );
+                throw new ParserException(string.Format(
+                    "unexpected token '{0}'", unwantedToken),
+                    mLineNumber);
             }
 
             // Read the section name, and trim all leading / trailing white-spaces.
-            string sectionName = line.Substring( 1, line.Length - 2 ).Trim();
+            string sectionName = line.Substring(1, line.Length - 2).Trim();
 
             // Otherwise, return a fresh section.
-            return new Section( sectionName );
+            return new Section(sectionName);
         }
 
-        private static Setting ParseSetting( string line )
+        private static Setting ParseSetting(string line)
         {
             // Find the assignment operator.
-            int indexOfAssignOp = line.IndexOf( '=' );
+            int indexOfAssignOp = line.IndexOf('=');
 
-            if ( indexOfAssignOp < 0 )
-                throw new ParserException( "setting assignment expected.", mLineNumber );
+            if (indexOfAssignOp < 0)
+                throw new ParserException("setting assignment expected.", mLineNumber);
 
             // Trim the setting name and value.
-            string settingName = line.Substring( 0, indexOfAssignOp ).Trim();
-            string settingValue = line.Substring( indexOfAssignOp + 1, line.Length - indexOfAssignOp - 1 ).Trim();
+            string settingName = line.Substring(0, indexOfAssignOp).Trim();
+            string settingValue = line.Substring(indexOfAssignOp + 1, line.Length - indexOfAssignOp - 1);
+            settingValue = settingValue.Trim();
 
             // Check if non-null name / value is given.
-            if ( string.IsNullOrEmpty( settingName ) )
-                throw new ParserException( "setting name expected.", mLineNumber );
+            if (string.IsNullOrEmpty(settingName))
+                throw new ParserException("setting name expected.", mLineNumber);
 
-            if ( settingValue == null )
+            if (settingValue == null)
                 settingValue = string.Empty;
 
-            // Trim all quote marks in the value. This is done to provide a clean raw value.
-            settingValue = settingValue.Trim( '\"' );
-
-            return new Setting( settingName, settingValue );
+            return new Setting(settingName, settingValue);
         }
 
     }
