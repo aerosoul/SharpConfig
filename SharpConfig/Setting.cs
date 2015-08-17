@@ -187,10 +187,13 @@ namespace SharpConfig
                     i++;
                 }
 
-                // Read the last element.
-                values[i] = ConvertValue(
-                    mRawValue.Substring(elemIndex, mRawValue.Length - elemIndex - 1),
-                    elemType);
+                if (this.ArraySize > 0)
+                {
+                    // Read the last element.
+                    values[i] = ConvertValue(
+                        mRawValue.Substring(elemIndex, mRawValue.Length - elemIndex - 1),
+                        elemType);
+                }
 
                 return values;
             }
