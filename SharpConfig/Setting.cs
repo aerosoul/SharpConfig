@@ -1,21 +1,5 @@
-﻿/*
- * Copyright (c) 2013-2015 Cemalettin Dervis
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software
- * is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
- * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
- * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
- * OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+﻿// Copyright (c) 2013-2015 Cemalettin Dervis, MIT License.
+// https://github.com/cemdervis/SharpConfig
 
 using System;
 using System.Collections.Generic;
@@ -40,8 +24,8 @@ namespace SharpConfig
         /// <summary>
         /// Initializes a new instance of the <see cref="Setting"/> class.
         /// </summary>
-        public Setting(string name)
-            : this(name, string.Empty)
+        public Setting(string name) :
+            this(name, string.Empty)
         {
             mRawValue = string.Empty;
         }
@@ -52,8 +36,8 @@ namespace SharpConfig
         ///
         /// <param name="name"> The name of the setting.</param>
         /// <param name="value">The value of the setting.</param>
-        public Setting(string name, string value)
-            : base(name)
+        public Setting(string name, string value) :
+            base(name)
         {
             mRawValue = value;
         }
@@ -65,6 +49,56 @@ namespace SharpConfig
         /// <summary>
         /// Gets or sets the raw string value of this setting.
         /// </summary>
+        public string StringValue
+        {
+            get { return mRawValue; }
+            set { mRawValue = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the value of this setting as an int.
+        /// Note: this is a shortcut to GetValue and SetValue.
+        /// </summary>
+        public int IntValue
+        {
+            get { return GetValueTyped<int>(); }
+            set { SetValue(value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the value of this setting as a float.
+        /// Note: this is a shortcut to GetValue and SetValue.
+        /// </summary>
+        public float FloatValue
+        {
+            get { return GetValueTyped<float>(); }
+            set { SetValue(value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the value of this setting as a double.
+        /// Note: this is a shortcut to GetValue and SetValue.
+        /// </summary>
+        public double DoubleValue
+        {
+            get { return GetValueTyped<double>(); }
+            set { SetValue(value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the value of this setting as a bool.
+        /// Note: this is a shortcut to GetValue and SetValue.
+        /// </summary>
+        public bool BoolValue
+        {
+            get { return GetValueTyped<bool>(); }
+            set { SetValue(value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the raw string value of this setting.
+        /// </summary>
+        [Obsolete("The Setting.Value property is obsolete. Please use Setting.StringValue instead.", false)]
         public string Value
         {
             get { return mRawValue; }
@@ -87,122 +121,264 @@ namespace SharpConfig
         {
             get
             {
-                // First, check if we have a non-empty raw value,
-                // and whether the value is declared as an array.
-                if (string.IsNullOrEmpty(mRawValue) ||
-                    mRawValue[0] != '{' ||
-                    mRawValue[mRawValue.Length - 1] != '}')
+                if (string.IsNullOrEmpty(mRawValue))
                 {
                     return -1;
                 }
 
-                if (mRawValue[mRawValue.Length - 2] == ',')
-                    return -1;
+                string value = mRawValue.Trim();
 
-                // Is this setting an empty array? (length = 0, e.g. {})
-                if (mRawValue.Length == 2 &&
-                    (mRawValue[0] == '{' && mRawValue[1] == '}'))
+                if (value[0] != '{')
                 {
-                    return 0;
+                    return -1;
                 }
 
-                int oldCommaIndex = 0;
-                int commaIndex = mRawValue.IndexOf(',');
-                int size = 1;
+                int arraySize = 0;
+                bool isInArrayBrackets = false;
+                int lastCommaIdx = 0;
 
-                while (commaIndex >= 0)
+                for (int pos = 0; pos < value.Length; ++pos)
                 {
-                    oldCommaIndex = commaIndex;
-                    commaIndex = mRawValue.IndexOf(',', oldCommaIndex + 1);
+                    char ch = value[pos];
+                    
+                    if (ch == '{')
+                    {
+                        if (isInArrayBrackets)
+                        {
+                            return -1;
+                        }
 
-                    if (commaIndex - oldCommaIndex == 1)
+                        isInArrayBrackets = true;
+                    }
+                    else if (ch == '}')
+                    {
+                        if (pos != value.Length - 1)
+                        {
+                            return -1;
+                        }
+
+                        isInArrayBrackets = false;
+                        break;
+                    }
+                    else if (ch == ',')
+                    {
+                        bool isElementEmpty = true;
+
+                        for (int e = lastCommaIdx + 1; e < pos; ++e)
+                        {
+                            if (value[e] != ' ')
+                            {
+                                // Okay, this is a value.
+                                isElementEmpty = false;
+                                break;
+                            }
+                        }
+
+                        if (isElementEmpty)
+                        {
+                            return -1;
+                        }
+
+                        lastCommaIdx = pos;
+                        ++arraySize;
+                    }
+                }
+
+                // Check the last element value for emptiness, since our loop
+                // only considered n-1 elements.
+                if (lastCommaIdx + 1 < value.Length-1)
+                {
+                    bool isElementEmpty = true;
+
+                    for (int e = lastCommaIdx + 1; e < value.Length - 1; ++e)
+                    {
+                        if (value[e] != ' ')
+                        {
+                            isElementEmpty = false;
+                            break;
+                        }
+                    }
+
+                    if (isElementEmpty)
+                    {
                         return -1;
-
-                    size++;
+                    }
+                }
+                else
+                {
+                    return -1;
                 }
 
-                return size;
+                return arraySize + 1;
             }
         }
 
         #endregion
 
-        #region GetValue
+        #region GetValueTyped
 
         /// <summary>
         /// Gets this setting's value as a specific type.
         /// </summary>
         ///
-        /// <typeparam name="T">Generic type parameter.</typeparam>
-        public T GetValue<T>()
+        /// <typeparam name="T">The type of the object to retrieve.</typeparam>
+        public T GetValueTyped<T>()
         {
-            return (T)GetValue(typeof(T));
+            Type type = typeof(T);
+
+            if (type == null)
+            {
+                throw new ArgumentNullException("type");
+            }
+
+            if (type.IsArray)
+            {
+                throw new InvalidOperationException(
+                    "To obtain an array value, use GetValueArray instead of GetValueTyped.");
+            }
+
+            if (this.IsArray)
+            {
+                throw new InvalidOperationException(
+                    "The setting represents an array. Use GetValueArray to obtain its value.");
+            }
+
+            return (T)ConvertValue(mRawValue, type);
         }
 
         /// <summary>
         /// Gets this setting's value as a specific type.
         /// </summary>
         ///
-        /// <param name="type">The type.</param>
-        public object GetValue(Type type)
+        /// <param name="type">The type of the object to retrieve.</param>
+        public object GetValueTyped(Type type)
         {
             if (type == null)
+            {
                 throw new ArgumentNullException("type");
-
-            if (type.IsArray && !this.IsArray)
-            {
-                throw new InvalidOperationException(
-                    "Trying to get the setting's array value, but the " +
-                    "setting does not represent an array.");
-            }
-
-            if (!type.IsArray && this.IsArray)
-            {
-                throw new InvalidOperationException(
-                    "Trying to get the setting's value as a single value, " +
-                    "but the setting represents an array.");
             }
 
             if (type.IsArray)
             {
-                // Parse as an array.
-
-                Type elemType = type.GetElementType();
-
-                var values = new object[this.ArraySize];
-                int i = 0;
-
-                int elemIndex = 1;
-                int commaIndex = mRawValue.IndexOf(',');
-
-                while (commaIndex >= 0)
-                {
-                    string sub = mRawValue.Substring(elemIndex, commaIndex - elemIndex);
-
-                    values[i] = ConvertValue(sub, elemType);
-
-                    elemIndex = commaIndex + 1;
-                    commaIndex = mRawValue.IndexOf(',', elemIndex + 1);
-
-                    i++;
-                }
-
-                if (this.ArraySize > 0)
-                {
-                    // Read the last element.
-                    values[i] = ConvertValue(
-                        mRawValue.Substring(elemIndex, mRawValue.Length - elemIndex - 1),
-                        elemType);
-                }
-
-                return values;
+                throw new InvalidOperationException(
+                    "To obtain an array value, use GetValueArray instead of GetValueTyped.");
             }
-            else
+
+            if (this.IsArray)
             {
-                // Parse a single value.
-
-                return ConvertValue(mRawValue, type);
+                throw new InvalidOperationException(
+                    "The setting represents an array. Use GetValueArray to obtain its value.");
             }
+
+            return ConvertValue(mRawValue, type);
+        }
+
+        /// <summary>
+        /// Gets this setting's value as an array of a specific type.
+        /// Note: this only works if the setting represents an array.
+        /// </summary>
+        /// <typeparam name="T">
+        ///     The type of elements in the array. All values in the array are going to be converted to objects of this type.
+        ///     If the conversion of an element fails, an exception is thrown.
+        /// </typeparam>
+        /// <returns></returns>
+        public T[] GetValueArray<T>()
+        {
+            int myArraySize = this.ArraySize;
+
+            var values = new T[myArraySize];
+            int i = 0;
+
+            int elemIndex = 1;
+            int commaIndex = mRawValue.IndexOf(',');
+
+            while (commaIndex >= 0)
+            {
+                string sub = mRawValue.Substring(elemIndex, commaIndex - elemIndex);
+                sub = sub.Trim();
+
+                values[i] = (T)ConvertValue(sub, typeof(T));
+
+                elemIndex = commaIndex + 1;
+                commaIndex = mRawValue.IndexOf(',', elemIndex + 1);
+
+                i++;
+            }
+
+            if (myArraySize > 0)
+            {
+                // Read the last element.
+                values[i] = (T)ConvertValue(
+                    mRawValue.Substring(elemIndex, mRawValue.Length - elemIndex - 1),
+                    typeof(T));
+            }
+
+            return values;
+        }
+
+        /// <summary>
+        /// Gets this setting's value as an array of a specific type.
+        /// Note: this only works if the setting represents an array.
+        /// </summary>
+        /// <param name="elementType">
+        ///     The type of elements in the array. All values in the array are going to be converted to objects of this type.
+        ///     If the conversion of an element fails, an exception is thrown.
+        /// </param>
+        /// <returns></returns>
+        public object[] GetValueArray(Type elementType)
+        {
+            int myArraySize = this.ArraySize;
+
+            var values = new object[myArraySize];
+            int i = 0;
+
+            int elemIndex = 1;
+            int commaIndex = mRawValue.IndexOf(',');
+
+            while (commaIndex >= 0)
+            {
+                string sub = mRawValue.Substring(elemIndex, commaIndex - elemIndex);
+                sub = sub.Trim();
+
+                values[i] = ConvertValue(sub, elementType);
+
+                elemIndex = commaIndex + 1;
+                commaIndex = mRawValue.IndexOf(',', elemIndex + 1);
+
+                i++;
+            }
+
+            if (myArraySize > 0)
+            {
+                // Read the last element.
+                values[i] = ConvertValue(
+                    mRawValue.Substring(elemIndex, mRawValue.Length - elemIndex - 1),
+                    elementType);
+            }
+
+            return values;
+        }
+
+        /// <summary>
+        /// Gets this setting's value as a specific type.
+        /// </summary>
+        ///
+        /// <typeparam name="T">The type of the object to retrieve.</typeparam>
+        [Obsolete("The Setting.GetValue<T> method is obsolete. Please use Setting.GetValueTyped<T> instead.", false)]
+        public T GetValue<T>()
+        {
+            return GetValueTyped<T>();
+        }
+
+        /// <summary>
+        /// Gets this setting's value as a specific type.
+        /// </summary>
+        ///
+        /// <param name="type">The type of the object to retrieve.</param>
+        [Obsolete("The Setting.GetValue method is obsolete. Please use Setting.GetValueTyped instead.", false)]
+        public object GetValue(Type type)
+        {
+            return GetValueTyped(type);
         }
 
         // Converts the value of a single element to a desired type.
@@ -236,7 +412,9 @@ namespace SharpConfig
                 int indexOfLastDot = value.LastIndexOf('.');
 
                 if (indexOfLastDot >= 0)
+                {
                     value = value.Substring(indexOfLastDot + 1, value.Length - indexOfLastDot - 1).Trim();
+                }
 
                 try
                 {
@@ -269,10 +447,7 @@ namespace SharpConfig
         /// <param name="value">The value to set.</param>
         public void SetValue<T>(T value)
         {
-            if (value == null)
-                mRawValue = string.Empty;
-            else
-                mRawValue = value.ToString();
+            mRawValue = (value == null) ? string.Empty : value.ToString();
         }
 
         /// <summary>
@@ -283,7 +458,9 @@ namespace SharpConfig
         public void SetValue<T>(T[] values)
         {
             if (values == null)
+            {
                 mRawValue = string.Empty;
+            }
             else
             {
                 var strings = new string[values.Length];
@@ -302,7 +479,7 @@ namespace SharpConfig
         #region Public Methods
 
         /// <summary>
-        /// Gets a string that represents the setting. Comments not included.
+        /// Gets a string that represents the setting, not including comments.
         /// </summary>
         public override string ToString()
         {

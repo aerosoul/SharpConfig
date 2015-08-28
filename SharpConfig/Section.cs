@@ -1,21 +1,5 @@
-﻿/*
- * Copyright (c) 2013-2015 Cemalettin Dervis
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software
- * is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
- * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
- * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
- * OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+﻿// Copyright (c) 2013-2015 Cemalettin Dervis, MIT License.
+// https://github.com/cemdervis/SharpConfig
 
 using System;
 using System.Collections;
@@ -40,6 +24,48 @@ namespace SharpConfig
             : base(name)
         {
             mSettings = new List<Setting>();
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="Section"/> class that is
+        /// based on an existing object.
+        /// Important: the section is built only from the public getter properties
+        /// of its type. When this method is called, all of those properties will be called
+        /// once to obtain their values.
+        /// </summary>
+        /// <param name="name">The name of the section.</param>
+        /// <param name="obj"></param>
+        /// <returns>The newly created section.</returns>
+        public static Section FromObject<T>(string name, T obj)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("The section name must not be null or empty.", "name");
+            }
+
+            if (obj == null)
+            {
+                throw new ArgumentNullException("obj", "obj must not be null.");
+            }
+
+            Section section = new Section(name);
+
+            Type type = typeof(T);
+
+            foreach (var prop in type.GetProperties())
+            {
+                if (!prop.CanRead)
+                {
+                    continue;
+                }
+
+                object propValue = prop.GetValue(obj, null);
+                Setting setting = new Setting(prop.Name, propValue != null ? propValue.ToString() : "");
+
+                section.mSettings.Add(setting);
+            }
+
+            return section;
         }
 
         /// <summary>
@@ -81,7 +107,9 @@ namespace SharpConfig
         public void MapTo<T>(T obj) where T : class
         {
             if (obj == null)
+            {
                 throw new ArgumentNullException("obj");
+            }
 
             Type type = typeof(T);
 
@@ -90,13 +118,15 @@ namespace SharpConfig
             foreach (var prop in properties)
             {
                 if (!prop.CanWrite)
+                {
                     continue;
+                }
 
                 var setting = GetSetting(prop.Name);
 
                 if (setting != null)
                 {
-                    object value = setting.GetValue(prop.PropertyType);
+                    object value = setting.GetValueTyped(prop.PropertyType);
 
                     prop.SetValue(obj, value, null);
                 }
@@ -126,7 +156,9 @@ namespace SharpConfig
         public void Add(Setting setting)
         {
             if (setting == null)
+            {
                 throw new ArgumentNullException("setting");
+            }
 
             if (Contains(setting))
             {
@@ -171,7 +203,9 @@ namespace SharpConfig
         public void Remove(string settingName)
         {
             if (string.IsNullOrEmpty(settingName))
+            {
                 throw new ArgumentNullException("settingName");
+            }
 
             var setting = GetSetting(settingName);
 
@@ -219,14 +253,18 @@ namespace SharpConfig
             get
             {
                 if (index < 0 || index >= mSettings.Count)
+                {
                     throw new ArgumentOutOfRangeException("index");
+                }
 
                 return mSettings[index];
             }
             set
             {
                 if (index < 0 || index >= mSettings.Count)
+                {
                     throw new ArgumentOutOfRangeException("index");
+                }
 
                 mSettings[index] = value;
             }

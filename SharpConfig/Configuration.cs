@@ -1,21 +1,5 @@
-﻿/*
- * Copyright (c) 2013-2015 Cemalettin Dervis
- * Permission is hereby granted, free of charge, to any person obtaining
- * a copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software
- * is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
- * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
- * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
- * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE
- * OR OTHER DEALINGS IN THE SOFTWARE.
-*/
+﻿// Copyright (c) 2013-2015 Cemalettin Dervis, MIT License.
+// https://github.com/cemdervis/SharpConfig
 
 using System;
 using System.Collections;
@@ -201,17 +185,19 @@ namespace SharpConfig
         /// </returns>
         public static Configuration LoadFromFile(string filename, Encoding encoding)
         {
+            if (string.IsNullOrEmpty(filename))
+            {
+                throw new ArgumentNullException("filename");
+            }
+
             if (!File.Exists(filename))
+            {
                 throw new FileNotFoundException("Configuration file not found.", filename);
+            }
 
-            Configuration cfg = null;
-
-            if (encoding == null)
-                cfg = LoadFromText(File.ReadAllText(filename));
-            else
-                cfg = LoadFromText(File.ReadAllText(filename, encoding));
-
-            return cfg;
+            return encoding == null ?
+                LoadFromString(File.ReadAllText(filename)) :
+                LoadFromString(File.ReadAllText(filename, encoding));
         }
 
         /// <summary>
@@ -242,12 +228,15 @@ namespace SharpConfig
         public static Configuration LoadFromStream(Stream stream, Encoding encoding)
         {
             if (stream == null)
+            {
                 throw new ArgumentNullException("stream");
+            }
 
             string source = null;
 
             var reader = encoding == null ?
-                new StreamReader(stream) : new StreamReader(stream, encoding);
+                new StreamReader(stream) :
+                new StreamReader(stream, encoding);
 
             using (reader)
             {
@@ -255,24 +244,46 @@ namespace SharpConfig
                 reader.Close();
             }
 
-            return LoadFromText(source);
+            return LoadFromString(source);
         }
 
         /// <summary>
         /// Loads a configuration from text (source code).
         /// </summary>
         ///
-        /// <param name="source">   The text (source code) of the configuration.</param>
+        /// <param name="source">The text (source code) of the configuration.</param>
         ///
         /// <returns>
         /// The loaded <see cref="Configuration"/> object.
         /// </returns>
+        public static Configuration LoadFromString(string source)
+        {
+            if (string.IsNullOrEmpty(source))
+            {
+                throw new ArgumentNullException("source");
+            }
+
+            return Parse(source);
+        }
+
+        /// <summary>
+        /// Loads a configuration from text (source code).
+        /// </summary>
+        ///
+        /// <param name="source">The text (source code) of the configuration.</param>
+        ///
+        /// <returns>
+        /// The loaded <see cref="Configuration"/> object.
+        /// </returns>
+        [Obsolete("The Configuration.LoadFromText method is obsolete. Please use Configuration.LoadFromString instead.", false)]
         public static Configuration LoadFromText(string source)
         {
             if (string.IsNullOrEmpty(source))
+            {
                 throw new ArgumentNullException("source");
+            }
 
-            return Parse(source);
+            return LoadFromString(source);
         }
 
         #endregion
@@ -288,10 +299,32 @@ namespace SharpConfig
         /// <returns>
         /// The loaded configuration.
         /// </returns>
+        public static Configuration LoadFromBinaryFile(string filename)
+        {
+            if (string.IsNullOrEmpty(filename))
+            {
+                throw new ArgumentNullException("filename");
+            }
+
+            return DeserializeBinary(null, filename);
+        }
+
+        /// <summary>
+        /// Loads a configuration from a binary file using the <b>default</b> <see cref="BinaryReader"/>.
+        /// </summary>
+        ///
+        /// <param name="filename">The location of the configuration file.</param>
+        ///
+        /// <returns>
+        /// The loaded configuration.
+        /// </returns>
+        [Obsolete("The Configuration.LoadBinary method is obsolete. Please use Configuration.LoadFromBinaryFile instead.", false)]
         public static Configuration LoadBinary(string filename)
         {
             if (string.IsNullOrEmpty(filename))
+            {
                 throw new ArgumentNullException("filename");
+            }
 
             return DeserializeBinary(null, filename);
         }
@@ -306,10 +339,33 @@ namespace SharpConfig
         /// <returns>
         /// The loaded configuration.
         /// </returns>
+        public static Configuration LoadFromBinaryFile(string filename, BinaryReader reader)
+        {
+            if (string.IsNullOrEmpty(filename))
+            {
+                throw new ArgumentNullException("filename");
+            }
+
+            return DeserializeBinary(reader, filename);
+        }
+
+        /// <summary>
+        /// Loads a configuration from a binary file using a specific <see cref="BinaryReader"/>.
+        /// </summary>
+        ///
+        /// <param name="filename">The location of the configuration file.</param>
+        /// <param name="reader">  The reader to use. Specify null to use the default <see cref="BinaryReader"/>.</param>
+        ///
+        /// <returns>
+        /// The loaded configuration.
+        /// </returns>
+        [Obsolete("The Configuration.LoadBinary method is obsolete. Please use Configuration.LoadFromBinaryFile instead.", false)]
         public static Configuration LoadBinary(string filename, BinaryReader reader)
         {
             if (string.IsNullOrEmpty(filename))
+            {
                 throw new ArgumentNullException("filename");
+            }
 
             return DeserializeBinary(reader, filename);
         }
@@ -323,10 +379,32 @@ namespace SharpConfig
         /// <returns>
         /// The loaded configuration.
         /// </returns>
+        public static Configuration LoadFromBinaryStream(Stream stream)
+        {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+
+            return DeserializeBinary(null, stream);
+        }
+
+        /// <summary>
+        /// Loads a configuration from a binary stream, using the <b>default</b> <see cref="BinaryReader"/>.
+        /// </summary>
+        ///
+        /// <param name="stream">The stream to load the configuration from.</param>
+        ///
+        /// <returns>
+        /// The loaded configuration.
+        /// </returns>
+        [Obsolete("The Configuration.LoadBinary(Stream) method is obsolete. Please use Configuration.LoadFromBinaryStream instead.", false)]
         public static Configuration LoadBinary(Stream stream)
         {
             if (stream == null)
+            {
                 throw new ArgumentNullException("stream");
+            }
 
             return DeserializeBinary(null, stream);
         }
@@ -341,10 +419,33 @@ namespace SharpConfig
         /// <returns>
         /// The loaded configuration.
         /// </returns>
+        public static Configuration LoadFromBinaryStream(Stream stream, BinaryReader reader)
+        {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+
+            return DeserializeBinary(reader, stream);
+        }
+
+        /// <summary>
+        /// Loads a configuration from a binary stream, using a specific <see cref="BinaryReader"/>.
+        /// </summary>
+        ///
+        /// <param name="stream">The stream to load the configuration from.</param>
+        /// <param name="reader">The reader to use. Specify null to use the default <see cref="BinaryReader"/>.</param>
+        ///
+        /// <returns>
+        /// The loaded configuration.
+        /// </returns>
+        [Obsolete("The Configuration.LoadBinary(Stream) method is obsolete. Please use Configuration.LoadFromBinaryStream instead.", false)]
         public static Configuration LoadBinary(Stream stream, BinaryReader reader)
         {
             if (stream == null)
+            {
                 throw new ArgumentNullException("stream");
+            }
 
             return DeserializeBinary(reader, stream);
         }
@@ -358,6 +459,17 @@ namespace SharpConfig
         /// </summary>
         ///
         /// <param name="filename">The location of the configuration file.</param>
+        public void SaveToFile(string filename)
+        {
+            SaveToFile(filename, null);
+        }
+
+        /// <summary>
+        /// Saves the configuration to a file using the default character encoding, which is UTF8.
+        /// </summary>
+        ///
+        /// <param name="filename">The location of the configuration file.</param>
+        [Obsolete("The Configuration.Save method is obsolete. Please use Configuration.SaveToFile instead.", false)]
         public void Save(string filename)
         {
             Save(filename, null);
@@ -369,10 +481,29 @@ namespace SharpConfig
         ///
         /// <param name="filename">The location of the configuration file.</param>
         /// <param name="encoding">The character encoding to use. Specify null to use the default encoding, which is UTF8.</param>
+        public void SaveToFile(string filename, Encoding encoding)
+        {
+            if (string.IsNullOrEmpty(filename))
+            {
+                throw new ArgumentNullException("filename");
+            }
+
+            Serialize(filename, encoding);
+        }
+
+        /// <summary>
+        /// Saves the configuration to a file.
+        /// </summary>
+        ///
+        /// <param name="filename">The location of the configuration file.</param>
+        /// <param name="encoding">The character encoding to use. Specify null to use the default encoding, which is UTF8.</param>
+        [Obsolete("The Configuration.Save method is obsolete. Please use Configuration.SaveToFile instead.", false)]
         public void Save(string filename, Encoding encoding)
         {
             if (string.IsNullOrEmpty(filename))
+            {
                 throw new ArgumentNullException("filename");
+            }
 
             Serialize(filename, encoding);
         }
@@ -382,9 +513,20 @@ namespace SharpConfig
         /// </summary>
         ///
         /// <param name="stream">The stream to save the configuration to.</param>
+        public void SaveToStream(Stream stream)
+        {
+            SaveToStream(stream, null);
+        }
+
+        /// <summary>
+        /// Saves the configuration to a stream using the default character encoding, which is UTF8.
+        /// </summary>
+        ///
+        /// <param name="stream">The stream to save the configuration to.</param>
+        [Obsolete("The Configuration.Save(Stream) method is obsolete. Please use Configuration.SaveToStream instead.", false)]
         public void Save(Stream stream)
         {
-            Save(stream, null);
+            SaveToStream(stream, null);
         }
 
         /// <summary>
@@ -393,10 +535,29 @@ namespace SharpConfig
         ///
         /// <param name="stream">The stream to save the configuration to.</param>
         /// <param name="encoding">The character encoding to use. Specify null to use the default encoding, which is UTF8.</param>
+        public void SaveToStream(Stream stream, Encoding encoding)
+        {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+
+            Serialize(stream, encoding);
+        }
+
+        /// <summary>
+        /// Saves the configuration to a stream.
+        /// </summary>
+        ///
+        /// <param name="stream">The stream to save the configuration to.</param>
+        /// <param name="encoding">The character encoding to use. Specify null to use the default encoding, which is UTF8.</param>
+        [Obsolete("The Configuration.Save(Stream) method is obsolete. Please use Configuration.SaveToStream instead.", false)]
         public void Save(Stream stream, Encoding encoding)
         {
             if (stream == null)
+            {
                 throw new ArgumentNullException("stream");
+            }
 
             Serialize(stream, encoding);
         }
@@ -410,9 +571,20 @@ namespace SharpConfig
         /// </summary>
         ///
         /// <param name="filename">The location of the configuration file.</param>
+        public void SaveBinaryToFile(string filename)
+        {
+            SaveBinaryToFile(filename, null);
+        }
+
+        /// <summary>
+        /// Saves the configuration to a binary file, using the default <see cref="BinaryWriter"/>.
+        /// </summary>
+        ///
+        /// <param name="filename">The location of the configuration file.</param>
+        [Obsolete("The Configuration.SaveBinary method is obsolete. Please use Configuration.SaveBinaryToFile instead.", false)]
         public void SaveBinary(string filename)
         {
-            SaveBinary(filename, null);
+            SaveBinaryToFile(filename, null);
         }
 
         /// <summary>
@@ -421,10 +593,29 @@ namespace SharpConfig
         ///
         /// <param name="filename">The location of the configuration file.</param>
         /// <param name="writer">  The writer to use. Specify null to use the default writer.</param>
+        public void SaveBinaryToFile(string filename, BinaryWriter writer)
+        {
+            if (string.IsNullOrEmpty(filename))
+            {
+                throw new ArgumentNullException("filename");
+            }
+
+            SerializeBinary(writer, filename);
+        }
+
+        /// <summary>
+        /// Saves the configuration to a binary file, using a specific <see cref="BinaryWriter"/>.
+        /// </summary>
+        ///
+        /// <param name="filename">The location of the configuration file.</param>
+        /// <param name="writer">  The writer to use. Specify null to use the default writer.</param>
+        [Obsolete("The Configuration.SaveBinary method is obsolete. Please use Configuration.SaveBinaryToFile instead.", false)]
         public void SaveBinary(string filename, BinaryWriter writer)
         {
             if (string.IsNullOrEmpty(filename))
+            {
                 throw new ArgumentNullException("filename");
+            }
 
             SerializeBinary(writer, filename);
         }
@@ -434,9 +625,20 @@ namespace SharpConfig
         /// </summary>
         ///
         /// <param name="stream">The stream to save the configuration to.</param>
+        public void SaveBinaryToStream(Stream stream)
+        {
+            SaveBinaryToStream(stream, null);
+        }
+
+        /// <summary>
+        /// Saves the configuration to a binary stream, using the default <see cref="BinaryWriter"/>.
+        /// </summary>
+        ///
+        /// <param name="stream">The stream to save the configuration to.</param>
+        [Obsolete("The Configuration.SaveBinary(Stream) method is obsolete. Please use Configuration.SaveBinaryToStream instead.", false)]
         public void SaveBinary(Stream stream)
         {
-            SaveBinary(stream, null);
+            SaveBinaryToStream(stream, null);
         }
 
         /// <summary>
@@ -445,10 +647,29 @@ namespace SharpConfig
         ///
         /// <param name="stream">The stream to save the configuration to.</param>
         /// <param name="writer">The writer to use. Specify null to use the default writer.</param>
+        public void SaveBinaryToStream(Stream stream, BinaryWriter writer)
+        {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+
+            SerializeBinary(writer, stream);
+        }
+
+        /// <summary>
+        /// Saves the configuration to a binary file, using a specific <see cref="BinaryWriter"/>.
+        /// </summary>
+        ///
+        /// <param name="stream">The stream to save the configuration to.</param>
+        /// <param name="writer">The writer to use. Specify null to use the default writer.</param>
+        [Obsolete("The Configuration.SaveBinary(Stream) method is obsolete. Please use Configuration.SaveBinaryToStream instead.", false)]
         public void SaveBinary(Stream stream, BinaryWriter writer)
         {
             if (stream == null)
+            {
                 throw new ArgumentNullException("stream");
+            }
 
             SerializeBinary(writer, stream);
         }
@@ -532,14 +753,18 @@ namespace SharpConfig
             get
             {
                 if (index < 0 || index >= mSections.Count)
+                {
                     throw new ArgumentOutOfRangeException("index");
+                }
 
                 return mSections[index];
             }
             set
             {
                 if (index < 0 || index >= mSections.Count)
+                {
                     throw new ArgumentOutOfRangeException("index");
+                }
 
                 mSections[index] = value;
             }
@@ -571,12 +796,18 @@ namespace SharpConfig
             }
             set
             {
+                if (string.IsNullOrEmpty(name))
+                {
+                    throw new ArgumentNullException("name", "The section name must not be null or empty.");
+                }
+
                 if (value == null)
-                    throw new ArgumentNullException("value");
+                {
+                    throw new ArgumentNullException("value", "The specified value must not be null.");
+                }
 
                 // Check if there already is a section by that name.
                 var section = GetSection(name);
-
                 int settingIndex = section != null ? mSections.IndexOf(section) : -1;
 
                 if (settingIndex < 0)
@@ -592,12 +823,24 @@ namespace SharpConfig
             }
         }
 
+        private Section GetSection(int index)
+        {
+            if (index < 0 || index >= mSections.Count)
+            {
+                throw new ArgumentOutOfRangeException("index");
+            }
+
+            return mSections[index];
+        }
+
         private Section GetSection(string name)
         {
             foreach (var section in mSections)
             {
                 if (string.Equals(section.Name, name, StringComparison.OrdinalIgnoreCase))
+                {
                     return section;
+                }
             }
 
             return null;
