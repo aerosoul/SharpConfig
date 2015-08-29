@@ -18,6 +18,7 @@ You can install SharpConfig via the following NuGet command:
 
 An example Configuration
 ---
+
 ```cfg
 [General]
 # a comment
@@ -29,12 +30,12 @@ ABoolean = true
 
 To read these values, your C# code would look like:
 ```csharp
-Configuration config = Configuration.LoadFromFile( "sample.cfg" );
+Configuration config = Configuration.LoadFromFile("sample.cfg");
 Section section = config["General"];
 
-string someString = section["SomeString"].Value;
-int someInteger = section["SomeInteger"].GetValue<int>();
-float someFloat = section["SomeFloat"].GetValue<float>();
+string someString = section["SomeString"].StringValue;
+int someInteger = section["SomeInteger"].IntValue;
+float someFloat = section["SomeFloat"].FloatValue.
 ```
 
 Enumerations
@@ -47,11 +48,11 @@ For example you have a configuration like this:
 Day = Monday
 ```
 
-It is now possible to read this value as a System.DayOfWeek enum, because Monday is present there.
+It is now possible to read this value as a System.DayOfWeek enum, because **Monday** is present there.
 An example of how to read it:
 
 ```csharp
-DayOfWeek day = config["DateInfo"]["Day"].GetValue<DayOfWeek>();
+DayOfWeek day = config["DateInfo"]["Day"].GetValueTyped<DayOfWeek>();
 ```
 
 Arrays
@@ -68,7 +69,9 @@ This array can be interpreted as any type array that can be converted from 0, 2,
 
 Reading this array is simple:
 ```csharp
-object[] myArray = config["General"]["MyArray"].GetValue<object[]>();
+string[] stringArray = config["General"]["MyArray"].GetValueArray<string>();
+int[] intArray = config["General"]["MyArray"].GetValueArray<int>();
+// ...
 ```
 
 Creating a Configuration in-memory
@@ -80,22 +83,28 @@ var myConfig = new Configuration();
 
 // Set some values.
 // This will automatically create the sections and settings.
-myConfig["Video"]["Width"].Value = "1920";
-myConfig["Video"]["Height"].Value = "1080";
+myConfig["Video"]["Width"].IntValue = 1920;
+myConfig["Video"]["Height"].IntValue = 1080;
 
 // Set an array value.
 myConfig["Video"]["Formats"].SetValue( new string[] { "RGB32", "RGBA32" } );
+
+// Get the values just to test.
+int width = myConfig["Video"]["Width"].IntValue;
+int height = myConfig["Video"]["Height"].IntValue;
+string[] formats = myConfig["Video"]["Formats"].GetValueArray<string>();
+// ...
 ```
 
 Iterating through a Configuration
 ---
 
 ```csharp
-foreach ( var section in myConfig )
+foreach (var section in myConfig)
 {
-    foreach ( var setting in section )
+    foreach (var setting in section)
     {
-        ...
+        // ...
     }
 }
 ```
@@ -104,10 +113,10 @@ Saving a Configuration
 ---
 
 ```csharp
-myConfig.Save( "myConfig.cfg" ); // Save to a text-based file.
-myConfig.Save( myStream ); // Save to a text-based stream.
-myConfig.SaveBinary( "myConfig.cfg" ); // Save to a binary file.
-myConfig.SaveBinary( myStream ); // Save to a binary stream.
+myConfig.SaveToFile("myConfig.cfg");        // Save to a text-based file.
+myConfig.SaveToStream(myStream);            // Save to a text-based stream.
+myConfig.SaveBinaryToFile("myConfig.cfg");  // Save to a binary file.
+myConfig.SaveBinaryToStream(myStream);      // Save to a binary stream.
 ```
 
 Object Mapping
