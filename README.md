@@ -151,7 +151,20 @@ Like this:
 Person person = config["Person"].CreateObject<Person>();
 ```
 
-Note: The mapping only works on classes, public properties and primitive data types (int, bool, enums ...).
+You can also create a section from objects. Let's create a section out of the
+Person object above:
+```csharp
+Section section = Section.FromObject("Person", person);
+```
+
+The first parameter is the name of the section. You can choose this freely, but it must not be empty.
+The second parameter specifies the object that is used to create the section.
+After this, the section would look exactly like the [Person] section above.
+
+**Note**: Creating objects from sections uses the type's public property getters and setters.
+It uses string conversion for every type, so if you use a custom (complex) type, please ensure
+that it can be created from a string and also returns an appropriate string from its ToString method.
+Otherwise, if you just use primitive types such as int, float, bool, enums or strings, it just works.
 
 If you already have a Person object and don't want to create a new one, you can use the MapTo method:
 ```csharp
