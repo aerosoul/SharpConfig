@@ -8,7 +8,16 @@ to read, modify and save configuration files and streams, in either text or bina
 > If SharpConfig has helped you and you feel like donating, [feel free](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=WWN94LMDN5HMC)!
 > Donations help to keep the development of SharpConfig active.
 
-A configuration file example:
+Installing via NuGet
+---
+You can install SharpConfig via the following NuGet command:
+> Install-Package sharpconfig
+[NuGet Page](https://www.nuget.org/packages/sharpconfig/)
+
+
+
+An example Configuration
+---
 ```cfg
 [General]
 # a comment
@@ -104,7 +113,7 @@ myConfig.SaveBinary( myStream ); // Save to a binary stream.
 Object Mapping
 ---
 
-A nice-to-have in SharpConfig is the mapping of sections to objects.
+A nice-to-have in SharpConfig is the mapping of sections to objects and vice versa.
 If you have a class and enumeration in C# like this:
 ```csharp
 class Person
@@ -140,11 +149,6 @@ If you already have a Person object and don't want to create a new one, you can 
 config["Person"].MapTo(person);
 ```
 
-Installing via NuGet
+More examples
 ---
-
-You can install SharpConfig via the following NuGet command:
-> Install-Package sharpconfig
-
-
-[NuGet Page](https://www.nuget.org/packages/sharpconfig/)
+For more examples and how to use SharpConfig, please look at the [Example application](https://github.com/cemdervis/SharpConfig/blob/master/Example/Program.cs).
