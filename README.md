@@ -166,6 +166,7 @@ It uses string conversion for every type, so if you use a custom (complex) type,
 that it can be created from a string and also returns an appropriate string from its ToString method.
 Otherwise, if you just use primitive types such as int, float, bool, enums or strings, it just works.
 
+
 If you already have a Person object and don't want to create a new one, you can use the MapTo method:
 ```csharp
 config["Person"].MapTo(person);
