@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Reflection;
 
 namespace SharpConfig
 {
@@ -30,8 +31,9 @@ namespace SharpConfig
         /// Creates a new instance of the <see cref="Section"/> class that is
         /// based on an existing object.
         /// Important: the section is built only from the public getter properties
-        /// of its type. When this method is called, all of those properties will be called
-        /// once to obtain their values.
+        /// and fields of its type.
+        /// When this method is called, all of those properties will be called
+        /// and fields accessed once to obtain their values.
         /// </summary>
         /// <param name="name">The name of the section.</param>
         /// <param name="obj"></param>
@@ -52,7 +54,7 @@ namespace SharpConfig
 
             Type type = typeof(T);
 
-            foreach (var prop in type.GetProperties())
+            foreach (var prop in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
                 if (!prop.CanRead)
                 {
@@ -65,12 +67,21 @@ namespace SharpConfig
                 section.mSettings.Add(setting);
             }
 
+            // Repeat for each public field.
+            foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public))
+            {
+                object fieldValue = field.GetValue(obj);
+                Setting setting = new Setting(field.Name, fieldValue != null ? fieldValue.ToString() : "");
+
+                section.mSettings.Add(setting);
+            }
+
             return section;
         }
 
         /// <summary>
         /// Creates an object of a specific type, and maps the settings
-        /// in this section to the public properties of the object.
+        /// in this section to the public properties and writable fields of the object.
         /// </summary>
         /// 
         /// <returns>The created object.</returns>
@@ -86,7 +97,6 @@ namespace SharpConfig
             try
             {
                 T obj = Activator.CreateInstance<T>();
-
                 MapTo(obj);
 
                 return obj;
@@ -100,7 +110,7 @@ namespace SharpConfig
         }
 
         /// <summary>
-        /// Assigns the values of this section to an object's public properties.
+        /// Assigns the values of this section to an object's public properties and fields.
         /// </summary>
         /// 
         /// <param name="obj">The object that is modified based on the section.</param>
@@ -113,9 +123,8 @@ namespace SharpConfig
 
             Type type = typeof(T);
 
-            var properties = type.GetProperties();
-
-            foreach (var prop in properties)
+            // Properties.
+            foreach (var prop in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
                 if (!prop.CanWrite)
                 {
@@ -127,8 +136,25 @@ namespace SharpConfig
                 if (setting != null)
                 {
                     object value = setting.GetValueTyped(prop.PropertyType);
-
                     prop.SetValue(obj, value, null);
+                }
+            }
+
+            // Fields.
+            foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public))
+            {
+                // Skip readonly fields.
+                if (field.IsInitOnly)
+                {
+                    continue;
+                }
+
+                var setting = GetSetting(field.Name);
+
+                if (setting != null)
+                {
+                    object value = setting.GetValueTyped(field.FieldType);
+                    field.SetValue(obj, value);
                 }
             }
         }

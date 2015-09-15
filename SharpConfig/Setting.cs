@@ -96,16 +96,6 @@ namespace SharpConfig
         }
 
         /// <summary>
-        /// Gets or sets the raw string value of this setting.
-        /// </summary>
-        [Obsolete("The Setting.Value property is obsolete. Please use Setting.StringValue instead.", false)]
-        public string Value
-        {
-            get { return mRawValue; }
-            set { mRawValue = value; }
-        }
-
-        /// <summary>
         /// Gets a value indicating whether this setting is an array.
         /// </summary>
         public bool IsArray
@@ -357,28 +347,6 @@ namespace SharpConfig
             }
 
             return values;
-        }
-
-        /// <summary>
-        /// Gets this setting's value as a specific type.
-        /// </summary>
-        ///
-        /// <typeparam name="T">The type of the object to retrieve.</typeparam>
-        [Obsolete("The Setting.GetValue<T> method is obsolete. Please use Setting.GetValueTyped<T> instead.", false)]
-        public T GetValue<T>()
-        {
-            return GetValueTyped<T>();
-        }
-
-        /// <summary>
-        /// Gets this setting's value as a specific type.
-        /// </summary>
-        ///
-        /// <param name="type">The type of the object to retrieve.</param>
-        [Obsolete("The Setting.GetValue method is obsolete. Please use Setting.GetValueTyped instead.", false)]
-        public object GetValue(Type type)
-        {
-            return GetValueTyped(type);
         }
 
         // Converts the value of a single element to a desired type.

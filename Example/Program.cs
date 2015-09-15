@@ -9,6 +9,7 @@ namespace Example
     {
         public string Name { get; set; }
         public int Age { get; set; }
+        public int SomeField;
     }
 
     class Program
@@ -71,6 +72,7 @@ namespace Example
 
             cfg["Person"]["Name"].SetValue("Peter");
             cfg["Person"]["Age"].SetValue(50);
+            cfg["Person"]["SomeField"].SetValue(10);
 
             // We can obtain the values directly as strings, ints, floats, or any other (custom) type,
             // as long as the string value of the setting can be converted to the type you wish to obtain.
@@ -91,6 +93,7 @@ namespace Example
 
             cfg["Person"]["Name"].SetValue("Peter");
             cfg["Person"]["Age"].SetValue(50);
+            cfg["Person"]["SomeField"].SetValue(10);
 
             cfg.SaveToFile(filename);
         }
@@ -105,13 +108,15 @@ namespace Example
             // Create the section.
             cfg["Person"]["Name"].SetValue("Peter");
             cfg["Person"]["Age"].SetValue(50);
+            cfg["Person"]["SomeField"].SetValue(10);
 
             // Now create an object from it.
             Person p = cfg["Person"].CreateObject<Person>();
 
             // Test.
-            Console.WriteLine("Name: " + p.Name);
-            Console.WriteLine("Age : " + p.Age);
+            Console.WriteLine("Name:      " + p.Name);
+            Console.WriteLine("Age :      " + p.Age);
+            Console.WriteLine("SomeField: " + p.SomeField);
         }
 
         /// <summary>
@@ -125,6 +130,7 @@ namespace Example
             Person p = new Person();
             p.Name = "Peter";
             p.Age = 50;
+            p.SomeField = 10;
 
             // Now create a section from it.
             Section section = Section.FromObject("Person Section", p);
