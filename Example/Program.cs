@@ -10,13 +10,24 @@ namespace Example
         public string Name { get; set; }
         public int Age { get; set; }
         public int SomeField;
+
+        // This field will be ignored by SharpConfig
+        // when creating sections from objects and vice versa.
+        [SharpConfig.Ignore]
+        public int SomeIgnoredField = 0;
+
+        // Same for this property.
+        [SharpConfig.Ignore]
+        public int SomeIgnoredProperty { get; set; }
     }
 
     class Program
     {
         static void Main(string[] args)
         {
+            // Call other methods in this file here to see their effect.
             HowToLoadAConfig();
+
             Console.WriteLine("Hi, please take a look at the methods below");
             Console.WriteLine("to get an understanding of how to use SharpConfig!");
             Console.ReadLine();

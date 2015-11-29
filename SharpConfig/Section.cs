@@ -34,6 +34,8 @@ namespace SharpConfig
         /// and fields of its type.
         /// When this method is called, all of those properties will be called
         /// and fields accessed once to obtain their values.
+        /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
+        /// or are of a type that is marked with that attribute, are ignored.
         /// </summary>
         /// <param name="name">The name of the section.</param>
         /// <param name="obj"></param>
@@ -50,14 +52,14 @@ namespace SharpConfig
                 throw new ArgumentNullException("obj", "obj must not be null.");
             }
 
-            Section section = new Section(name);
-
-            Type type = typeof(T);
+            var section = new Section(name);
+            var type = typeof(T);
 
             foreach (var prop in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                if (!prop.CanRead)
+                if (!prop.CanRead || ShouldIgnoreMappingFor(prop))
                 {
+                    // Skip this property, as it can't be read from.
                     continue;
                 }
 
@@ -70,6 +72,12 @@ namespace SharpConfig
             // Repeat for each public field.
             foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public))
             {
+                if (ShouldIgnoreMappingFor(field))
+                {
+                    // Skip this field.
+                    continue;
+                }
+
                 object fieldValue = field.GetValue(obj);
                 Setting setting = new Setting(field.Name, fieldValue != null ? fieldValue.ToString() : "");
 
@@ -82,6 +90,8 @@ namespace SharpConfig
         /// <summary>
         /// Creates an object of a specific type, and maps the settings
         /// in this section to the public properties and writable fields of the object.
+        /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
+        /// or are of a type that is marked with that attribute, are ignored.
         /// </summary>
         /// 
         /// <returns>The created object.</returns>
@@ -109,8 +119,34 @@ namespace SharpConfig
             }
         }
 
+        private static bool ShouldIgnoreMappingFor(MemberInfo member)
+        {
+            if (member.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0)
+            {
+                return true;
+            }
+            else
+            {
+                PropertyInfo prop = member as PropertyInfo;
+                if (prop != null)
+                {
+                    return prop.PropertyType.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0;
+                }
+
+                FieldInfo field = member as FieldInfo;
+                if (field!= null)
+                {
+                    return field.FieldType.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0;
+                }
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Assigns the values of this section to an object's public properties and fields.
+        /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
+        /// or are of a type that is marked with that attribute, are ignored.
         /// </summary>
         /// 
         /// <param name="obj">The object that is modified based on the section.</param>
@@ -123,10 +159,10 @@ namespace SharpConfig
 
             Type type = typeof(T);
 
-            // Properties.
+            // Scan the type's properties.
             foreach (var prop in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                if (!prop.CanWrite)
+                if (!prop.CanWrite || ShouldIgnoreMappingFor(prop))
                 {
                     continue;
                 }
@@ -140,11 +176,11 @@ namespace SharpConfig
                 }
             }
 
-            // Fields.
+            // Scan the type's fields.
             foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public))
             {
                 // Skip readonly fields.
-                if (field.IsInitOnly)
+                if (field.IsInitOnly || ShouldIgnoreMappingFor(field))
                 {
                     continue;
                 }
