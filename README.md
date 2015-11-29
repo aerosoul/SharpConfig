@@ -119,6 +119,7 @@ int[] intArray = config["General"]["MyArray"].GetValueArray<int>();
 // ...
 ```
 
-More examples
+More
 ---
-For more examples and how to use SharpConfig, please look at the [Example application](https://github.com/cemdervis/SharpConfig/blob/master/Example/Program.cs).
+For more details and advanced features, please visit the [Wiki](https://github.com/cemdervis/SharpConfig/wiki).
+There are also use case example available in the [Example File](https://github.com/cemdervis/SharpConfig/blob/master/Example/Program.cs).
