@@ -4,6 +4,7 @@ SharpConfig is an easy-to-use CFG/INI configuration library for .NET.
 
 You can use SharpConfig in your .NET applications to add the functionality
 to read, modify and save configuration files and streams, in either text or binary format.
+The library is backward compatible up to .NET 2.0.
 
 > If SharpConfig has helped you and you feel like donating, [feel free](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=WWN94LMDN5HMC)!
 > Donations help to keep the development of SharpConfig active.
@@ -38,6 +39,19 @@ int someInteger = section["SomeInteger"].IntValue;
 float someFloat = section["SomeFloat"].FloatValue.
 ```
 
+Iterating through a Configuration
+---
+
+```csharp
+foreach (var section in myConfig)
+{
+    foreach (var setting in section)
+    {
+        // ...
+    }
+}
+```
+
 Creating a Configuration in-memory
 ---
 
@@ -60,19 +74,6 @@ string[] formats = myConfig["Video"]["Formats"].GetValueArray<string>();
 // ...
 ```
 
-Iterating through a Configuration
----
-
-```csharp
-foreach (var section in myConfig)
-{
-    foreach (var setting in section)
-    {
-        // ...
-    }
-}
-```
-
 Saving a Configuration
 ---
 
@@ -85,5 +86,6 @@ myConfig.SaveBinaryToStream(myStream);      // Save to a binary stream.
 
 More
 ---
-For more details and advanced features, please visit the [Wiki](https://github.com/cemdervis/SharpConfig/wiki).
-There are also use case example available in the [Example File](https://github.com/cemdervis/SharpConfig/blob/master/Example/Program.cs).
+SharpConfig has more features, such as support for **arrays**, **enums** and **object mapping**.
+For details and examples, please visit the [Wiki](https://github.com/cemdervis/SharpConfig/wiki).
+There are also use case examples available in the [Example File](https://github.com/cemdervis/SharpConfig/blob/master/Example/Program.cs).
