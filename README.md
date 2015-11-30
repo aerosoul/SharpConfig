@@ -83,42 +83,6 @@ myConfig.SaveBinaryToFile("myConfig.cfg");  // Save to a binary file.
 myConfig.SaveBinaryToStream(myStream);      // Save to a binary stream.
 ```
 
-Enumerations
----
-
-SharpConfig is also able to parse enumerations.
-For example you have a configuration like this:
-```cfg
-[DateInfo]
-Day = Monday
-```
-
-It is now possible to read this value as a System.DayOfWeek enum, because **Monday** is present there.
-An example of how to read it:
-
-```csharp
-DayOfWeek day = config["DateInfo"]["Day"].GetValueTyped<DayOfWeek>();
-```
-
-Arrays
----
-
-Arrays are also supported in SharpConfig.
-For example you have a configuration like this:
-```cfg
-[General]
-MyArray = {0,2,5,6}
-```
-
-This array can be interpreted as any type array that can be converted from 0, 2, 5 and 6, for example int, float, double, char, byte, string etc.
-
-Reading this array is simple:
-```csharp
-string[] stringArray = config["General"]["MyArray"].GetValueArray<string>();
-int[] intArray = config["General"]["MyArray"].GetValueArray<int>();
-// ...
-```
-
 More
 ---
 For more details and advanced features, please visit the [Wiki](https://github.com/cemdervis/SharpConfig/wiki).
