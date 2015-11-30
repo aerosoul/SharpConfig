@@ -81,8 +81,8 @@ Saving a Configuration
 ```csharp
 myConfig.SaveToFile("myConfig.cfg");        // Save to a text-based file.
 myConfig.SaveToStream(myStream);            // Save to a text-based stream.
-myConfig.SaveBinaryToFile("myConfig.cfg");  // Save to a binary file.
-myConfig.SaveBinaryToStream(myStream);      // Save to a binary stream.
+myConfig.SaveToBinaryFile("myConfig.cfg");  // Save to a binary file.
+myConfig.SaveToBinaryStream(myStream);      // Save to a binary stream.
 ```
 
 More
