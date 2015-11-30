@@ -13,6 +13,7 @@ Installing via NuGet
 ---
 You can install SharpConfig via the following NuGet command:
 > Install-Package sharpconfig
+
 [NuGet Page](https://www.nuget.org/packages/sharpconfig/)
 
 
