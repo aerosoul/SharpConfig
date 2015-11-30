@@ -42,7 +42,7 @@ namespace Example
         {
             // Read our example config.
             Configuration cfg = Configuration.LoadFromString(Properties.Resources.SampleCfg);
-
+            
             // Just print all sections and their settings.
             PrintConfig(cfg);
         }

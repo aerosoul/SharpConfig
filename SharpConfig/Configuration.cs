@@ -413,9 +413,9 @@ namespace SharpConfig
         /// </summary>
         ///
         /// <param name="filename">The location of the configuration file.</param>
-        public void SaveBinaryToFile(string filename)
+        public void SaveToBinaryFile(string filename)
         {
-            SaveBinaryToFile(filename, null);
+            SaveToBinaryFile(filename, null);
         }
 
         /// <summary>
@@ -424,7 +424,7 @@ namespace SharpConfig
         ///
         /// <param name="filename">The location of the configuration file.</param>
         /// <param name="writer">  The writer to use. Specify null to use the default writer.</param>
-        public void SaveBinaryToFile(string filename, BinaryWriter writer)
+        public void SaveToBinaryFile(string filename, BinaryWriter writer)
         {
             if (string.IsNullOrEmpty(filename))
             {
@@ -439,9 +439,9 @@ namespace SharpConfig
         /// </summary>
         ///
         /// <param name="stream">The stream to save the configuration to.</param>
-        public void SaveBinaryToStream(Stream stream)
+        public void SaveToBinaryStream(Stream stream)
         {
-            SaveBinaryToStream(stream, null);
+            SaveToBinaryStream(stream, null);
         }
 
         /// <summary>
@@ -450,7 +450,7 @@ namespace SharpConfig
         ///
         /// <param name="stream">The stream to save the configuration to.</param>
         /// <param name="writer">The writer to use. Specify null to use the default writer.</param>
-        public void SaveBinaryToStream(Stream stream, BinaryWriter writer)
+        public void SaveToBinaryStream(Stream stream, BinaryWriter writer)
         {
             if (stream == null)
             {
@@ -458,6 +458,30 @@ namespace SharpConfig
             }
 
             SerializeBinary(writer, stream);
+        }
+        
+        [Obsolete("Please use the SaveToBinaryFile method instead.", false)]
+        public void SaveBinaryToFile(string filename)
+        {
+            SaveToBinaryFile(filename, null);
+        }
+
+        [Obsolete("Please use the SaveToBinaryFile method instead.", false)]
+        public void SaveBinaryToFile(string filename, BinaryWriter writer)
+        {
+            SaveToBinaryFile(filename, writer);
+        }
+
+        [Obsolete("Please use the SaveToBinaryStream method instead.", false)]
+        public void SaveBinaryToStream(Stream stream)
+        {
+            SaveToBinaryStream(stream);
+        }
+
+        [Obsolete("Please use the SaveToBinaryStream method instead.", false)]
+        public void SaveBinaryToStream(Stream stream, BinaryWriter writer)
+        {
+            SaveToBinaryStream(stream, writer);
         }
 
         #endregion
