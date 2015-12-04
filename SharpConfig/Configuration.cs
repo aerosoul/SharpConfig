@@ -40,6 +40,7 @@ namespace SharpConfig
             mValidCommentChars = new[] { '#', ';', '\'' };
             mIgnoreInlineComments = false;
             mIgnorePreComments = false;
+            IgnoreDuplicateSettings = false;
         }
 
         /// <summary>
@@ -553,6 +554,8 @@ namespace SharpConfig
         {
             get { return mSections.Count; }
         }
+
+        public static bool IgnoreDuplicateSettings { get; set; }
 
         /// <summary>
         /// Gets or sets a section by index.

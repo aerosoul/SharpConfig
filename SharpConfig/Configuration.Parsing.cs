@@ -94,6 +94,11 @@ namespace SharpConfig
 
                         if (currentSection.Contains(setting.Name))
                         {
+                            if (IgnoreDuplicateSettings)
+                            {
+                                continue;
+                            }
+
                             throw new ParserException(string.Format(
                                 "The setting '{0}' was already declared in the section.",
                                 setting.Name), mLineNumber);
