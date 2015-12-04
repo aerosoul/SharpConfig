@@ -42,14 +42,14 @@ namespace SharpConfig
                     int commentIndex = 0;
                     var comment = ParseComment(line, out commentIndex);
 
-                    if (!mIgnorePreComments && commentIndex == 0)
+                    if (!IgnorePreComments && commentIndex == 0)
                     {
                         // This is a comment line (pre-comment).
                         // Add it to the list of pre-comments.
                         preComments.Add(comment);
                         continue;
                     }
-                    else if (!mIgnoreInlineComments && commentIndex > 0)
+                    else if (!IgnoreInlineComments && commentIndex > 0)
                     {
                         // Strip away the comments of this line.
                         line = line.Remove(commentIndex).Trim();
@@ -60,7 +60,7 @@ namespace SharpConfig
                     {
                         currentSection = ParseSection(line);
 
-                        if (!mIgnoreInlineComments)
+                        if (!IgnoreInlineComments)
                             currentSection.Comment = comment;
 
                         if (config.Contains(currentSection.Name))
@@ -75,7 +75,7 @@ namespace SharpConfig
                                 currentSection.Name), mLineNumber);
                         }
 
-                        if (!mIgnorePreComments && preComments.Count > 0)
+                        if (!IgnorePreComments && preComments.Count > 0)
                         {
                             currentSection.mPreComments = new List<Comment>(preComments);
                             preComments.Clear();
@@ -87,7 +87,7 @@ namespace SharpConfig
                     {
                         Setting setting = ParseSetting(line);
 
-                        if (!mIgnoreInlineComments)
+                        if (!IgnoreInlineComments)
                             setting.Comment = comment;
 
                         if (currentSection == null)
@@ -109,7 +109,7 @@ namespace SharpConfig
                                 setting.Name), mLineNumber);
                         }
 
-                        if (!mIgnorePreComments && preComments.Count > 0)
+                        if (!IgnorePreComments && preComments.Count > 0)
                         {
                             setting.mPreComments = new List<Comment>(preComments);
                             preComments.Clear();

@@ -25,9 +25,6 @@ namespace SharpConfig
 
         private static NumberFormatInfo mNumberFormat;
         private static char[] mValidCommentChars;
-        private static bool mIgnoreInlineComments;
-        private static bool mIgnorePreComments;
-
         private List<Section> mSections;
 
         #endregion
@@ -38,8 +35,8 @@ namespace SharpConfig
         {
             mNumberFormat = CultureInfo.InvariantCulture.NumberFormat;
             mValidCommentChars = new[] { '#', ';', '\'' };
-            mIgnoreInlineComments = false;
-            mIgnorePreComments = false;
+            IgnoreInlineComments = false;
+            IgnorePreComments = false;
             IgnoreDuplicateSettings = false;
             IgnoreDuplicateSettings = false;
         }
@@ -461,30 +458,6 @@ namespace SharpConfig
 
             SerializeBinary(writer, stream);
         }
-        
-        [Obsolete("Please use the SaveToBinaryFile method instead.", false)]
-        public void SaveBinaryToFile(string filename)
-        {
-            SaveToBinaryFile(filename, null);
-        }
-
-        [Obsolete("Please use the SaveToBinaryFile method instead.", false)]
-        public void SaveBinaryToFile(string filename, BinaryWriter writer)
-        {
-            SaveToBinaryFile(filename, writer);
-        }
-
-        [Obsolete("Please use the SaveToBinaryStream method instead.", false)]
-        public void SaveBinaryToStream(Stream stream)
-        {
-            SaveToBinaryStream(stream);
-        }
-
-        [Obsolete("Please use the SaveToBinaryStream method instead.", false)]
-        public void SaveBinaryToStream(Stream stream, BinaryWriter writer)
-        {
-            SaveToBinaryStream(stream, writer);
-        }
 
         #endregion
 
@@ -500,7 +473,9 @@ namespace SharpConfig
             set
             {
                 if (value == null)
+                {
                     throw new ArgumentNullException("value");
+                }
 
                 mNumberFormat = value;
             }
@@ -515,7 +490,9 @@ namespace SharpConfig
             set
             {
                 if (value == null)
+                {
                     throw new ArgumentNullException("value");
+                }
 
                 if (value.Length == 0)
                 {
@@ -532,29 +509,13 @@ namespace SharpConfig
         /// Gets or sets a value indicating whether inline-comments
         /// should be ignored when parsing a configuration.
         /// </summary>
-        public static bool IgnoreInlineComments
-        {
-            get { return mIgnoreInlineComments; }
-            set { mIgnoreInlineComments = value; }
-        }
+        public static bool IgnoreInlineComments { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether pre-comments
         /// should be ignored when parsing a configuration.
         /// </summary>
-        public static bool IgnorePreComments
-        {
-            get { return mIgnorePreComments; }
-            set { mIgnorePreComments = value; }
-        }
-
-        /// <summary>
-        /// Gets the number of sections that are in the configuration.
-        /// </summary>
-        public int SectionCount
-        {
-            get { return mSections.Count; }
-        }
+        public static bool IgnorePreComments { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether duplicate
@@ -567,6 +528,14 @@ namespace SharpConfig
         /// should be ignored when parsing a configuration
         /// </summary>
         public static bool IgnoreDuplicateSections { get; set; }
+
+        /// <summary>
+        /// Gets the number of sections that are in the configuration.
+        /// </summary>
+        public int SectionCount
+        {
+            get { return mSections.Count; }
+        }
 
         /// <summary>
         /// Gets or sets a section by index.
