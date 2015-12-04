@@ -65,6 +65,11 @@ namespace SharpConfig
 
                         if (config.Contains(currentSection.Name))
                         {
+                            if (IgnoreDuplicateSections)
+                            {
+                                continue;
+                            }
+
                             throw new ParserException(string.Format(
                                 "The section '{0}' was already declared in the configuration.",
                                 currentSection.Name), mLineNumber);
@@ -94,6 +99,11 @@ namespace SharpConfig
 
                         if (currentSection.Contains(setting.Name))
                         {
+                            if (IgnoreDuplicateSettings)
+                            {
+                                continue;
+                            }
+
                             throw new ParserException(string.Format(
                                 "The setting '{0}' was already declared in the section.",
                                 setting.Name), mLineNumber);

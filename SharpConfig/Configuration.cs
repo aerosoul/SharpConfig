@@ -40,6 +40,8 @@ namespace SharpConfig
             mValidCommentChars = new[] { '#', ';', '\'' };
             mIgnoreInlineComments = false;
             mIgnorePreComments = false;
+            IgnoreDuplicateSettings = false;
+            IgnoreDuplicateSettings = false;
         }
 
         /// <summary>
@@ -553,6 +555,18 @@ namespace SharpConfig
         {
             get { return mSections.Count; }
         }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether duplicate
+        /// settings should be ignored when parsing a configuration.
+        /// </summary>
+        public static bool IgnoreDuplicateSettings { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether duplicate sections
+        /// should be ignored when parsing a configuration
+        /// </summary>
+        public static bool IgnoreDuplicateSections { get; set; }
 
         /// <summary>
         /// Gets or sets a section by index.
