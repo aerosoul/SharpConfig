@@ -555,6 +555,10 @@ namespace SharpConfig
             get { return mSections.Count; }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether duplicate
+        /// settings should be ignored when parsing a configuration.
+        /// </summary>
         public static bool IgnoreDuplicateSettings { get; set; }
 
         /// <summary>
