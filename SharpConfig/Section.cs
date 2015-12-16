@@ -411,11 +411,11 @@ namespace SharpConfig
         public string ToString(bool includeComment)
         {
             if (includeComment)
-            {
+            {                
                 bool hasPreComments = mPreComments != null && mPreComments.Count > 0;
 
                 string[] preCommentStrings = hasPreComments ?
-                    mPreComments.ConvertAll<string>(Comment.ConvertToString).ToArray() : null;
+                    mPreComments.ConvertAll(c => c.ToString()).ToArray() : null;
 
                 if (Comment != null && hasPreComments)
                 {

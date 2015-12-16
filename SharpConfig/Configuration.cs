@@ -240,7 +240,6 @@ namespace SharpConfig
             using (reader)
             {
                 source = reader.ReadToEnd();
-                reader.Close();
             }
 
             return LoadFromString(source);

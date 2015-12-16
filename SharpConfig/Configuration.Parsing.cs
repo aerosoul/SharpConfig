@@ -46,7 +46,7 @@ namespace SharpConfig
                     {
                         // This is a comment line (pre-comment).
                         // Add it to the list of pre-comments.
-                        preComments.Add(comment);
+                        preComments.Add(comment.Value);
                         continue;
                     }
                     else if (!IgnoreInlineComments && commentIndex > 0)
@@ -147,14 +147,14 @@ namespace SharpConfig
             return left && right;
         }
 
-        private static Comment ParseComment(string line, out int commentIndex)
+        private static Comment? ParseComment(string line, out int commentIndex)
         {
-            Comment comment = null;
+            Comment? comment = null;
             commentIndex = -1;
 
             do
             {
-                commentIndex = line.IndexOfAny(Configuration.ValidCommentChars, commentIndex + 1);
+                commentIndex = line.IndexOfAny(ValidCommentChars, commentIndex + 1);
 
                 if (commentIndex < 0)
                     break;
