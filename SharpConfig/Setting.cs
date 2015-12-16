@@ -352,6 +352,17 @@ namespace SharpConfig
         // Converts the value of a single element to a desired type.
         private static object ConvertValue(string value, Type type)
         {
+            var underlyingType = Nullable.GetUnderlyingType(type);
+            if (underlyingType != null)
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    return null;
+                }
+
+                type = underlyingType;
+            }
+
             if (type == typeof(bool))
             {
                 switch (value.ToLowerInvariant())
