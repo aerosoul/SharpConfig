@@ -360,7 +360,9 @@ namespace SharpConfig
                     return null;
                 }
 
-                return ConvertValue(value, underlyingType);
+                // this will not do multiple unfolding, which might
+                // be a problem for Nullable<Nullable<int>> ... :astonished:
+                type = underlyingType;
             }
 
             if (type == typeof(bool))
