@@ -352,14 +352,18 @@ namespace SharpConfig
             {
                 if (string.IsNullOrEmpty(value))
                 {
+                    // Returns Nullable<type>().
                     return null;
                 }
 
+                // Otherwise, continue with our conversion using
+                // the underlying type of the nullable.
                 type = underlyingType;
             }
 
             if (type == typeof(bool))
             {
+                // Special case for bool.
                 switch (value.ToLowerInvariant())
                 {
                     case "off":
@@ -402,6 +406,7 @@ namespace SharpConfig
 
             try
             {
+                // Main conversion routine.
                 return Convert.ChangeType(value, type, Configuration.NumberFormat);
             }
             catch
