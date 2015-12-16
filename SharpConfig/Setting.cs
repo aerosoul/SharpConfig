@@ -398,9 +398,9 @@ namespace SharpConfig
                 {
                     return Enum.Parse(type, value);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    throw new SettingValueCastException(value, type);
+                    throw new SettingValueCastException(value, type, ex);
                 }
             }
 
@@ -409,9 +409,9 @@ namespace SharpConfig
                 // Main conversion routine.
                 return Convert.ChangeType(value, type, Configuration.NumberFormat);
             }
-            catch
+            catch (Exception ex)
             {
-                throw new SettingValueCastException(value, type);
+                throw new SettingValueCastException(value, type, ex);
             }
         }
 
