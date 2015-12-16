@@ -216,11 +216,6 @@ namespace SharpConfig
         {
             Type type = typeof(T);
 
-            if (type == null)
-            {
-                throw new ArgumentNullException("type");
-            }
-
             if (type.IsArray)
             {
                 throw new InvalidOperationException(

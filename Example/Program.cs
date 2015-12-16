@@ -55,12 +55,11 @@ namespace Example
         {
             foreach (Section section in cfg)
             {
-                Console.WriteLine("Section: " + section.Name);
-                Console.WriteLine("Settings:");
+                Console.WriteLine("[{0}]", section.Name);
 
                 foreach (Setting setting in section)
                 {
-                    Console.Write("    ");
+                    Console.Write("  ");
 
                     if (setting.IsArray)
                     {
