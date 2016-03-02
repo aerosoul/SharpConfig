@@ -294,7 +294,7 @@ namespace SharpConfig
             {
                 // Read the last element.
                 values[i] = (T)ConvertValue(
-                    mRawValue.Substring(elemIndex, mRawValue.Length - elemIndex - 1),
+                    mRawValue.Substring(elemIndex, mRawValue.Length - elemIndex - 1).Trim(),
                     typeof(T));
             }
 
@@ -337,7 +337,7 @@ namespace SharpConfig
             {
                 // Read the last element.
                 values[i] = ConvertValue(
-                    mRawValue.Substring(elemIndex, mRawValue.Length - elemIndex - 1),
+                    mRawValue.Substring(elemIndex, mRawValue.Length - elemIndex - 1).Trim(),
                     elementType);
             }
 
