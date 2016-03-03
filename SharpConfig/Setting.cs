@@ -278,7 +278,6 @@ namespace SharpConfig
 
             public bool Next()
             {
-
                 ++mIndex;
                 return true;
             }
