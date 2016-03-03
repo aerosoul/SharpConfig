@@ -42,8 +42,6 @@ namespace Example
         {
             // Read our example config.
             Configuration cfg = Configuration.LoadFromString(Properties.Resources.SampleCfg);
-
-            var arr = cfg["OtherProperties"]["AnEmptyArray"].GetValueArray<string>();
             
             // Just print all sections and their settings.
             PrintConfig(cfg);

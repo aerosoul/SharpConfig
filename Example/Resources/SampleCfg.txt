@@ -24,3 +24,4 @@ ABoolean = yes
 ABooleanArray = {on,off,yes,no}
 
 AnEmptyArray = {}
+AnotherEmptyArray = {  }

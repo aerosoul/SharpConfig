@@ -57,6 +57,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Setting.cs" />
     <Compile Include="Section.cs" />
+    <Compile Include="SettingArrayEnumerator.cs" />
     <Compile Include="SettingValueCastException.cs" />
   </ItemGroup>
   <ItemGroup>

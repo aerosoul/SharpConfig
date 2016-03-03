@@ -163,9 +163,13 @@ namespace SharpConfig
                     // That does not mean that there are no elements.
                     // Check if there is at least something.
                     // If so, that is the single element of the array.
-                    if (Math.Abs(arrayEndIdx-arrayStartIdx) > 1)
+                    for (int i = arrayStartIdx + 1; i < arrayEndIdx; ++i)
                     {
-                        ++arraySize;
+                        if (mRawValue[i] != ' ')
+                        {
+                            ++arraySize;
+                            break;
+                        }
                     }
                 }
                 else if (arraySize > 0)
@@ -175,7 +179,7 @@ namespace SharpConfig
                     // that the number of commas equaled the number of elements + 1.
                     ++arraySize;
                 }
-                
+
                 return arraySize;
             }
         }
@@ -253,44 +257,18 @@ namespace SharpConfig
             }
 
             var values = new T[myArraySize];
-            var enumerator = new SettingArrayEnumerator(mRawValue);
 
-            while (enumerator.Next())
+            if (myArraySize > 0)
             {
-                values[enumerator.Index] = (T)ConvertValue(enumerator.CurrentElement, typeof(T));
+                var enumerator = new SettingArrayEnumerator(mRawValue);
+
+                while (enumerator.Next())
+                {
+                    values[enumerator.Index] = (T)ConvertValue(enumerator.Current, typeof(T));
+                }
             }
 
             return values;
-        }
-
-        private struct SettingArrayEnumerator
-        {
-            private string mRawValue;
-            private string mCurrentElement;
-            private int mIndex;
-
-            public SettingArrayEnumerator(string rawValue)
-            {
-                mRawValue = rawValue;
-                mCurrentElement = null;
-                mIndex = -1;
-            }
-
-            public bool Next()
-            {
-                ++mIndex;
-                return true;
-            }
-
-            public string CurrentElement
-            {
-                get { return mCurrentElement; }
-            }
-
-            public int Index
-            {
-                get { return mIndex; }
-            }
         }
 
         /// <summary>
@@ -304,7 +282,25 @@ namespace SharpConfig
         /// <returns></returns>
         public object[] GetValueArray(Type elementType)
         {
-            throw new NotImplementedException();
+            int myArraySize = this.ArraySize;
+            if (myArraySize < 0)
+            {
+                return null;
+            }
+
+            var values = new object[myArraySize];
+
+            if (myArraySize > 0)
+            {
+                var enumerator = new SettingArrayEnumerator(mRawValue);
+
+                while (enumerator.Next())
+                {
+                    values[enumerator.Index] = ConvertValue(enumerator.Current, elementType);
+                }
+            }
+
+            return values;
         }
 
         // Converts the value of a single element to a desired type.
