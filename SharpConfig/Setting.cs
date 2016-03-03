@@ -2,6 +2,7 @@
 // https://github.com/cemdervis/SharpConfig
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -116,90 +117,66 @@ namespace SharpConfig
                     return -1;
                 }
 
-                string value = mRawValue.Trim();
+                int arrayStartIdx = mRawValue.IndexOf('{');
+                int arrayEndIdx = mRawValue.LastIndexOf('}');
 
-                if (value[0] != '{')
+                if (arrayStartIdx < 0 || arrayEndIdx < 0)
                 {
+                    // Not an array.
                     return -1;
                 }
 
-                int arraySize = 0;
-                bool isInArrayBrackets = false;
-                int lastCommaIdx = 0;
-
-                for (int pos = 0; pos < value.Length; ++pos)
+                // There may only be spaces between the beginning
+                // of the string and the first left bracket.
+                for (int i = 0; i < arrayStartIdx; ++i)
                 {
-                    char ch = value[pos];
-                    
-                    if (ch == '{')
-                    {
-                        if (isInArrayBrackets)
-                        {
-                            return -1;
-                        }
-
-                        isInArrayBrackets = true;
-                    }
-                    else if (ch == '}')
-                    {
-                        if (pos != value.Length - 1)
-                        {
-                            return -1;
-                        }
-
-                        isInArrayBrackets = false;
-                        break;
-                    }
-                    else if (ch == ',')
-                    {
-                        bool isElementEmpty = true;
-
-                        for (int e = lastCommaIdx + 1; e < pos; ++e)
-                        {
-                            if (value[e] != ' ')
-                            {
-                                // Okay, this is a value.
-                                isElementEmpty = false;
-                                break;
-                            }
-                        }
-
-                        if (isElementEmpty)
-                        {
-                            return -1;
-                        }
-
-                        lastCommaIdx = pos;
-                        ++arraySize;
-                    }
-                }
-
-                // Check the last element value for emptiness, since our loop
-                // only considered n-1 elements.
-                if (lastCommaIdx + 1 < value.Length-1)
-                {
-                    bool isElementEmpty = true;
-
-                    for (int e = lastCommaIdx + 1; e < value.Length - 1; ++e)
-                    {
-                        if (value[e] != ' ')
-                        {
-                            isElementEmpty = false;
-                            break;
-                        }
-                    }
-
-                    if (isElementEmpty)
+                    if (mRawValue[i] != ' ')
                     {
                         return -1;
                     }
                 }
-                else
+
+                // Also, there may only be spaces between the last
+                // right brace and the end of the string.
+                for (int i = arrayEndIdx + 1; i < mRawValue.Length; ++i)
                 {
-                    return -1;
+                    if (mRawValue[i] != ' ')
+                    {
+                        return -1;
+                    }
                 }
 
-                return arraySize + 1;
+                int arraySize = 0;
+
+                // Naive algorithm; assume the number of commas equals the number of elements + 1.
+                for (int i = 0; i < mRawValue.Length; ++i)
+                {
+                    if (mRawValue[i] == ',')
+                    {
+                        ++arraySize;
+                    }
+                }
+
+                if (arraySize == 0)
+                {
+                    // There were no commas in the array expression.
+                    // That does not mean that there are no elements.
+                    // Check if there is at least something.
+                    // If so, that is the single element of the array.
+                    if (Math.Abs(arrayEndIdx-arrayStartIdx) > 1)
+                    {
+                        ++arraySize;
+                    }
+                }
+                else if (arraySize > 0)
+                {
+                    // If there were any commas in the array expression,
+                    // we have to increment the array size, as we assumed
+                    // that the number of commas equaled the number of elements + 1.
+                    ++arraySize;
+                }
+                
+                return arraySize;
             }
         }
 
@@ -260,7 +237,7 @@ namespace SharpConfig
 
         /// <summary>
         /// Gets this setting's value as an array of a specific type.
-        /// Note: this only works if the setting represents an array.
+        /// Note: this only works if the setting represents an array. If it is not, then null is returned.
         /// </summary>
         /// <typeparam name="T">
         ///     The type of elements in the array. All values in the array are going to be converted to objects of this type.
@@ -270,40 +247,56 @@ namespace SharpConfig
         public T[] GetValueArray<T>()
         {
             int myArraySize = this.ArraySize;
-
-            var values = new T[myArraySize];
-            int i = 0;
-
-            int elemIndex = 1;
-            int commaIndex = mRawValue.IndexOf(',');
-
-            while (commaIndex >= 0)
+            if (myArraySize < 0)
             {
-                string sub = mRawValue.Substring(elemIndex, commaIndex - elemIndex);
-                sub = sub.Trim();
-
-                values[i] = (T)ConvertValue(sub, typeof(T));
-
-                elemIndex = commaIndex + 1;
-                commaIndex = mRawValue.IndexOf(',', elemIndex + 1);
-
-                i++;
+                return null;
             }
 
-            if (myArraySize > 0)
+            var values = new T[myArraySize];
+            var enumerator = new SettingArrayEnumerator(mRawValue);
+
+            while (enumerator.Next())
             {
-                // Read the last element.
-                values[i] = (T)ConvertValue(
-                    mRawValue.Substring(elemIndex, mRawValue.Length - elemIndex - 1),
-                    typeof(T));
+                values[enumerator.Index] = (T)ConvertValue(enumerator.CurrentElement, typeof(T));
             }
 
             return values;
         }
 
+        private struct SettingArrayEnumerator
+        {
+            private string mRawValue;
+            private string mCurrentElement;
+            private int mIndex;
+
+            public SettingArrayEnumerator(string rawValue)
+            {
+                mRawValue = rawValue;
+                mCurrentElement = null;
+                mIndex = -1;
+            }
+
+            public bool Next()
+            {
+
+                ++mIndex;
+                return true;
+            }
+
+            public string CurrentElement
+            {
+                get { return mCurrentElement; }
+            }
+
+            public int Index
+            {
+                get { return mIndex; }
+            }
+        }
+
         /// <summary>
         /// Gets this setting's value as an array of a specific type.
-        /// Note: this only works if the setting represents an array.
+        /// Note: this only works if the setting represents an array. If it is not, then null is returned.
         /// </summary>
         /// <param name="elementType">
         ///     The type of elements in the array. All values in the array are going to be converted to objects of this type.
@@ -312,36 +305,7 @@ namespace SharpConfig
         /// <returns></returns>
         public object[] GetValueArray(Type elementType)
         {
-            int myArraySize = this.ArraySize;
-
-            var values = new object[myArraySize];
-            int i = 0;
-
-            int elemIndex = 1;
-            int commaIndex = mRawValue.IndexOf(',');
-
-            while (commaIndex >= 0)
-            {
-                string sub = mRawValue.Substring(elemIndex, commaIndex - elemIndex);
-                sub = sub.Trim();
-
-                values[i] = ConvertValue(sub, elementType);
-
-                elemIndex = commaIndex + 1;
-                commaIndex = mRawValue.IndexOf(',', elemIndex + 1);
-
-                i++;
-            }
-
-            if (myArraySize > 0)
-            {
-                // Read the last element.
-                values[i] = ConvertValue(
-                    mRawValue.Substring(elemIndex, mRawValue.Length - elemIndex - 1),
-                    elementType);
-            }
-
-            return values;
+            throw new NotImplementedException();
         }
 
         // Converts the value of a single element to a desired type.

@@ -22,3 +22,5 @@ Format = RGB24
 # false:  no, 0, false, off
 ABoolean = yes
 ABooleanArray = {on,off,yes,no}
+
+AnEmptyArray = {}
