@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿// Copyright (c) 2013-2015 Cemalettin Dervis, MIT License.
+// https://github.com/cemdervis/SharpConfig
 
 namespace SharpConfig
 {

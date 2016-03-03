@@ -2,9 +2,6 @@
 // https://github.com/cemdervis/SharpConfig
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SharpConfig
 {
