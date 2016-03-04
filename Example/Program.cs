@@ -3,11 +3,11 @@ using SharpConfig;
 
 namespace Example
 {
-    class Person
+    class SomeStructure
     {
-        public string Name { get; set; }
-        public int Age { get; set; }
-        public int SomeField;
+        public string SomeString { get; set; }
+        public int SomeInt { get; set; }
+        public DateTime SomeDate { get; set; }
 
         // This field will be ignored by SharpConfig
         // when creating sections from objects and vice versa.
@@ -40,35 +40,9 @@ namespace Example
         {
             // Read our example config.
             Configuration cfg = Configuration.LoadFromString(Properties.Resources.SampleCfg);
-            
+
             // Just print all sections and their settings.
             PrintConfig(cfg);
-        }
-
-        /// <summary>
-        /// Prints all sections and their settings to the console.
-        /// </summary>
-        /// <param name="cfg">The configuration to print.</param>
-        static void PrintConfig(Configuration cfg)
-        {
-            foreach (Section section in cfg)
-            {
-                Console.WriteLine("[{0}]", section.Name);
-
-                foreach (Setting setting in section)
-                {
-                    Console.Write("  ");
-
-                    if (setting.IsArray)
-                    {
-                        Console.Write("[Array, {0} elements] ", setting.ArraySize);
-                    }
-
-                    Console.WriteLine(setting.ToString());
-                }
-
-                Console.WriteLine();
-            }
         }
 
         /// <summary>
@@ -78,14 +52,15 @@ namespace Example
         {
             Configuration cfg = new Configuration();
 
-            cfg["Person"]["Name"].SetValue("Peter");
-            cfg["Person"]["Age"].SetValue(50);
-            cfg["Person"]["SomeField"].SetValue(10);
+            cfg["SomeStructure"]["SomeString"].StringValue = "foobar";
+            cfg["SomeStructure"]["SomeInt"].IntValue = 2000;
+            cfg["SomeStructure"]["SomeDate"].DateTimeValue = DateTime.Now;
 
             // We can obtain the values directly as strings, ints, floats, or any other (custom) type,
             // as long as the string value of the setting can be converted to the type you wish to obtain.
-            string nameValue = cfg["Person"]["Name"].StringValue;
-            int ageValue = cfg["Person"]["Age"].IntValue;
+            string nameValue = cfg["SomeStructure"]["SomeString"].StringValue;
+            int ageValue = cfg["SomeStructure"]["SomeInt"].IntValue;
+            DateTime dateValue = cfg["SomeStructure"]["SomeDate"].DateTimeValue;
 
             // Print our config just to see that it works.
             PrintConfig(cfg);
@@ -99,9 +74,9 @@ namespace Example
         {
             Configuration cfg = new Configuration();
 
-            cfg["Person"]["Name"].SetValue("Peter");
-            cfg["Person"]["Age"].SetValue(50);
-            cfg["Person"]["SomeField"].SetValue(10);
+            cfg["SomeStructure"]["SomeString"].StringValue = "foobar";
+            cfg["SomeStructure"]["SomeInt"].IntValue = 2000;
+            cfg["SomeStructure"]["SomeDate"].DateTimeValue = DateTime.Now;
 
             cfg.SaveToFile(filename);
         }
@@ -114,17 +89,17 @@ namespace Example
             Configuration cfg = new Configuration();
 
             // Create the section.
-            cfg["Person"]["Name"].SetValue("Peter");
-            cfg["Person"]["Age"].SetValue(50);
-            cfg["Person"]["SomeField"].SetValue(10);
+            cfg["SomeStructure"]["SomeString"].SetValue("foobar");
+            cfg["SomeStructure"]["SomeInt"].SetValue(2000);
+            cfg["SomeStructure"]["SomeDate"].SetValue(DateTime.Now);
 
             // Now create an object from it.
-            Person p = cfg["Person"].CreateObject<Person>();
+            SomeStructure p = cfg["SomeStructure"].CreateObject<SomeStructure>();
 
             // Test.
-            Console.WriteLine("Name:      " + p.Name);
-            Console.WriteLine("Age :      " + p.Age);
-            Console.WriteLine("SomeField: " + p.SomeField);
+            Console.WriteLine("SomeString:   " + p.SomeString);
+            Console.WriteLine("SomeInt:      " + p.SomeInt);
+            Console.WriteLine("SomeDate:     " + p.SomeDate);
         }
 
         /// <summary>
@@ -135,13 +110,13 @@ namespace Example
             Configuration cfg = new Configuration();
 
             // Create an object.
-            Person p = new Person();
-            p.Name = "Peter";
-            p.Age = 50;
-            p.SomeField = 10;
+            SomeStructure p = new SomeStructure();
+            p.SomeString = "foobar";
+            p.SomeInt = 2000;
+            p.SomeDate = DateTime.Now;
 
             // Now create a section from it.
-            Section section = Section.FromObject("Person Section", p);
+            Section section = Section.FromObject("SomeStructure", p);
             cfg.Add(section);
 
             // Print the config to see that it worked.
@@ -173,12 +148,38 @@ namespace Example
             PrintArray("sameValuesButObjects", sameValuesButObjects);
         }
 
+        /// <summary>
+        /// Prints all sections and their settings to the console.
+        /// </summary>
+        /// <param name="cfg">The configuration to print.</param>
+        static void PrintConfig(Configuration cfg)
+        {
+            foreach (Section section in cfg)
+            {
+                Console.WriteLine("[{0}]", section.Name);
+
+                foreach (Setting setting in section)
+                {
+                    Console.Write("  ");
+
+                    if (setting.IsArray)
+                    {
+                        Console.Write("[Array, {0} elements] ", setting.ArraySize);
+                    }
+
+                    Console.WriteLine(setting.ToString());
+                }
+
+                Console.WriteLine();
+            }
+        }
+
         // Small helper method.
         static void PrintArray<T>(string arrName, T[] arr)
         {
             Console.Write(arrName + " = { ");
 
-            for (int i = 0; i < arr.Length-1; i++)
+            for (int i = 0; i < arr.Length - 1; i++)
             {
                 Console.Write(arr[i].ToString() + ", ");
             }
