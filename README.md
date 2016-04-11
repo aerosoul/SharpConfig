@@ -37,7 +37,7 @@ Section section = config["General"];
 
 string someString = section["SomeString"].StringValue;
 int someInteger = section["SomeInteger"].IntValue;
-float someFloat = section["SomeFloat"].FloatValue.
+float someFloat = section["SomeFloat"].FloatValue;
 ```
 
 Iterating through a Configuration
