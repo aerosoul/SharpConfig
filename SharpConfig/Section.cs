@@ -61,7 +61,7 @@ namespace SharpConfig
                     // Skip this property, as it can't be read from.
                     continue;
                 }
-                
+
                 Setting setting = new Setting(prop.Name, prop.GetValue(obj, null));
                 section.mSettings.Add(setting);
             }
@@ -74,7 +74,7 @@ namespace SharpConfig
                     // Skip this field.
                     continue;
                 }
-                
+
                 Setting setting = new Setting(field.Name, field.GetValue(obj));
                 section.mSettings.Add(setting);
             }
@@ -129,7 +129,7 @@ namespace SharpConfig
                 }
 
                 FieldInfo field = member as FieldInfo;
-                if (field!= null)
+                if (field != null)
                 {
                     return field.FieldType.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0;
                 }
@@ -219,11 +219,60 @@ namespace SharpConfig
 
             if (Contains(setting))
             {
-                throw new ArgumentException(
-                    "The specified setting already exists in the section.");
+                throw new ArgumentException("The specified setting already exists in the section.");
+            }
+
+            if (Contains(setting.Name))
+            {
+                throw new ArgumentException(string.Format(
+                    "A setting named '{0}' already exists in the section.",
+                    setting.Name
+                    ));
             }
 
             mSettings.Add(setting);
+        }
+
+        /// <summary>
+        /// Removes a setting from the section by its name.
+        /// </summary>
+        public void Remove(string settingName)
+        {
+            if (string.IsNullOrEmpty(settingName))
+            {
+                throw new ArgumentNullException("settingName");
+            }
+
+            var setting = FindSetting(settingName);
+
+            if (setting == null)
+            {
+                throw new ArgumentException(string.Format(
+                    "A setting named '{0}' does not exist in the section.",
+                    settingName
+                    ));
+            }
+
+            mSettings.Remove(setting);
+        }
+
+        /// <summary>
+        /// Removes a setting from the section.
+        /// </summary>
+        /// <param name="setting">The setting to remove.</param>
+        public void Remove(Setting setting)
+        {
+            if (setting == null)
+            {
+                throw new ArgumentNullException("setting");
+            }
+
+            if (!Contains(setting))
+            {
+                throw new ArgumentException("The specified setting does not exist in the section.");
+            }
+
+            mSettings.Remove(setting);
         }
 
         /// <summary>
@@ -255,45 +304,6 @@ namespace SharpConfig
         }
 
         /// <summary>
-        /// Removes a setting from this section by its name.
-        /// </summary>
-        public void Remove(string settingName)
-        {
-            if (string.IsNullOrEmpty(settingName))
-            {
-                throw new ArgumentNullException("settingName");
-            }
-
-            var setting = FindSetting(settingName);
-
-            if (setting == null)
-            {
-                throw new ArgumentException(
-                    "The specified setting does not exist in the section.");
-            }
-
-            mSettings.Remove(setting);
-        }
-
-        /// <summary>
-        /// Removes a setting from the section.
-        /// </summary>
-        /// <param name="setting">The setting to remove.</param>
-        public void Remove(Setting setting)
-        {
-            if (setting == null)
-                throw new ArgumentNullException("setting");
-
-            if (!Contains(setting))
-            {
-                throw new ArgumentException(
-                    "The specified setting does not exist in the section.");
-            }
-
-            mSettings.Remove(setting);
-        }
-
-        /// <summary>
         /// Gets the number of settings that are in the section.
         /// </summary>
         public int SettingCount
@@ -305,6 +315,11 @@ namespace SharpConfig
         /// Gets or sets a setting by index.
         /// </summary>
         /// <param name="index">The index of the setting in the section.</param>
+        /// 
+        /// <returns>
+        /// The setting at the specified index.
+        /// Note: no setting is created when using this accessor.
+        /// </returns>
         public Setting this[int index]
         {
             get
@@ -315,33 +330,6 @@ namespace SharpConfig
                 }
 
                 return mSettings[index];
-            }
-            set
-            {
-                if (index < 0 || index >= mSettings.Count)
-                {
-                    throw new ArgumentOutOfRangeException("index");
-                }
-
-                if (value == null)
-                {
-                    throw new ArgumentNullException("value");
-                }
-
-                var existingSetting = FindSetting(value.Name);
-                if (existingSetting != null)
-                {
-                    // See if the user is trying to replace a setting that has the same
-                    // name, but is at a different index.
-                    if (mSettings.IndexOf(existingSetting) != index)
-                    {
-                        throw new ArgumentException(string.Format(
-                            "A setting named '{0}' already exists in the section, at a different index.",
-                            value.Name));
-                    }
-                }
-
-                mSettings[index] = value;
             }
         }
 
@@ -369,42 +357,9 @@ namespace SharpConfig
 
                 return setting;
             }
-            set
-            {
-                if (value == null)
-                {
-                    throw new ArgumentNullException("value");
-                }
-
-                if (string.IsNullOrEmpty(name))
-                {
-                    throw new ArgumentNullException("name");
-                }
-
-                if (value.Name != name)
-                {
-                    throw new ArgumentException(string.Format(
-                        "Trying to set a setting named '{0}' as '{1}'. The names have to be equal.",
-                        value.Name, Name));
-                }
-
-                // Check if there already is a setting by that name.
-                var setting = FindSetting(name);
-                int settingIndex = setting != null ? mSettings.IndexOf(setting) : -1;
-
-                if (settingIndex < 0)
-                {
-                    // A setting with that name does not exist yet; add it.
-                    mSettings.Add(value);
-                }
-                else
-                {
-                    // A setting with that name exists; replace it.
-                    mSettings[settingIndex] = value;
-                }
-            }
         }
 
+        // Finds a setting by its name.
         private Setting FindSetting(string name)
         {
             foreach (var setting in mSettings)
@@ -442,7 +397,7 @@ namespace SharpConfig
         public string ToString(bool includeComment)
         {
             if (includeComment)
-            {                
+            {
                 bool hasPreComments = mPreComments != null && mPreComments.Count > 0;
 
                 string[] preCommentStrings = hasPreComments ?

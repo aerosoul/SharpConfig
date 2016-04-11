@@ -40,18 +40,6 @@ namespace SharpConfig
             SetValue(value);
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Setting"/> class.
-        /// </summary>
-        ///
-        /// <param name="name"> The name of the setting.</param>
-        /// <param name="value">The value of the setting.</param>
-        public Setting(string name, DateTime value) :
-            base(name)
-        {
-            SetValue(value);
-        }
-
         #endregion
 
         #region Properties
@@ -369,15 +357,17 @@ namespace SharpConfig
                 // Special case for bool.
                 switch (value.ToLowerInvariant())
                 {
+                    case "false":
                     case "off":
                     case "no":
                     case "0":
-                        value = bool.FalseString;
+                        ret = false;
                         break;
+                    case "true":
                     case "on":
                     case "yes":
                     case "1":
-                        value = bool.TrueString;
+                        ret = true;
                         break;
                 }
             }

@@ -77,15 +77,67 @@ namespace SharpConfig
         public void Add(Section section)
         {
             if (section == null)
+            {
                 throw new ArgumentNullException("section");
+            }
 
             if (Contains(section))
             {
-                throw new ArgumentException(
-                    "The specified section already exists in the configuration.");
+                throw new ArgumentException("The specified section already exists in the configuration.");
+            }
+
+            if (Contains(section.Name))
+            {
+                throw new ArgumentException(string.Format(
+                    "A section named '{0}' already exists in the configuration.",
+                    section.Name
+                    ));
             }
 
             mSections.Add(section);
+        }
+
+        /// <summary>
+        /// Removes a section from the configuration by its name.
+        /// </summary>
+        /// <param name="sectionName">The case-sensitive name of the section to remove.</param>
+        public void Remove(string sectionName)
+        {
+            if (string.IsNullOrEmpty(sectionName))
+            {
+                throw new ArgumentNullException("sectionName");
+            }
+
+            var section = FindSection(sectionName);
+
+            if (section == null)
+            {
+                throw new ArgumentException(string.Format(
+                    "A section named '{0}' does not exist in the configuration.",
+                    sectionName
+                    ));
+            }
+
+            Remove(section);
+        }
+
+        /// <summary>
+        /// Removes a section from the configuration.
+        /// </summary>
+        /// <param name="section">The section to remove.</param>
+        public void Remove(Section section)
+        {
+            if (section == null)
+            {
+                throw new ArgumentNullException("section");
+            }
+
+            if (!Contains(section))
+            {
+                throw new ArgumentException("The specified section does not exist in the section.");
+            }
+
+            mSections.Remove(section);
         }
 
         /// <summary>
@@ -113,45 +165,7 @@ namespace SharpConfig
         /// <returns>True if the setting is contained in the section; false otherwise.</returns>
         public bool Contains(string sectionName)
         {
-            return GetSection(sectionName) != null;
-        }
-
-        /// <summary>
-        /// Removes a section from this section by its name.
-        /// </summary>
-        /// <param name="sectionName">The case-sensitive name of the section to remove.</param>
-        public void Remove(string sectionName)
-        {
-            if (string.IsNullOrEmpty(sectionName))
-                throw new ArgumentNullException("sectionName");
-
-            var section = GetSection(sectionName);
-
-            if (section == null)
-            {
-                throw new ArgumentException(
-                    "The specified section does not exist in the section.");
-            }
-
-            Remove(section);
-        }
-
-        /// <summary>
-        /// Removes a section from the configuration.
-        /// </summary>
-        /// <param name="section">The section to remove.</param>
-        public void Remove(Section section)
-        {
-            if (section == null)
-                throw new ArgumentNullException("section");
-
-            if (!Contains(section))
-            {
-                throw new ArgumentException(
-                    "The specified section does not exist in the section.");
-            }
-
-            mSections.Remove(section);
+            return FindSection(sectionName) != null;
         }
 
         #endregion
@@ -195,7 +209,7 @@ namespace SharpConfig
                 throw new FileNotFoundException("Configuration file not found.", filename);
             }
 
-            return encoding == null ?
+            return (encoding == null) ?
                 LoadFromString(File.ReadAllText(filename)) :
                 LoadFromString(File.ReadAllText(filename, encoding));
         }
@@ -234,7 +248,7 @@ namespace SharpConfig
 
             string source = null;
 
-            var reader = encoding == null ?
+            var reader = (encoding == null) ?
                 new StreamReader(stream) :
                 new StreamReader(stream, encoding);
 
@@ -498,7 +512,7 @@ namespace SharpConfig
                 mDateTimeFormat = value;
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the array that contains all comment delimiting characters.
         /// </summary>
@@ -559,6 +573,11 @@ namespace SharpConfig
         /// Gets or sets a section by index.
         /// </summary>
         /// <param name="index">The index of the section in the configuration.</param>
+        /// 
+        /// <returns>
+        /// The section at the specified index.
+        /// Note: no section is created when using this accessor.
+        /// </returns>
         public Section this[int index]
         {
             get
@@ -569,15 +588,6 @@ namespace SharpConfig
                 }
 
                 return mSections[index];
-            }
-            set
-            {
-                if (index < 0 || index >= mSections.Count)
-                {
-                    throw new ArgumentOutOfRangeException("index");
-                }
-
-                mSections[index] = value;
             }
         }
 
@@ -595,7 +605,7 @@ namespace SharpConfig
         {
             get
             {
-                var section = GetSection(name);
+                var section = FindSection(name);
 
                 if (section == null)
                 {
@@ -605,46 +615,10 @@ namespace SharpConfig
 
                 return section;
             }
-            set
-            {
-                if (string.IsNullOrEmpty(name))
-                {
-                    throw new ArgumentNullException("name", "The section name must not be null or empty.");
-                }
-
-                if (value == null)
-                {
-                    throw new ArgumentNullException("value", "The specified value must not be null.");
-                }
-
-                // Check if there already is a section by that name.
-                var section = GetSection(name);
-                int settingIndex = section != null ? mSections.IndexOf(section) : -1;
-
-                if (settingIndex < 0)
-                {
-                    // A section with that name does not exist yet; add it.
-                    mSections.Add(section);
-                }
-                else
-                {
-                    // A section with that name exists; overwrite.
-                    mSections[settingIndex] = section;
-                }
-            }
         }
 
-        private Section GetSection(int index)
-        {
-            if (index < 0 || index >= mSections.Count)
-            {
-                throw new ArgumentOutOfRangeException("index");
-            }
-
-            return mSections[index];
-        }
-
-        private Section GetSection(string name)
+        // Finds a section by its name.
+        private Section FindSection(string name)
         {
             foreach (var section in mSections)
             {

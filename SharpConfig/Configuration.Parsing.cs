@@ -8,14 +8,11 @@ namespace SharpConfig
 {
     public partial class Configuration
     {
-        private static int mLineNumber;
-
         // Parses a configuration from a source string.
         // This is the core parsing function.
         private static Configuration Parse(string source)
         {
-            // Reset temporary fields.
-            mLineNumber = 0;
+            int lineNumber = 0;
 
             Configuration config = new Configuration();
             Section currentSection = null;
@@ -28,14 +25,16 @@ namespace SharpConfig
                 // Read until EOF.
                 while ((line = reader.ReadLine()) != null)
                 {
-                    mLineNumber++;
+                    lineNumber++;
 
                     // Remove all leading / trailing white-spaces.
                     line = line.Trim();
 
                     // Empty line? If so, skip.
                     if (string.IsNullOrEmpty(line))
+                    {
                         continue;
+                    }
 
                     int commentIndex = 0;
                     var comment = ParseComment(line, out commentIndex);
@@ -56,10 +55,12 @@ namespace SharpConfig
                     // Sections start with a '['.
                     if (line.StartsWith("["))
                     {
-                        currentSection = ParseSection(line);
+                        currentSection = ParseSection(line, lineNumber);
 
                         if (!IgnoreInlineComments)
+                        {
                             currentSection.Comment = comment;
+                        }
 
                         if (config.Contains(currentSection.Name))
                         {
@@ -70,7 +71,7 @@ namespace SharpConfig
 
                             throw new ParserException(string.Format(
                                 "The section '{0}' was already declared in the configuration.",
-                                currentSection.Name), mLineNumber);
+                                currentSection.Name), lineNumber);
                         }
 
                         if (!IgnorePreComments && preComments.Count > 0)
@@ -83,16 +84,18 @@ namespace SharpConfig
                     }
                     else
                     {
-                        Setting setting = ParseSetting(line);
+                        Setting setting = ParseSetting(line, lineNumber);
 
                         if (!IgnoreInlineComments)
+                        {
                             setting.Comment = comment;
+                        }
 
                         if (currentSection == null)
                         {
                             throw new ParserException(string.Format(
                                 "The setting '{0}' has to be in a section.",
-                                setting.Name), mLineNumber);
+                                setting.Name), lineNumber);
                         }
 
                         if (currentSection.Contains(setting.Name))
@@ -104,7 +107,7 @@ namespace SharpConfig
 
                             throw new ParserException(string.Format(
                                 "The setting '{0}' was already declared in the section.",
-                                setting.Name), mLineNumber);
+                                setting.Name), lineNumber);
                         }
 
                         if (!IgnorePreComments && preComments.Count > 0)
@@ -142,7 +145,7 @@ namespace SharpConfig
 
             bool right = (line.IndexOf('\"', startIndex) > 0);
 
-            return left && right;
+            return (left && right);
         }
 
         private static Comment? ParseComment(string line, out int commentIndex)
@@ -155,7 +158,9 @@ namespace SharpConfig
                 commentIndex = line.IndexOfAny(ValidCommentChars, commentIndex + 1);
 
                 if (commentIndex < 0)
+                {
                     break;
+                }
 
                 // Tip from MarkAJones:
                 // Database connection strings can contain semicolons, which should not be
@@ -166,10 +171,14 @@ namespace SharpConfig
 
                 // If the char before the comment is a backslash, it's not a comment.
                 if (commentIndex >= 1 && line[commentIndex - 1] == '\\')
+                {
                     return null;
+                }
 
                 if (IsInQuoteMarks(line, commentIndex))
+                {
                     continue;
+                }
 
                 comment = new Comment(
                     value: line.Substring(commentIndex + 1).Trim(),
@@ -182,14 +191,16 @@ namespace SharpConfig
             return comment;
         }
 
-        private static Section ParseSection(string line)
+        private static Section ParseSection(string line, int lineNumber)
         {
             line = line.Trim();
 
             int closingBracketIndex = line.IndexOf(']');
 
             if (closingBracketIndex < 0)
-                throw new ParserException("closing bracket missing.", mLineNumber);
+            {
+                throw new ParserException("closing bracket missing.", lineNumber);
+            }
 
             // See if there are unwanted chars after the closing bracket.
             if ((line.Length - 1) > closingBracketIndex)
@@ -198,7 +209,7 @@ namespace SharpConfig
 
                 throw new ParserException(string.Format(
                     "unexpected token '{0}'", unwantedToken),
-                    mLineNumber);
+                    lineNumber);
             }
 
             // Read the section name, and trim all leading / trailing white-spaces.
@@ -208,14 +219,14 @@ namespace SharpConfig
             return new Section(sectionName);
         }
 
-        private static Setting ParseSetting(string line)
+        private static Setting ParseSetting(string line, int lineNumber)
         {
             // Find the assignment operator.
             int indexOfAssignOp = line.IndexOf('=');
 
             if (indexOfAssignOp < 0)
             {
-                throw new ParserException("setting assignment expected.", mLineNumber);
+                throw new ParserException("setting assignment expected.", lineNumber);
             }
 
             // Trim the setting name and value.
@@ -226,11 +237,13 @@ namespace SharpConfig
             // Check if non-null name / value is given.
             if (string.IsNullOrEmpty(settingName))
             {
-                throw new ParserException("setting name expected.", mLineNumber);
+                throw new ParserException("setting name expected.", lineNumber);
             }
 
             if (settingValue == null)
+            {
                 settingValue = string.Empty;
+            }
 
             return new Setting(settingName, settingValue);
         }

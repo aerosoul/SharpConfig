@@ -12,7 +12,9 @@ namespace SharpConfig
         private void Serialize(string filename, Encoding encoding)
         {
             if (string.IsNullOrEmpty(filename))
+            {
                 throw new ArgumentNullException("filename");
+            }
 
             using (var stream = new FileStream(filename, FileMode.Create, FileAccess.Write))
             {
@@ -23,7 +25,9 @@ namespace SharpConfig
         private void Serialize(Stream stream, Encoding encoding)
         {
             if (stream == null)
+            {
                 throw new ArgumentNullException("stream");
+            }
 
             var sb = new StringBuilder();
 
@@ -64,8 +68,9 @@ namespace SharpConfig
             sb.Replace("\r\n\r\n\r\n", "\r\n\r\n");
 
             // Write to stream.
-            var writer = encoding == null ?
-                new StreamWriter(stream) : new StreamWriter(stream, encoding);
+            var writer = (encoding == null) ?
+                new StreamWriter(stream) :
+                new StreamWriter(stream, encoding);
 
             using (writer)
             {
@@ -76,7 +81,9 @@ namespace SharpConfig
         private void SerializeBinary(BinaryWriter writer, string filename)
         {
             if (string.IsNullOrEmpty(filename))
+            {
                 throw new ArgumentNullException("filename");
+            }
 
             using (var stream = new FileStream(filename, FileMode.Create, FileAccess.Write))
             {
@@ -87,7 +94,9 @@ namespace SharpConfig
         private void SerializeBinary(BinaryWriter writer, Stream stream)
         {
             if (stream == null)
+            {
                 throw new ArgumentNullException("stream");
+            }
 
             bool ownWriter = false;
 
@@ -121,7 +130,9 @@ namespace SharpConfig
             finally
             {
                 if (ownWriter)
+                {
                     writer.Close();
+                }
             }
         }
 

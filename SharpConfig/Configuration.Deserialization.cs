@@ -12,7 +12,9 @@ namespace SharpConfig
         private static Configuration DeserializeBinary(BinaryReader reader, string filename)
         {
             if (string.IsNullOrEmpty(filename))
+            {
                 throw new ArgumentNullException("filename");
+            }
 
             Configuration config = null;
 
@@ -27,7 +29,9 @@ namespace SharpConfig
         private static Configuration DeserializeBinary(BinaryReader reader, Stream stream)
         {
             if (stream == null)
+            {
                 throw new ArgumentNullException("stream");
+            }
 
             bool ownReader = false;
 
