@@ -27,7 +27,7 @@ An example Configuration
 SomeString = Hello World!
 SomeInteger = 10 # an inline comment
 SomeFloat = 20.05
-ABoolean = true
+SomeBoolean = true
 ```
 
 To read these values, your C# code would look like:
@@ -38,6 +38,7 @@ Section section = config["General"];
 string someString = section["SomeString"].StringValue;
 int someInteger = section["SomeInteger"].IntValue;
 float someFloat = section["SomeFloat"].FloatValue;
+bool someBool = section["SomeBoolean"].BoolValue;
 ```
 
 Iterating through a Configuration
