@@ -406,9 +406,12 @@ namespace SharpConfig
                 if (Comment != null && hasPreComments)
                 {
                     // Include inline comment and pre-comments.
-                    return string.Format("{0}\n[{1}] {2}",
-                        string.Join(Environment.NewLine, preCommentStrings),
-                        Name, Comment.ToString());
+                    return string.Format("{0}{1}[{2}] {3}",
+                        string.Join(Environment.NewLine, preCommentStrings),    // {0}
+                        Environment.NewLine,    // {1}
+                        Name,                   // {2}
+                        Comment.ToString()      // {3}
+                        );
                 }
                 else if (Comment != null)
                 {
@@ -418,9 +421,11 @@ namespace SharpConfig
                 else if (hasPreComments)
                 {
                     // Include only the pre-comments.
-                    return string.Format("{0}\n[{1}]",
-                        string.Join(Environment.NewLine, preCommentStrings),
-                        Name);
+                    return string.Format("{0}{1}[{2}]",
+                        string.Join(Environment.NewLine, preCommentStrings),    // {0}
+                        Environment.NewLine,    // {1}
+                        Name                    // {2}
+                        );
                 }
             }
 
