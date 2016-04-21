@@ -374,26 +374,18 @@ namespace SharpConfig
         }
 
         /// <summary>
-        /// Returns a string that represents the current object.
+        /// Gets the string representation of the section, without its comments.
         /// </summary>
-        ///
-        /// <returns>
-        /// A string that represents the current object.
-        /// </returns>
         public override string ToString()
         {
             return ToString(false);
         }
 
         /// <summary>
-        /// Convert this object into a string representation.
+        /// Gets the string representation of the section.
         /// </summary>
         ///
         /// <param name="includeComment">True to include, false to exclude the comment.</param>
-        ///
-        /// <returns>
-        /// A string that represents the current object.
-        /// </returns>
         public string ToString(bool includeComment)
         {
             if (includeComment)
