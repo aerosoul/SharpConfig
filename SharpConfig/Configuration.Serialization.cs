@@ -36,6 +36,11 @@ namespace SharpConfig
 
             foreach (var section in this)
             {
+                if (!isFirstSection)
+                {
+                    sb.AppendLine();
+                }
+
                 // Leave some space between this section and the element that is above,
                 // if this section has pre-comments and isn't the first section in the configuration.
                 if (!isFirstSection &&
@@ -59,13 +64,8 @@ namespace SharpConfig
                     sb.AppendLine(setting.ToString(true));
                 }
 
-                sb.AppendLine();
-
                 isFirstSection = false;
             }
-
-            // Replace triple new-lines with double new-lines.
-            sb.Replace("\r\n\r\n\r\n", "\r\n\r\n");
 
             // Write to stream.
             var writer = (encoding == null) ?

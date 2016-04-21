@@ -501,7 +501,7 @@ namespace SharpConfig
         #region Public Methods
 
         /// <summary>
-        /// Gets a string that represents the setting, not including comments.
+        /// Gets the string representation of the setting, without its comments.
         /// </summary>
         public override string ToString()
         {
@@ -509,7 +509,7 @@ namespace SharpConfig
         }
 
         /// <summary>
-        /// Gets a string that represents the setting.
+        /// Gets the string representation of the setting.
         /// </summary>
         ///
         /// <param name="includeComment">Specify true to include the comments in the string; false otherwise.</param>
@@ -525,7 +525,7 @@ namespace SharpConfig
                 if (Comment != null && hasPreComments)
                 {
                     // Include inline comment and pre-comments.
-                    return string.Format("{0}{1}{2}={3} {4}",
+                    return string.Format("{0}{1}{2} = {3} {4}",
                         string.Join(Environment.NewLine, preCommentStrings), // {0}
                         Environment.NewLine,    // {1}
                         Name,                   // {2}
@@ -536,12 +536,12 @@ namespace SharpConfig
                 else if (Comment != null)
                 {
                     // Include only the inline comment.
-                    return string.Format("{0}={1} {2}", Name, mRawValue, Comment.ToString());
+                    return string.Format("{0} = {1} {2}", Name, mRawValue, Comment.ToString());
                 }
                 else if (hasPreComments)
                 {
                     // Include only the pre-comments.
-                    return string.Format("{0}{1}{2}={3}",
+                    return string.Format("{0}{1}{2} = {3}",
                         string.Join(Environment.NewLine, preCommentStrings), // {0}
                         Environment.NewLine,    // {1}
                         Name,                   // {2}
@@ -551,7 +551,7 @@ namespace SharpConfig
             }
 
             // In every other case, include just the assignment in the string.
-            return string.Format("{0}={1}", Name, mRawValue);
+            return string.Format("{0} = {1}", Name, mRawValue);
         }
 
         #endregion
