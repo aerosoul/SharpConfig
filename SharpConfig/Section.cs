@@ -164,8 +164,8 @@ namespace SharpConfig
 
                 if (setting != null)
                 {
-                    object haha = prop.GetValue(obj, null);
-                    setting.SetValue(haha);
+                    object value = prop.GetValue(obj, null);
+                    setting.SetValue(value);
                 }
             }
 
@@ -182,8 +182,8 @@ namespace SharpConfig
 
                 if (setting != null)
                 {
-                    object haha = field.GetValue(obj);
-                    setting.SetValue(haha);
+                    object value = field.GetValue(obj);
+                    setting.SetValue(value);
                 }
             }
         }
