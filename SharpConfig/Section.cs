@@ -139,6 +139,55 @@ namespace SharpConfig
         }
 
         /// <summary>
+        ///Replace In the cfg Properties.
+        /// </summary>
+        /// 
+        /// <param name="obj">The object that is modified based on the section.</param>
+        public void ReplaceToSection<T>(T obj)
+        {
+            if (obj == null)
+            {
+                throw new ArgumentNullException("obj");
+            }
+
+            Type type = typeof(T);
+
+            // Scan the type's properties.
+            foreach (var prop in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+            {
+                if (!prop.CanWrite || ShouldIgnoreMappingFor(prop))
+                {
+                    continue;
+                }
+
+                var setting = FindSetting(prop.Name);
+
+                if (setting != null)
+                {
+                    object value = prop.GetValue(obj, null);
+                    setting.SetValue(value);
+                }
+            }
+
+            // Scan the type's fields.
+            foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public))
+            {
+                // Skip readonly fields.
+                if (field.IsInitOnly || ShouldIgnoreMappingFor(field))
+                {
+                    continue;
+                }
+
+                var setting = FindSetting(field.Name);
+
+                if (setting != null)
+                {
+                    object value = field.GetValue(obj);
+                    setting.SetValue(value);
+                }
+            }
+        }
+        /// <summary>
         /// Assigns the values of this section to an object's public properties and fields.
         /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
         /// or are of a type that is marked with that attribute, are ignored.
