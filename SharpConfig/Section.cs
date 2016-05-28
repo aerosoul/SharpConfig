@@ -139,11 +139,14 @@ namespace SharpConfig
         }
 
         /// <summary>
-        ///Replace In the cfg Properties.
+        /// Assigns the values of an object's public properties and fields to the corresponding
+        /// settings in this section.
+        /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
+        /// or are of a type that is marked with that attribute, are ignored.
         /// </summary>
         /// 
-        /// <param name="obj">The object that is modified based on the section.</param>
-        public void ReplaceToSection<T>(T obj)
+        /// <param name="obj">The object from which the values are obtained.</param>
+        public void MapFrom<T>(T obj)
         {
             if (obj == null)
             {
@@ -187,6 +190,7 @@ namespace SharpConfig
                 }
             }
         }
+        
         /// <summary>
         /// Assigns the values of this section to an object's public properties and fields.
         /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
