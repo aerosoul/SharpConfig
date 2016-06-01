@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2015 Cemalettin Dervis, MIT License.
+﻿// Copyright (c) 2013-2016 Cemalettin Dervis, MIT License.
 // https://github.com/cemdervis/SharpConfig
 
 namespace SharpConfig

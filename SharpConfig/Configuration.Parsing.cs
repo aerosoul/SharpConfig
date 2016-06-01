@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2015 Cemalettin Dervis, MIT License.
+﻿// Copyright (c) 2013-2016 Cemalettin Dervis, MIT License.
 // https://github.com/cemdervis/SharpConfig
 
 using System.Collections.Generic;
@@ -62,18 +62,6 @@ namespace SharpConfig
                             currentSection.Comment = comment;
                         }
 
-                        if (config.Contains(currentSection.Name))
-                        {
-                            if (IgnoreDuplicateSections)
-                            {
-                                continue;
-                            }
-
-                            throw new ParserException(string.Format(
-                                "The section '{0}' was already declared in the configuration.",
-                                currentSection.Name), lineNumber);
-                        }
-
                         if (!IgnorePreComments && preComments.Count > 0)
                         {
                             currentSection.mPreComments = new List<Comment>(preComments);
@@ -95,18 +83,6 @@ namespace SharpConfig
                         {
                             throw new ParserException(string.Format(
                                 "The setting '{0}' has to be in a section.",
-                                setting.Name), lineNumber);
-                        }
-
-                        if (currentSection.Contains(setting.Name))
-                        {
-                            if (IgnoreDuplicateSettings)
-                            {
-                                continue;
-                            }
-
-                            throw new ParserException(string.Format(
-                                "The setting '{0}' was already declared in the section.",
                                 setting.Name), lineNumber);
                         }
 

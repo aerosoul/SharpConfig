@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2015 Cemalettin Dervis, MIT License.
+﻿// Copyright (c) 2013-2016 Cemalettin Dervis, MIT License.
 // https://github.com/cemdervis/SharpConfig
 
 using System;
@@ -38,8 +38,6 @@ namespace SharpConfig
             mValidCommentChars = new[] { '#', ';', '\'' };
             IgnoreInlineComments = false;
             IgnorePreComments = false;
-            IgnoreDuplicateSettings = false;
-            IgnoreDuplicateSettings = false;
         }
 
         /// <summary>
@@ -86,19 +84,13 @@ namespace SharpConfig
                 throw new ArgumentException("The specified section already exists in the configuration.");
             }
 
-            if (Contains(section.Name))
-            {
-                throw new ArgumentException(string.Format(
-                    "A section named '{0}' already exists in the configuration.",
-                    section.Name
-                    ));
-            }
-
             mSections.Add(section);
         }
 
         /// <summary>
         /// Removes a section from the configuration by its name.
+        /// If there are multiple sections with the same name, only the first section is removed.
+        /// To remove all sections that have the name name, use the RemoveAllNamed() method instead.
         /// </summary>
         /// <param name="sectionName">The case-sensitive name of the section to remove.</param>
         public void Remove(string sectionName)
@@ -119,6 +111,26 @@ namespace SharpConfig
             }
 
             Remove(section);
+        }
+
+        /// <summary>
+        /// Removes all sections that have a specific name.
+        /// </summary>
+        /// <param name="sectionName">The case-sensitive name of the sections to remove.</param>
+        public void RemoveAllNamed(string sectionName)
+        {
+            if (string.IsNullOrEmpty(sectionName))
+            {
+                throw new ArgumentNullException("sectionName");
+            }
+
+            for (int i = mSections.Count - 1; i >= 0; i--)
+            {
+                if (string.Equals(mSections[i].Name, sectionName, StringComparison.OrdinalIgnoreCase))
+                {
+                    mSections.RemoveAt(i);
+                }
+            }
         }
 
         /// <summary>
@@ -550,18 +562,6 @@ namespace SharpConfig
         public static bool IgnorePreComments { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether duplicate
-        /// settings should be ignored when parsing a configuration.
-        /// </summary>
-        public static bool IgnoreDuplicateSettings { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether duplicate sections
-        /// should be ignored when parsing a configuration
-        /// </summary>
-        public static bool IgnoreDuplicateSections { get; set; }
-
-        /// <summary>
         /// Gets the number of sections that are in the configuration.
         /// </summary>
         public int SectionCount
@@ -593,9 +593,11 @@ namespace SharpConfig
 
         /// <summary>
         /// Gets or sets a section by its name.
+        /// If there are multiple sections with the same name, the first section is returned.
+        /// If you want to obtain all sections that have the same name, use the GetSectionsNamed() method instead.
         /// </summary>
         ///
-        /// <param name="name">The name of the section.</param>
+        /// <param name="name">The case-sensitive name of the section.</param>
         ///
         /// <returns>
         /// The section if found, otherwise a new section with
@@ -615,6 +617,28 @@ namespace SharpConfig
 
                 return section;
             }
+        }
+
+        /// <summary>
+        /// Gets all sections that have a specific name.
+        /// </summary>
+        /// <param name="name">The case-sensitive name of the sections.</param>
+        /// <returns>
+        /// The found sections.
+        /// </returns>
+        public IEnumerable<Section> GetSectionsNamed(string name)
+        {
+            var sections = new List<Section>();
+
+            foreach (var section in mSections)
+            {
+                if (string.Equals(section.Name, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    sections.Add(section);
+                }
+            }
+
+            return sections;
         }
 
         // Finds a section by its name.

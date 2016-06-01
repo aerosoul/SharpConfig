@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2015 Cemalettin Dervis, MIT License.
+﻿// Copyright (c) 2013-2016 Cemalettin Dervis, MIT License.
 // https://github.com/cemdervis/SharpConfig
 
 using System;
@@ -275,20 +275,15 @@ namespace SharpConfig
                 throw new ArgumentException("The specified setting already exists in the section.");
             }
 
-            if (Contains(setting.Name))
-            {
-                throw new ArgumentException(string.Format(
-                    "A setting named '{0}' already exists in the section.",
-                    setting.Name
-                    ));
-            }
-
             mSettings.Add(setting);
         }
 
         /// <summary>
         /// Removes a setting from the section by its name.
+        /// If there are multiple settings with the same name, only the first setting is removed.
+        /// To remove all settings that have the name name, use the RemoveAllNamed() method instead.
         /// </summary>
+        /// <param name="settingName">The case-sensitive name of the setting to remove.</param>
         public void Remove(string settingName)
         {
             if (string.IsNullOrEmpty(settingName))
@@ -307,6 +302,26 @@ namespace SharpConfig
             }
 
             mSettings.Remove(setting);
+        }
+
+        /// <summary>
+        /// Removes all settings that have a specific name.
+        /// </summary>
+        /// <param name="settingName">The case-sensitive name of the settings to remove.</param>
+        public void RemoveAllNamed(string settingName)
+        {
+            if (string.IsNullOrEmpty(settingName))
+            {
+                throw new ArgumentNullException("settingName");
+            }
+
+            for (int i = mSettings.Count - 1; i >= 0; i--)
+            {
+                if (string.Equals(mSettings[i].Name, settingName, StringComparison.OrdinalIgnoreCase))
+                {
+                    mSettings.RemoveAt(i);
+                }
+            }
         }
 
         /// <summary>
@@ -349,7 +364,7 @@ namespace SharpConfig
         /// <summary>
         /// Determines whether a specifically named setting is contained in the section.
         /// </summary>
-        /// <param name="settingName">The name of the setting.</param>
+        /// <param name="settingName">The case-sensitive name of the setting.</param>
         /// <returns>True if the setting is contained in the section; false otherwise.</returns>
         public bool Contains(string settingName)
         {
@@ -388,9 +403,11 @@ namespace SharpConfig
 
         /// <summary>
         /// Gets or sets a setting by its name.
+        /// If there are multiple settings with the same name, the first setting is returned.
+        /// If you want to obtain all settings that have the same name, use the GetSettingsNamed() method instead.
         /// </summary>
         ///
-        /// <param name="name">The name of the setting.</param>
+        /// <param name="name">The case-sensitive name of the setting.</param>
         ///
         /// <returns>
         /// The setting if found, otherwise a new setting with
@@ -410,6 +427,28 @@ namespace SharpConfig
 
                 return setting;
             }
+        }
+
+        /// <summary>
+        /// Gets all settings that have a specific name.
+        /// </summary>
+        /// <param name="name">The case-sensitive name of the settings.</param>
+        /// <returns>
+        /// The found settings.
+        /// </returns>
+        public IEnumerable<Setting> GetSettingsNamed(string name)
+        {
+            var settings = new List<Setting>();
+
+            foreach (var setting in mSettings)
+            {
+                if (string.Equals(setting.Name, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    settings.Add(setting);
+                }
+            }
+
+            return settings;
         }
 
         // Finds a setting by its name.
