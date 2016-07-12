@@ -283,7 +283,7 @@ namespace SharpConfig
         /// </returns>
         public static Configuration LoadFromString(string source)
         {
-            if (string.IsNullOrEmpty(source))
+            if (source == null)
             {
                 throw new ArgumentNullException("source");
             }
