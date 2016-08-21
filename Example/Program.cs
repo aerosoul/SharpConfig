@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using SharpConfig;
 
 namespace Example
@@ -7,6 +8,7 @@ namespace Example
     {
         public string SomeString { get; set; }
         public int SomeInt { get; set; }
+        public int[] SomeInts { get; set; }
         public DateTime SomeDate { get; set; }
 
         // This field will be ignored by SharpConfig
@@ -23,11 +25,15 @@ namespace Example
     {
         static void Main(string[] args)
         {
-            // Call other methods in this file here to see their effect.
-            HowToLoadAConfig();
+            // Call the methods in this file here to see their effect.
 
-            Console.WriteLine("Hi, please take a look at the methods below");
-            Console.WriteLine("to get an understanding of how to use SharpConfig!");
+            HowToLoadAConfig();
+            //HowToCreateAConfig();
+            //HowToSaveAConfig(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TestCfg.ini"));
+            //HowToCreateObjectsFromSections();
+            //HowToCreateSectionsFromObjects();
+            //HowToHandleArrays();
+
             Console.ReadLine();
         }
 
@@ -39,7 +45,7 @@ namespace Example
         static void HowToLoadAConfig()
         {
             // Read our example config.
-            Configuration cfg = Configuration.LoadFromString(Properties.Resources.SampleCfg);
+            var cfg = Configuration.LoadFromString(Properties.Resources.SampleCfg);
 
             // Just print all sections and their settings.
             PrintConfig(cfg);
@@ -54,6 +60,7 @@ namespace Example
 
             cfg["SomeStructure"]["SomeString"].StringValue = "foobar";
             cfg["SomeStructure"]["SomeInt"].IntValue = 2000;
+            cfg["SomeStructure"]["SomeInts"].IntValueArray = new[] { 1, 2, 3 };
             cfg["SomeStructure"]["SomeDate"].DateTimeValue = DateTime.Now;
 
             // We can obtain the values directly as strings, ints, floats, or any other (custom) type,
@@ -72,52 +79,57 @@ namespace Example
         /// <param name="filename">The destination filename.</param>
         static void HowToSaveAConfig(string filename)
         {
-            Configuration cfg = new Configuration();
+            var cfg = new Configuration();
 
             cfg["SomeStructure"]["SomeString"].StringValue = "foobar";
             cfg["SomeStructure"]["SomeInt"].IntValue = 2000;
+            cfg["SomeStructure"]["SomeInts"].IntValueArray = new[] { 1, 2, 3 };
             cfg["SomeStructure"]["SomeDate"].DateTimeValue = DateTime.Now;
 
             cfg.SaveToFile(filename);
+
+            Console.WriteLine("The config has been saved to {0}!", filename);
         }
 
         /// <summary>
-        /// Shows how to create .NET objects directly from sections.
+        /// Shows how to create C#/.NET objects directly from sections.
         /// </summary>
         static void HowToCreateObjectsFromSections()
         {
-            Configuration cfg = new Configuration();
+            var cfg = new Configuration();
 
             // Create the section.
-            cfg["SomeStructure"]["SomeString"].SetValue("foobar");
-            cfg["SomeStructure"]["SomeInt"].SetValue(2000);
-            cfg["SomeStructure"]["SomeDate"].SetValue(DateTime.Now);
+            cfg["SomeStructure"]["SomeString"].StringValue = "foobar";
+            cfg["SomeStructure"]["SomeInt"].IntValue = 2000;
+            cfg["SomeStructure"]["SomeInts"].IntValueArray = new[] { 1, 2, 3 };
+            cfg["SomeStructure"]["SomeDate"].DateTimeValue = DateTime.Now;
 
             // Now create an object from it.
-            SomeStructure p = cfg["SomeStructure"].CreateObject<SomeStructure>();
+            var p = cfg["SomeStructure"].ToObject<SomeStructure>();
 
             // Test.
             Console.WriteLine("SomeString:   " + p.SomeString);
             Console.WriteLine("SomeInt:      " + p.SomeInt);
+            PrintArray("SomeInts", p.SomeInts); 
             Console.WriteLine("SomeDate:     " + p.SomeDate);
         }
 
         /// <summary>
-        /// Shows how to create sections directly from .NET objects.
+        /// Shows how to create sections directly from C#/.NET objects.
         /// </summary>
         static void HowToCreateSectionsFromObjects()
         {
-            Configuration cfg = new Configuration();
+            var cfg = new Configuration();
 
             // Create an object.
-            SomeStructure p = new SomeStructure();
+            var p = new SomeStructure();
             p.SomeString = "foobar";
             p.SomeInt = 2000;
+            p.SomeInts = new[] { 1, 2, 3 };
             p.SomeDate = DateTime.Now;
 
             // Now create a section from it.
-            Section section = Section.FromObject("SomeStructure", p);
-            cfg.Add(section);
+            cfg.Add(Section.FromObject("SomeStructure", p));
 
             // Print the config to see that it worked.
             PrintConfig(cfg);
@@ -128,11 +140,9 @@ namespace Example
         /// </summary>
         static void HowToHandleArrays()
         {
-            int[] someIntValues = new int[] { 1, 2, 3, 4 };
+            var cfg = new Configuration();
 
-            Configuration cfg = new Configuration();
-
-            cfg["GeneralSection"]["SomeInts"].SetValue(someIntValues);
+            cfg["GeneralSection"]["SomeInts"].IntValueArray = new[] { 1, 2, 3 };
 
             // Get the array back.
             int[] someIntValuesBack = cfg["GeneralSection"]["SomeInts"].GetValueArray<int>();
@@ -163,9 +173,7 @@ namespace Example
                     Console.Write("  ");
 
                     if (setting.IsArray)
-                    {
                         Console.Write("[Array, {0} elements] ", setting.ArraySize);
-                    }
 
                     Console.WriteLine(setting.ToString());
                 }
@@ -180,9 +188,7 @@ namespace Example
             Console.Write(arrName + " = { ");
 
             for (int i = 0; i < arr.Length - 1; i++)
-            {
                 Console.Write(arr[i].ToString() + ", ");
-            }
 
             Console.Write(arr[arr.Length - 1].ToString());
             Console.WriteLine(" }");

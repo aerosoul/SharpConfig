@@ -25,6 +25,9 @@ namespace SharpConfig
         private static NumberFormatInfo mNumberFormat;
         private static DateTimeFormatInfo mDateTimeFormat;
         private static char[] mValidCommentChars;
+        private static ITypeStringConverter mFallbackConverter;
+        private static Dictionary<Type, ITypeStringConverter> mTypeStringConverters;
+
         private List<Section> mSections;
 
         #endregion
@@ -36,6 +39,28 @@ namespace SharpConfig
             mNumberFormat = CultureInfo.InvariantCulture.NumberFormat;
             mDateTimeFormat = CultureInfo.InvariantCulture.DateTimeFormat;
             mValidCommentChars = new[] { '#', ';', '\'' };
+
+            mFallbackConverter = new FallbackStringConverter();
+            mTypeStringConverters = new Dictionary<Type, ITypeStringConverter>()
+            {
+                { typeof(bool), new BoolStringConverter() },
+                { typeof(byte), new ByteStringConverter() },
+                { typeof(char), new CharStringConverter() },
+                { typeof(DateTime), new DateTimeStringConverter() },
+                { typeof(decimal), new DecimalStringConverter() },
+                { typeof(double), new DoubleStringConverter() },
+                { typeof(Enum), new EnumStringConverter() },
+                { typeof(short), new Int16StringConverter() },
+                { typeof(int), new Int32StringConverter() },
+                { typeof(long), new Int64StringConverter() },
+                { typeof(sbyte), new SByteStringConverter() },
+                { typeof(float), new SingleStringConverter() },
+                { typeof(string), new StringStringConverter() },
+                { typeof(ushort), new UInt16StringConverter() },
+                { typeof(uint), new UInt32StringConverter() },
+                { typeof(ulong), new UInt64StringConverter() }
+            };
+
             IgnoreInlineComments = false;
             IgnorePreComments = false;
         }
@@ -75,14 +100,10 @@ namespace SharpConfig
         public void Add(Section section)
         {
             if (section == null)
-            {
                 throw new ArgumentNullException("section");
-            }
 
             if (Contains(section))
-            {
                 throw new ArgumentException("The specified section already exists in the configuration.");
-            }
 
             mSections.Add(section);
         }
@@ -96,9 +117,7 @@ namespace SharpConfig
         public void Remove(string sectionName)
         {
             if (string.IsNullOrEmpty(sectionName))
-            {
                 throw new ArgumentNullException("sectionName");
-            }
 
             var section = FindSection(sectionName);
 
@@ -120,16 +139,12 @@ namespace SharpConfig
         public void RemoveAllNamed(string sectionName)
         {
             if (string.IsNullOrEmpty(sectionName))
-            {
                 throw new ArgumentNullException("sectionName");
-            }
 
             for (int i = mSections.Count - 1; i >= 0; i--)
             {
                 if (string.Equals(mSections[i].Name, sectionName, StringComparison.OrdinalIgnoreCase))
-                {
                     mSections.RemoveAt(i);
-                }
             }
         }
 
@@ -140,14 +155,10 @@ namespace SharpConfig
         public void Remove(Section section)
         {
             if (section == null)
-            {
                 throw new ArgumentNullException("section");
-            }
 
             if (!Contains(section))
-            {
                 throw new ArgumentException("The specified section does not exist in the section.");
-            }
 
             mSections.Remove(section);
         }
@@ -178,6 +189,51 @@ namespace SharpConfig
         public bool Contains(string sectionName)
         {
             return FindSection(sectionName) != null;
+        }
+
+        /// <summary>
+        /// Registers a type converter to be used for setting value conversions.
+        /// </summary>
+        /// <param name="converter">The converter to register.</param>
+        public static void RegisterTypeStringConverter(ITypeStringConverter converter)
+        {
+            if (converter == null)
+                throw new ArgumentNullException("converter");
+
+            var type = converter.ConvertibleType;
+            if (mTypeStringConverters.ContainsKey(type))
+                throw new InvalidOperationException(string.Format("A converter for type '{0}' is already registered.", type.FullName));
+            else
+                mTypeStringConverters.Add(type, converter);
+        }
+
+        /// <summary>
+        /// Deregisters a type converter from setting value conversion.
+        /// </summary>
+        /// <param name="converter">The converter to deregister.</param>
+        public static void DeregisterTypeStringConverter(Type type)
+        {
+            if (type == null)
+                throw new ArgumentNullException("type");
+
+            if (!mTypeStringConverters.ContainsKey(type))
+                throw new InvalidOperationException(string.Format("No converter is registered for type '{0}'.", type.FullName));
+            else
+                mTypeStringConverters.Remove(type);
+        }
+
+        internal static ITypeStringConverter FindTypeStringConverter(Type type)
+        {
+            ITypeStringConverter converter = null;
+            if (!mTypeStringConverters.TryGetValue(type, out converter))
+                converter = mFallbackConverter;
+
+            return converter;
+        }
+
+        internal static ITypeStringConverter FallbackConverter
+        {
+            get { return mFallbackConverter; }
         }
 
         #endregion
@@ -212,14 +268,10 @@ namespace SharpConfig
         public static Configuration LoadFromFile(string filename, Encoding encoding)
         {
             if (string.IsNullOrEmpty(filename))
-            {
                 throw new ArgumentNullException("filename");
-            }
 
             if (!File.Exists(filename))
-            {
                 throw new FileNotFoundException("Configuration file not found.", filename);
-            }
 
             return (encoding == null) ?
                 LoadFromString(File.ReadAllText(filename)) :
@@ -254,9 +306,7 @@ namespace SharpConfig
         public static Configuration LoadFromStream(Stream stream, Encoding encoding)
         {
             if (stream == null)
-            {
                 throw new ArgumentNullException("stream");
-            }
 
             string source = null;
 
@@ -265,9 +315,7 @@ namespace SharpConfig
                 new StreamReader(stream, encoding);
 
             using (reader)
-            {
                 source = reader.ReadToEnd();
-            }
 
             return LoadFromString(source);
         }
@@ -284,9 +332,7 @@ namespace SharpConfig
         public static Configuration LoadFromString(string source)
         {
             if (source == null)
-            {
                 throw new ArgumentNullException("source");
-            }
 
             return Parse(source);
         }
@@ -307,9 +353,7 @@ namespace SharpConfig
         public static Configuration LoadFromBinaryFile(string filename)
         {
             if (string.IsNullOrEmpty(filename))
-            {
                 throw new ArgumentNullException("filename");
-            }
 
             return DeserializeBinary(null, filename);
         }
@@ -327,9 +371,7 @@ namespace SharpConfig
         public static Configuration LoadFromBinaryFile(string filename, BinaryReader reader)
         {
             if (string.IsNullOrEmpty(filename))
-            {
                 throw new ArgumentNullException("filename");
-            }
 
             return DeserializeBinary(reader, filename);
         }
@@ -346,9 +388,7 @@ namespace SharpConfig
         public static Configuration LoadFromBinaryStream(Stream stream)
         {
             if (stream == null)
-            {
                 throw new ArgumentNullException("stream");
-            }
 
             return DeserializeBinary(null, stream);
         }
@@ -366,9 +406,7 @@ namespace SharpConfig
         public static Configuration LoadFromBinaryStream(Stream stream, BinaryReader reader)
         {
             if (stream == null)
-            {
                 throw new ArgumentNullException("stream");
-            }
 
             return DeserializeBinary(reader, stream);
         }
@@ -396,9 +434,7 @@ namespace SharpConfig
         public void SaveToFile(string filename, Encoding encoding)
         {
             if (string.IsNullOrEmpty(filename))
-            {
                 throw new ArgumentNullException("filename");
-            }
 
             Serialize(filename, encoding);
         }
@@ -422,9 +458,7 @@ namespace SharpConfig
         public void SaveToStream(Stream stream, Encoding encoding)
         {
             if (stream == null)
-            {
                 throw new ArgumentNullException("stream");
-            }
 
             Serialize(stream, encoding);
         }
@@ -452,9 +486,7 @@ namespace SharpConfig
         public void SaveToBinaryFile(string filename, BinaryWriter writer)
         {
             if (string.IsNullOrEmpty(filename))
-            {
                 throw new ArgumentNullException("filename");
-            }
 
             SerializeBinary(writer, filename);
         }
@@ -478,9 +510,7 @@ namespace SharpConfig
         public void SaveToBinaryStream(Stream stream, BinaryWriter writer)
         {
             if (stream == null)
-            {
                 throw new ArgumentNullException("stream");
-            }
 
             SerializeBinary(writer, stream);
         }
@@ -499,9 +529,7 @@ namespace SharpConfig
             set
             {
                 if (value == null)
-                {
                     throw new ArgumentNullException("value");
-                }
 
                 mNumberFormat = value;
             }
@@ -517,9 +545,7 @@ namespace SharpConfig
             set
             {
                 if (value == null)
-                {
                     throw new ArgumentNullException("value");
-                }
 
                 mDateTimeFormat = value;
             }
@@ -534,9 +560,7 @@ namespace SharpConfig
             set
             {
                 if (value == null)
-                {
                     throw new ArgumentNullException("value");
-                }
 
                 if (value.Length == 0)
                 {
@@ -583,9 +607,7 @@ namespace SharpConfig
             get
             {
                 if (index < 0 || index >= mSections.Count)
-                {
                     throw new ArgumentOutOfRangeException("index");
-                }
 
                 return mSections[index];
             }
@@ -633,9 +655,7 @@ namespace SharpConfig
             foreach (var section in mSections)
             {
                 if (string.Equals(section.Name, name, StringComparison.OrdinalIgnoreCase))
-                {
                     sections.Add(section);
-                }
             }
 
             return sections;
@@ -647,9 +667,7 @@ namespace SharpConfig
             foreach (var section in mSections)
             {
                 if (string.Equals(section.Name, name, StringComparison.OrdinalIgnoreCase))
-                {
                     return section;
-                }
             }
 
             return null;

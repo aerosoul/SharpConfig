@@ -2,6 +2,7 @@
 // https://github.com/cemdervis/SharpConfig
 
 using System;
+using System.Collections.Generic;
 
 namespace SharpConfig
 {
@@ -13,7 +14,9 @@ namespace SharpConfig
     {
         #region Fields
 
-        private string mRawValue;
+        private string mRawValue = string.Empty;
+        private int mCachedArraySize = 0;
+        private bool mShouldCalculateArraySize = false;
 
         #endregion
 
@@ -24,9 +27,7 @@ namespace SharpConfig
         /// </summary>
         public Setting(string name) :
             this(name, string.Empty)
-        {
-            mRawValue = string.Empty;
-        }
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Setting"/> class.
@@ -34,8 +35,8 @@ namespace SharpConfig
         ///
         /// <param name="name"> The name of the setting.</param>
         /// <param name="value">The value of the setting.</param>
-        public Setting(string name, object value) :
-            base(name)
+        public Setting(string name, object value)
+            : base(name)
         {
             SetValue(value);
         }
@@ -45,12 +46,23 @@ namespace SharpConfig
         #region Properties
 
         /// <summary>
-        /// Gets or sets the raw string value of this setting.
+        /// Gets or sets the value of this setting as a string.
+        /// Note: this is a shortcut to GetValue and SetValue.
         /// </summary>
         public string StringValue
         {
-            get { return mRawValue; }
-            set { mRawValue = value; }
+            get { return GetValue<string>(); }
+            set { SetValue(value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the value of this setting as a string array.
+        /// Note: this is a shortcut to GetValueArray and SetValue.
+        /// </summary>
+        public string[] StringValueArray
+        {
+            get { return GetValueArray<string>(); }
+            set { SetValue(value); }
         }
 
         /// <summary>
@@ -60,6 +72,16 @@ namespace SharpConfig
         public int IntValue
         {
             get { return GetValue<int>(); }
+            set { SetValue(value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the value of this setting as an int array.
+        /// Note: this is a shortcut to GetValueArray and SetValue.
+        /// </summary>
+        public int[] IntValueArray
+        {
+            get { return GetValueArray<int>(); }
             set { SetValue(value); }
         }
 
@@ -74,12 +96,32 @@ namespace SharpConfig
         }
 
         /// <summary>
+        /// Gets or sets the value of this setting as a float array.
+        /// Note: this is a shortcut to GetValueArray and SetValue.
+        /// </summary>
+        public float[] FloatValueArray
+        {
+            get { return GetValueArray<float>(); }
+            set { SetValue(value); }
+        }
+
+        /// <summary>
         /// Gets or sets the value of this setting as a double.
         /// Note: this is a shortcut to GetValue and SetValue.
         /// </summary>
         public double DoubleValue
         {
             get { return GetValue<double>(); }
+            set { SetValue(value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the value of this setting as a double array.
+        /// Note: this is a shortcut to GetValueArray and SetValue.
+        /// </summary>
+        public double[] DoubleValueArray
+        {
+            get { return GetValueArray<double>(); }
             set { SetValue(value); }
         }
 
@@ -94,12 +136,32 @@ namespace SharpConfig
         }
 
         /// <summary>
-        /// Gets or sets the value of this settings as a date.
+        /// Gets or sets the value of this setting as a bool array.
+        /// Note: this is a shortcut to GetValueArray and SetValue.
+        /// </summary>
+        public bool[] BoolValueArray
+        {
+            get { return GetValueArray<bool>(); }
+            set { SetValue(value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the value of this settings as a <see cref="DateTime"/>.
         /// Note: this is a shortcut to GetValue and SetValue.
         /// </summary>
         public DateTime DateTimeValue
         {
             get { return GetValue<DateTime>(); }
+            set { SetValue(value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the value of this setting as a <see cref="DateTime"/> array.
+        /// Note: this is a shortcut to GetValueArray and SetValue.
+        /// </summary>
+        public DateTime[] DateTimeValueArray
+        {
+            get { return GetValueArray<DateTime>(); }
             set { SetValue(value); }
         }
 
@@ -119,103 +181,80 @@ namespace SharpConfig
         {
             get
             {
-                if (string.IsNullOrEmpty(mRawValue))
+                if (mShouldCalculateArraySize)
                 {
-                    return -1;
+                    mCachedArraySize = CalculateArraySize();
+                    mShouldCalculateArraySize = false;
                 }
+                return mCachedArraySize;
+            }
+        }
 
-                int arrayStartIdx = mRawValue.IndexOf('{');
-                int arrayEndIdx = mRawValue.LastIndexOf('}');
+        private int CalculateArraySize()
+        {
+            if (string.IsNullOrEmpty(mRawValue))
+                return -1;
 
-                if (arrayStartIdx < 0 || arrayEndIdx < 0)
-                {
-                    // Not an array.
+            int arrayStartIdx = mRawValue.IndexOf('{');
+            int arrayEndIdx = mRawValue.LastIndexOf('}');
+
+            if (arrayStartIdx < 0 || arrayEndIdx < 0)
+                return -1; // Not an array.
+
+            // There may only be spaces between the beginning
+            // of the string and the first left bracket.
+            for (int i = 0; i < arrayStartIdx; ++i)
+            {
+                if (mRawValue[i] != ' ')
                     return -1;
-                }
+            }
 
-                // There may only be spaces between the beginning
-                // of the string and the first left bracket.
-                for (int i = 0; i < arrayStartIdx; ++i)
+            // Also, there may only be spaces between the last
+            // right brace and the end of the string.
+            for (int i = arrayEndIdx + 1; i < mRawValue.Length; ++i)
+            {
+                if (mRawValue[i] != ' ')
+                    return -1;
+            }
+
+            int arraySize = 0;
+
+            // Naive algorithm; assume the number of commas equals the number of elements + 1.
+            for (int i = 0; i < mRawValue.Length; ++i)
+            {
+                if (mRawValue[i] == ',')
+                    ++arraySize;
+            }
+
+            if (arraySize == 0)
+            {
+                // There were no commas in the array expression.
+                // That does not mean that there are no elements.
+                // Check if there is at least something.
+                // If so, that is the single element of the array.
+                for (int i = arrayStartIdx + 1; i < arrayEndIdx; ++i)
                 {
                     if (mRawValue[i] != ' ')
-                    {
-                        return -1;
-                    }
-                }
-
-                // Also, there may only be spaces between the last
-                // right brace and the end of the string.
-                for (int i = arrayEndIdx + 1; i < mRawValue.Length; ++i)
-                {
-                    if (mRawValue[i] != ' ')
-                    {
-                        return -1;
-                    }
-                }
-
-                int arraySize = 0;
-
-                // Naive algorithm; assume the number of commas equals the number of elements + 1.
-                for (int i = 0; i < mRawValue.Length; ++i)
-                {
-                    if (mRawValue[i] == ',')
                     {
                         ++arraySize;
+                        break;
                     }
                 }
-
-                if (arraySize == 0)
-                {
-                    // There were no commas in the array expression.
-                    // That does not mean that there are no elements.
-                    // Check if there is at least something.
-                    // If so, that is the single element of the array.
-                    for (int i = arrayStartIdx + 1; i < arrayEndIdx; ++i)
-                    {
-                        if (mRawValue[i] != ' ')
-                        {
-                            ++arraySize;
-                            break;
-                        }
-                    }
-                }
-                else if (arraySize > 0)
-                {
-                    // If there were any commas in the array expression,
-                    // we have to increment the array size, as we assumed
-                    // that the number of commas equaled the number of elements + 1.
-                    ++arraySize;
-                }
-
-                return arraySize;
             }
+            else if (arraySize > 0)
+            {
+                // If there were any commas in the array expression,
+                // we have to increment the array size, as we assumed
+                // that the number of commas equaled the number of elements + 1.
+                ++arraySize;
+            }
+
+            return arraySize;
         }
 
         #endregion
 
-        #region GetValueTyped
-
-        /// <summary>
-        /// Gets this setting's value as a specific type.
-        /// </summary>
-        ///
-        /// <typeparam name="T">The type of the object to retrieve.</typeparam>
-        [Obsolete("consider using GetValue().")]
-        public T GetValueTyped<T>()
-        {
-            return GetValue<T>();
-        }
-
-        /// <summary>
-        /// Gets this setting's value as a specific type.
-        /// </summary>
-        ///
-        /// <param name="type">The type of the object to retrieve.</param>
-        [Obsolete("consider using GetValue().")]
-        public object GetValueTyped(Type type)
-        {
-            return GetValue(type);
-        }
+        #region GetValue
 
         /// <summary>
         /// Gets this setting's value as a specific type.
@@ -224,19 +263,13 @@ namespace SharpConfig
         /// <typeparam name="T">The type of the object to retrieve.</typeparam>
         public T GetValue<T>()
         {
-            Type type = typeof(T);
+            var type = typeof(T);
 
             if (type.IsArray)
-            {
-                throw new InvalidOperationException(
-                    "To obtain an array value, use GetValueArray instead of GetValueTyped.");
-            }
+                throw new InvalidOperationException("To obtain an array value, use GetValueArray() instead of GetValue().");
 
             if (this.IsArray)
-            {
-                throw new InvalidOperationException(
-                    "The setting represents an array. Use GetValueArray to obtain its value.");
-            }
+                throw new InvalidOperationException("The setting represents an array. Use GetValueArray() to obtain its value.");
 
             return (T)CreateObjectFromString(mRawValue, type);
         }
@@ -249,23 +282,16 @@ namespace SharpConfig
         public object GetValue(Type type)
         {
             if (type == null)
-            {
                 throw new ArgumentNullException("type");
-            }
 
             if (type.IsArray)
             {
-                throw new InvalidOperationException(
-                    "To obtain an array value, use GetValueArray instead of GetValueTyped.");
+                return GetValueArray(type.GetElementType());
             }
-
-            if (this.IsArray)
+            else
             {
-                throw new InvalidOperationException(
-                    "The setting represents an array. Use GetValueArray to obtain its value.");
+                return CreateObjectFromString(mRawValue, type);
             }
-
-            return CreateObjectFromString(mRawValue, type);
         }
 
         /// <summary>
@@ -276,25 +302,23 @@ namespace SharpConfig
         ///     The type of elements in the array. All values in the array are going to be converted to objects of this type.
         ///     If the conversion of an element fails, an exception is thrown.
         /// </typeparam>
-        /// <returns></returns>
+        /// <returns>The values of this setting as an array.</returns>
         public T[] GetValueArray<T>()
         {
+            if (typeof(T).IsArray)
+                throw new ArgumentException("Jagged arrays are not supported.");
+
             int myArraySize = this.ArraySize;
             if (myArraySize < 0)
-            {
                 return null;
-            }
 
             var values = new T[myArraySize];
 
             if (myArraySize > 0)
             {
                 var enumerator = new SettingArrayEnumerator(mRawValue);
-
                 while (enumerator.Next())
-                {
                     values[enumerator.Index] = (T)CreateObjectFromString(enumerator.Current, typeof(T));
-                }
             }
 
             return values;
@@ -308,25 +332,23 @@ namespace SharpConfig
         ///     The type of elements in the array. All values in the array are going to be converted to objects of this type.
         ///     If the conversion of an element fails, an exception is thrown.
         /// </param>
-        /// <returns></returns>
+        /// <returns>The values of this setting as an array.</returns>
         public object[] GetValueArray(Type elementType)
         {
+            if (elementType.IsArray)
+                throw new ArgumentException("Jagged arrays are not supported.");
+
             int myArraySize = this.ArraySize;
-            if (myArraySize < 0)
-            {
+            if (ArraySize < 0)
                 return null;
-            }
 
             var values = new object[myArraySize];
 
             if (myArraySize > 0)
             {
                 var enumerator = new SettingArrayEnumerator(mRawValue);
-
                 while (enumerator.Next())
-                {
                     values[enumerator.Index] = CreateObjectFromString(enumerator.Current, elementType);
-                }
             }
 
             return values;
@@ -339,87 +361,30 @@ namespace SharpConfig
             if (underlyingType != null)
             {
                 if (string.IsNullOrEmpty(value))
-                {
-                    // Returns Nullable<type>().
-                    return null;
-                }
+                    return null; // Returns Nullable<T>().
 
                 // Otherwise, continue with our conversion using
                 // the underlying type of the nullable.
                 dstType = underlyingType;
             }
 
-            object ret = null;
-            IFormatProvider formatProvider = null;
-
-            if (dstType == typeof(bool))
+            var converter = Configuration.FindTypeStringConverter(dstType);
+            if (converter == Configuration.FallbackConverter)
             {
-                // Special case for bool.
-                switch (value.ToLowerInvariant())
-                {
-                    case "false":
-                    case "off":
-                    case "no":
-                    case "0":
-                        ret = false;
-                        break;
-                    case "true":
-                    case "on":
-                    case "yes":
-                    case "1":
-                        ret = true;
-                        break;
-                }
-            }
-            else if (dstType.BaseType == typeof(Enum))
-            {
-                // It's possible that the value is something like:
-                // UriFormat.Unescaped
-                // We, and especially Enum.Parse do not want this format.
-                // Instead, it wants the clean name like:
-                // Unescaped
-                //
-                // Because of that, let's get rid of unwanted type names.
-                int indexOfLastDot = value.LastIndexOf('.');
-
-                if (indexOfLastDot >= 0)
-                {
-                    value = value.Substring(indexOfLastDot + 1, value.Length - indexOfLastDot - 1).Trim();
-                }
-
-                try
-                {
-                    ret = Enum.Parse(dstType, value);
-                }
-                catch (Exception ex)
-                {
-                    throw new SettingValueCastException(value, dstType, ex);
-                }
-            }
-            else if (dstType == typeof(DateTime))
-            {
-                formatProvider = Configuration.DateTimeFormat;
-            }
-            else
-            {
-                // Assume that the destination type is a number.
-                formatProvider = Configuration.NumberFormat;
+                // The fallback converter is not able to create arbitrary objects
+                // from strings, so this means that there is no type converter
+                // registered for dstType.
+                throw SettingValueCastException.CreateBecauseConverterMissing(value, dstType);
             }
 
-            if (formatProvider != null)
+            try
             {
-                try
-                {
-                    // Main conversion routine.
-                    ret = Convert.ChangeType(value, dstType, formatProvider);
-                }
-                catch (Exception ex)
-                {
-                    throw new SettingValueCastException(value, dstType, ex);
-                }
+                return converter.ConvertFromString(value, dstType);
             }
-
-            return ret;
+            catch(Exception ex)
+            {
+                throw SettingValueCastException.Create(value, dstType, ex);
+            }
         }
 
         #endregion
@@ -433,7 +398,16 @@ namespace SharpConfig
         /// <param name="value">The value to set.</param>
         public void SetValue<T>(T value)
         {
-            mRawValue = (value == null) ? string.Empty : value.ToString();
+            if (value == null)
+            {
+                SetEmptyValue();
+            }
+            else
+            {
+                var converter = Configuration.FindTypeStringConverter(typeof(T));
+                mRawValue = converter.ConvertToString(value);
+                mShouldCalculateArraySize = true;
+            }
         }
 
         /// <summary>
@@ -443,57 +417,101 @@ namespace SharpConfig
         /// <param name="values">The values to set.</param>
         public void SetValue<T>(T[] values)
         {
+            if (typeof(T).IsArray)
+                throw new ArgumentException("Jagged arrays are not supported.");
+
             if (values == null)
             {
-                mRawValue = string.Empty;
+                SetEmptyValue();
             }
             else
             {
                 var strings = new string[values.Length];
 
+                var converter = Configuration.FindTypeStringConverter(typeof(T));
                 for (int i = 0; i < values.Length; ++i)
+                    strings[i] = converter.ConvertToString(values[i]);
+
+                mRawValue = string.Format("{{{0}}}", string.Join(",", strings));
+                mCachedArraySize = values.Length;
+                mShouldCalculateArraySize = false;
+            }
+        }
+
+        /// <summary>
+        /// Sets the value of this setting via an object.
+        /// </summary>
+        /// 
+        /// <param name="value">The value to set.</param>
+        public void SetValue(object value)
+        {
+            var type = value.GetType();
+            if (value == null)
+            {
+                SetEmptyValue();
+            }
+            else if (type.IsArray)
+            {
+                if (type.GetElementType().IsArray)
+                    throw new ArgumentException("Jagged arrays are not supported.");
+
+                var values = value as Array;
+                var strings = new string[values.Length];
+
+                for (int i = 0; i < values.Length; i++)
                 {
-                    strings[i] = values[i].ToString();
+                    object elemValue = values.GetValue(i);
+                    var converter = Configuration.FindTypeStringConverter(elemValue.GetType());
+                    strings[i] = converter.ConvertToString(elemValue);
                 }
 
                 mRawValue = string.Format("{{{0}}}", string.Join(",", strings));
-            }
-        }
-
-        /// <summary>
-        /// Sets the value of this setting via a DateTime object.
-        /// DateTime.ToString() is used for the conversion, using the format string and DateTimeFormat that
-        /// is set in and <see cref="Configuration.DateTimeFormat"/>, respectively.
-        /// </summary>
-        /// <param name="value">The time value to set.</param>
-        public void SetValue(DateTime value)
-        {
-            mRawValue = value.ToString(Configuration.DateTimeFormat);
-        }
-
-        /// <summary>
-        /// Sets the value of this setting via a DateTime array.
-        /// DateTime.ToString() is used for the conversion, using the format string and DateTimeFormat that
-        /// is set in and <see cref="Configuration.DateTimeFormat"/>, respectively.
-        /// </summary>
-        /// <param name="values">The time values to set.</param>
-        public void SetValue(DateTime[] values)
-        {
-            if (values == null)
-            {
-                mRawValue = null;
+                mCachedArraySize = values.Length;
+                mShouldCalculateArraySize = false;
             }
             else
             {
+                var converter = Configuration.FindTypeStringConverter(type);
+                mRawValue = converter.ConvertToString(value);
+                mShouldCalculateArraySize = true;
+            }
+        }
+
+        /// <summary>
+        /// Sets the value of this setting via an array.
+        /// </summary>
+        /// 
+        /// <param name="values">The values to set.</param>
+        public void SetValue(object[] values)
+        {
+            if (values == null)
+            {
+                SetEmptyValue();
+            }
+            else
+            {
+                if (values.GetType().GetElementType().IsArray)
+                    throw new ArgumentException("Jagged arrays are not supported.");
+
                 var strings = new string[values.Length];
 
                 for (int i = 0; i < values.Length; ++i)
                 {
-                    strings[i] = values[i].ToString(Configuration.DateTimeFormat);
+                    var converter = Configuration.FindTypeStringConverter(values[i].GetType());
+                    strings[i] = converter.ConvertToString(values[i]);
                 }
 
                 mRawValue = string.Format("{{{0}}}", string.Join(",", strings));
+                mCachedArraySize = values.Length;
+                mShouldCalculateArraySize = false;
             }
+        }
+
+        private void SetEmptyValue()
+        {
+            mRawValue = string.Empty;
+            mCachedArraySize = 0;
+            mShouldCalculateArraySize = false;
         }
 
         #endregion

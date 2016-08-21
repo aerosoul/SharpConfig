@@ -20,9 +20,7 @@ namespace SharpConfig
         internal ConfigurationElement(string name)
         {
             if (string.IsNullOrEmpty(name))
-            {
                 throw new ArgumentNullException("name");
-            }
 
             mName = name;
         }
@@ -52,9 +50,7 @@ namespace SharpConfig
             get
             {
                 if (mPreComments == null)
-                {
                     mPreComments = new List<Comment>();
-                }
 
                 return mPreComments;
             }

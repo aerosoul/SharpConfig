@@ -12,22 +12,16 @@ namespace SharpConfig
         private void Serialize(string filename, Encoding encoding)
         {
             if (string.IsNullOrEmpty(filename))
-            {
                 throw new ArgumentNullException("filename");
-            }
 
             using (var stream = new FileStream(filename, FileMode.Create, FileAccess.Write))
-            {
                 Serialize(stream, encoding);
-            }
         }
 
         private void Serialize(Stream stream, Encoding encoding)
         {
             if (stream == null)
-            {
                 throw new ArgumentNullException("stream");
-            }
 
             var sb = new StringBuilder();
 
@@ -37,17 +31,12 @@ namespace SharpConfig
             foreach (var section in this)
             {
                 if (!isFirstSection)
-                {
                     sb.AppendLine();
-                }
 
                 // Leave some space between this section and the element that is above,
                 // if this section has pre-comments and isn't the first section in the configuration.
-                if (!isFirstSection &&
-                    section.mPreComments != null && section.mPreComments.Count > 0)
-                {
+                if (!isFirstSection && section.mPreComments != null && section.mPreComments.Count > 0)
                     sb.AppendLine();
-                }
 
                 sb.AppendLine(section.ToString(true));
 
@@ -57,9 +46,7 @@ namespace SharpConfig
                     // Leave some space between this setting and the element that is above,
                     // if this element has pre-comments.
                     if (setting.mPreComments != null && setting.mPreComments.Count > 0)
-                    {
                         sb.AppendLine();
-                    }
 
                     sb.AppendLine(setting.ToString(true));
                 }
@@ -73,30 +60,22 @@ namespace SharpConfig
                 new StreamWriter(stream, encoding);
 
             using (writer)
-            {
                 writer.Write(sb.ToString());
-            }
         }
 
         private void SerializeBinary(BinaryWriter writer, string filename)
         {
             if (string.IsNullOrEmpty(filename))
-            {
                 throw new ArgumentNullException("filename");
-            }
 
             using (var stream = new FileStream(filename, FileMode.Create, FileAccess.Write))
-            {
                 SerializeBinary(writer, stream);
-            }
         }
 
         private void SerializeBinary(BinaryWriter writer, Stream stream)
         {
             if (stream == null)
-            {
                 throw new ArgumentNullException("stream");
-            }
 
             bool ownWriter = false;
 
@@ -130,9 +109,7 @@ namespace SharpConfig
             finally
             {
                 if (ownWriter)
-                {
                     writer.Close();
-                }
             }
         }
 

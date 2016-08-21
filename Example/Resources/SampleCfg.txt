@@ -21,7 +21,9 @@ Format = RGB24
 # true:   yes, 1, true, on
 # false:  no, 0, false, off
 ABoolean = yes
-ABooleanArray = {on,off,yes,no}
+ABooleanArray = {on,off,yes,no,true,false}
 
 AnEmptyArray = {}
-AnotherEmptyArray = {  }
+AnotherEmptyArray = {      }
+
+ArrayWithMixedTypes = {1, 3.0, "Hello!", true}

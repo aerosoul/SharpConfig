@@ -42,14 +42,10 @@ namespace SharpConfig
         public static Section FromObject<T>(string name, T obj)
         {
             if (string.IsNullOrEmpty(name))
-            {
                 throw new ArgumentException("The section name must not be null or empty.", "name");
-            }
 
             if (obj == null)
-            {
                 throw new ArgumentNullException("obj", "obj must not be null.");
-            }
 
             var section = new Section(name);
             var type = typeof(T);
@@ -95,73 +91,66 @@ namespace SharpConfig
         /// The specified type must have a public default constructor
         /// in order to be created.
         /// </remarks>
-        public T CreateObject<T>()
+        [Obsolete("consider using ToObject<T>()")]
+        public T CreateObject<T>() where T : new()
         {
-            Type type = typeof(T);
-
-            try
-            {
-                T obj = Activator.CreateInstance<T>();
-                MapTo(obj);
-
-                return obj;
-            }
-            catch (Exception)
-            {
-                throw new ArgumentException(string.Format(
-                    "The type '{0}' does not have a default public constructor.",
-                    type.Name));
-            }
+            return ToObject<T>();
         }
 
-        private static bool ShouldIgnoreMappingFor(MemberInfo member)
+        /// <summary>
+        /// Creates an object of a specific type, and maps the settings
+        /// in this section to the public properties and writable fields of the object.
+        /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
+        /// or are of a type that is marked with that attribute, are ignored.
+        /// </summary>
+        /// 
+        /// <returns>The created object.</returns>
+        /// 
+        /// <remarks>
+        /// The specified type must have a public default constructor
+        /// in order to be created.
+        /// </remarks>
+        public T ToObject<T>() where T : new()
         {
-            if (member.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0)
-            {
-                return true;
-            }
-            else
-            {
-                PropertyInfo prop = member as PropertyInfo;
-                if (prop != null)
-                {
-                    return prop.PropertyType.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0;
-                }
-
-                FieldInfo field = member as FieldInfo;
-                if (field != null)
-                {
-                    return field.FieldType.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0;
-                }
-            }
-
-            return false;
+            T obj = Activator.CreateInstance<T>();
+            SetValuesTo(obj);
+            return obj;
         }
 
         /// <summary>
         /// Assigns the values of an object's public properties and fields to the corresponding
-        /// settings in this section.
+        /// <b>already existing</b> settings in this section.
         /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
         /// or are of a type that is marked with that attribute, are ignored.
         /// </summary>
         /// 
         /// <param name="obj">The object from which the values are obtained.</param>
+        [Obsolete("consider using GetValuesFrom<T>()")]
         public void MapFrom<T>(T obj)
         {
-            if (obj == null)
-            {
-                throw new ArgumentNullException("obj");
-            }
+            GetValuesFrom(obj);
+        }
 
-            Type type = typeof(T);
+        /// <summary>
+        /// Assigns the values of an object's public properties and fields to the corresponding
+        /// <b>already existing</b> settings in this section.
+        /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
+        /// or are of a type that is marked with that attribute, are ignored.
+        /// </summary>
+        /// 
+        /// <param name="obj">The object from which the values are obtained.</param>
+        public void GetValuesFrom<T>(T obj)
+        {
+            if (obj == null)
+                throw new ArgumentNullException("obj");
+
+            var type = typeof(T);
 
             // Scan the type's properties.
             foreach (var prop in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
                 if (!prop.CanWrite || ShouldIgnoreMappingFor(prop))
-                {
                     continue;
-                }
 
                 var setting = FindSetting(prop.Name);
 
@@ -177,9 +166,7 @@ namespace SharpConfig
             {
                 // Skip readonly fields.
                 if (field.IsInitOnly || ShouldIgnoreMappingFor(field))
-                {
                     continue;
-                }
 
                 var setting = FindSetting(field.Name);
 
@@ -190,7 +177,7 @@ namespace SharpConfig
                 }
             }
         }
-        
+
         /// <summary>
         /// Assigns the values of this section to an object's public properties and fields.
         /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
@@ -198,28 +185,54 @@ namespace SharpConfig
         /// </summary>
         /// 
         /// <param name="obj">The object that is modified based on the section.</param>
+        [Obsolete("consider using SetValuesTo<T>()")]
         public void MapTo<T>(T obj)
         {
-            if (obj == null)
-            {
-                throw new ArgumentNullException("obj");
-            }
+            SetValuesTo(obj);
+        }
 
-            Type type = typeof(T);
+        /// <summary>
+        /// Assigns the values of this section to an object's public properties and fields.
+        /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
+        /// or are of a type that is marked with that attribute, are ignored.
+        /// </summary>
+        /// 
+        /// <param name="obj">The object that is modified based on the section.</param>
+        public void SetValuesTo<T>(T obj)
+        {
+            if (obj == null)
+                throw new ArgumentNullException("obj");
+
+            var type = typeof(T);
 
             // Scan the type's properties.
             foreach (var prop in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
                 if (!prop.CanWrite || ShouldIgnoreMappingFor(prop))
-                {
                     continue;
-                }
 
                 var setting = FindSetting(prop.Name);
+                if (setting == null)
+                    continue;
 
-                if (setting != null)
+                object value = setting.GetValue(prop.PropertyType);
+                if (value is Array)
                 {
-                    object value = setting.GetValue(prop.PropertyType);
+                    var settingArray = value as Array;
+                    var propArray = prop.GetValue(obj, null) as Array;
+                    if (propArray == null || propArray.Length != settingArray.Length)
+                    {
+                        // (Re)create the property's array.
+                        propArray = Array.CreateInstance(prop.PropertyType.GetElementType(), settingArray.Length);
+                    }
+
+                    for (int i = 0; i < settingArray.Length; i++)
+                        propArray.SetValue(settingArray.GetValue(i), i);
+
+                    prop.SetValue(obj, propArray, null);
+                }
+                else
+                {
                     prop.SetValue(obj, value, null);
                 }
             }
@@ -229,18 +242,53 @@ namespace SharpConfig
             {
                 // Skip readonly fields.
                 if (field.IsInitOnly || ShouldIgnoreMappingFor(field))
-                {
                     continue;
-                }
 
                 var setting = FindSetting(field.Name);
+                if (setting == null)
+                    continue;
 
-                if (setting != null)
+                object value = setting.GetValue(field.FieldType);
+                if (value is Array)
                 {
-                    object value = setting.GetValue(field.FieldType);
+                    var settingArray = value as Array;
+                    var fieldArray = field.GetValue(obj) as Array;
+                    if (fieldArray == null || fieldArray.Length != settingArray.Length)
+                    {
+                        // (Re)create the field's array.
+                        fieldArray = Array.CreateInstance(field.FieldType.GetElementType(), settingArray.Length);
+                    }
+
+                    for (int i = 0; i < settingArray.Length; i++)
+                        fieldArray.SetValue(settingArray.GetValue(i), i);
+
+                    field.SetValue(obj, fieldArray);
+                }
+                else
+                {
                     field.SetValue(obj, value);
                 }
             }
+        }
+
+        private static bool ShouldIgnoreMappingFor(MemberInfo member)
+        {
+            if (member.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0)
+            {
+                return true;
+            }
+            else
+            {
+                var prop = member as PropertyInfo;
+                if (prop != null)
+                    return prop.PropertyType.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0;
+
+                var field = member as FieldInfo;
+                if (field != null)
+                    return field.FieldType.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -266,14 +314,10 @@ namespace SharpConfig
         public void Add(Setting setting)
         {
             if (setting == null)
-            {
                 throw new ArgumentNullException("setting");
-            }
 
             if (Contains(setting))
-            {
                 throw new ArgumentException("The specified setting already exists in the section.");
-            }
 
             mSettings.Add(setting);
         }
@@ -287,19 +331,12 @@ namespace SharpConfig
         public void Remove(string settingName)
         {
             if (string.IsNullOrEmpty(settingName))
-            {
                 throw new ArgumentNullException("settingName");
-            }
 
             var setting = FindSetting(settingName);
 
             if (setting == null)
-            {
-                throw new ArgumentException(string.Format(
-                    "A setting named '{0}' does not exist in the section.",
-                    settingName
-                    ));
-            }
+                throw new ArgumentException(string.Format("A setting named '{0}' does not exist in the section.", settingName));
 
             mSettings.Remove(setting);
         }
@@ -311,16 +348,12 @@ namespace SharpConfig
         public void RemoveAllNamed(string settingName)
         {
             if (string.IsNullOrEmpty(settingName))
-            {
                 throw new ArgumentNullException("settingName");
-            }
 
             for (int i = mSettings.Count - 1; i >= 0; i--)
             {
                 if (string.Equals(mSettings[i].Name, settingName, StringComparison.OrdinalIgnoreCase))
-                {
                     mSettings.RemoveAt(i);
-                }
             }
         }
 
@@ -331,14 +364,10 @@ namespace SharpConfig
         public void Remove(Setting setting)
         {
             if (setting == null)
-            {
                 throw new ArgumentNullException("setting");
-            }
 
             if (!Contains(setting))
-            {
                 throw new ArgumentException("The specified setting does not exist in the section.");
-            }
 
             mSettings.Remove(setting);
         }
@@ -393,9 +422,7 @@ namespace SharpConfig
             get
             {
                 if (index < 0 || index >= mSettings.Count)
-                {
                     throw new ArgumentOutOfRangeException("index");
-                }
 
                 return mSettings[index];
             }
@@ -443,9 +470,7 @@ namespace SharpConfig
             foreach (var setting in mSettings)
             {
                 if (string.Equals(setting.Name, name, StringComparison.OrdinalIgnoreCase))
-                {
                     settings.Add(setting);
-                }
             }
 
             return settings;
@@ -457,9 +482,7 @@ namespace SharpConfig
             foreach (var setting in mSettings)
             {
                 if (string.Equals(setting.Name, name, StringComparison.OrdinalIgnoreCase))
-                {
                     return setting;
-                }
             }
 
             return null;

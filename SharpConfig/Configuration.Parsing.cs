@@ -14,7 +14,7 @@ namespace SharpConfig
         {
             int lineNumber = 0;
 
-            Configuration config = new Configuration();
+            var config = new Configuration();
             Section currentSection = null;
             var preComments = new List<Comment>();
 
@@ -32,9 +32,7 @@ namespace SharpConfig
 
                     // Empty line? If so, skip.
                     if (string.IsNullOrEmpty(line))
-                    {
                         continue;
-                    }
 
                     int commentIndex = 0;
                     var comment = ParseComment(line, out commentIndex);
@@ -58,9 +56,7 @@ namespace SharpConfig
                         currentSection = ParseSection(line, lineNumber);
 
                         if (!IgnoreInlineComments)
-                        {
                             currentSection.Comment = comment;
-                        }
 
                         if (!IgnorePreComments && preComments.Count > 0)
                         {
@@ -72,12 +68,10 @@ namespace SharpConfig
                     }
                     else
                     {
-                        Setting setting = ParseSetting(line, lineNumber);
+                        var setting = ParseSetting(line, lineNumber);
 
                         if (!IgnoreInlineComments)
-                        {
                             setting.Comment = comment;
-                        }
 
                         if (currentSection == null)
                         {
@@ -134,9 +128,7 @@ namespace SharpConfig
                 commentIndex = line.IndexOfAny(ValidCommentChars, commentIndex + 1);
 
                 if (commentIndex < 0)
-                {
                     break;
-                }
 
                 // Tip from MarkAJones:
                 // Database connection strings can contain semicolons, which should not be
@@ -147,14 +139,10 @@ namespace SharpConfig
 
                 // If the char before the comment is a backslash, it's not a comment.
                 if (commentIndex >= 1 && line[commentIndex - 1] == '\\')
-                {
                     return null;
-                }
 
                 if (IsInQuoteMarks(line, commentIndex))
-                {
                     continue;
-                }
 
                 comment = new Comment(
                     value: line.Substring(commentIndex + 1).Trim(),
@@ -174,9 +162,7 @@ namespace SharpConfig
             int closingBracketIndex = line.IndexOf(']');
 
             if (closingBracketIndex < 0)
-            {
                 throw new ParserException("closing bracket missing.", lineNumber);
-            }
 
             // See if there are unwanted chars after the closing bracket.
             if ((line.Length - 1) > closingBracketIndex)
@@ -201,9 +187,7 @@ namespace SharpConfig
             int indexOfAssignOp = line.IndexOf('=');
 
             if (indexOfAssignOp < 0)
-            {
                 throw new ParserException("setting assignment expected.", lineNumber);
-            }
 
             // Trim the setting name and value.
             string settingName = line.Substring(0, indexOfAssignOp).Trim();
@@ -212,14 +196,10 @@ namespace SharpConfig
 
             // Check if non-null name / value is given.
             if (string.IsNullOrEmpty(settingName))
-            {
                 throw new ParserException("setting name expected.", lineNumber);
-            }
 
             if (settingValue == null)
-            {
                 settingValue = string.Empty;
-            }
 
             return new Setting(settingName, settingValue);
         }

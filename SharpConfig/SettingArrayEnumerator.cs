@@ -4,7 +4,6 @@
 namespace SharpConfig
 {
     // Enumerates the elements of a Setting that represents an array.
-    // Used in Setting.GetValueArray().
     internal struct SettingArrayEnumerator
     {
         private string mRawValue;

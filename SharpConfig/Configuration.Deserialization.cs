@@ -12,16 +12,12 @@ namespace SharpConfig
         private static Configuration DeserializeBinary(BinaryReader reader, string filename)
         {
             if (string.IsNullOrEmpty(filename))
-            {
                 throw new ArgumentNullException("filename");
-            }
 
             Configuration config = null;
 
             using (var stream = File.OpenRead(filename))
-            {
                 config = DeserializeBinary(reader, stream);
-            }
 
             return config;
         }
@@ -29,9 +25,7 @@ namespace SharpConfig
         private static Configuration DeserializeBinary(BinaryReader reader, Stream stream)
         {
             if (stream == null)
-            {
                 throw new ArgumentNullException("stream");
-            }
 
             bool ownReader = false;
 
@@ -52,13 +46,13 @@ namespace SharpConfig
                     string sectionName = reader.ReadString();
                     int settingCount = reader.ReadInt32();
 
-                    Section section = new Section(sectionName);
+                    var section = new Section(sectionName);
 
                     DeserializeComments(reader, section);
 
                     for (int j = 0; j < settingCount; j++)
                     {
-                        Setting setting = new Setting(
+                        var setting = new Setting(
                             reader.ReadString(),
                             reader.ReadString());
 

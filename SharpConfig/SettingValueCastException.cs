@@ -6,15 +6,27 @@ using System;
 namespace SharpConfig
 {
     [Serializable]
-    internal sealed class SettingValueCastException : Exception
+    public sealed class SettingValueCastException : Exception
     {
-        public SettingValueCastException(string stringValue, Type destType, Exception innerException) :
-            base(CreateMessage(stringValue, destType), innerException)
+        private SettingValueCastException(string message, Exception innerException)
+            : base(message, innerException)
         { }
 
-        private static string CreateMessage(string stringValue, Type destType)
+        internal static SettingValueCastException Create(string stringValue, Type dstType, Exception innerException)
         {
-            return string.Format("Failed to convert value '{0}' to type {1}.", stringValue, destType.FullName);
+            string msg = string.Format("Failed to convert value '{0}' to type {1}.", stringValue, dstType.FullName);
+            return new SettingValueCastException(msg, innerException);
+        }
+
+        internal static SettingValueCastException CreateBecauseConverterMissing(string stringValue, Type dstType)
+        {
+            string msg = string.Format(
+                "Failed to convert value '{0}' to type {1}; no converter for this type is registered.",
+                stringValue, dstType.FullName);
+
+            var innerException = new NotImplementedException("no converter for this type is registered.");
+
+            return new SettingValueCastException(msg, innerException);
         }
     }
 }
