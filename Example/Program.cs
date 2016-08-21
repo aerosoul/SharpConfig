@@ -110,7 +110,7 @@ namespace Example
             // Test.
             Console.WriteLine("SomeString:   " + p.SomeString);
             Console.WriteLine("SomeInt:      " + p.SomeInt);
-            PrintArray("SomeInts", p.SomeInts); 
+            PrintArray("SomeInts", p.SomeInts);
             Console.WriteLine("SomeDate:     " + p.SomeDate);
         }
 

@@ -149,11 +149,10 @@ namespace SharpConfig
             // Scan the type's properties.
             foreach (var prop in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
-                if (!prop.CanWrite || ShouldIgnoreMappingFor(prop))
+                if (!prop.CanRead || ShouldIgnoreMappingFor(prop))
                     continue;
 
                 var setting = FindSetting(prop.Name);
-
                 if (setting != null)
                 {
                     object value = prop.GetValue(obj, null);
@@ -165,11 +164,10 @@ namespace SharpConfig
             foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public))
             {
                 // Skip readonly fields.
-                if (field.IsInitOnly || ShouldIgnoreMappingFor(field))
+                if (ShouldIgnoreMappingFor(field))
                     continue;
 
                 var setting = FindSetting(field.Name);
-
                 if (setting != null)
                 {
                     object value = field.GetValue(obj);
