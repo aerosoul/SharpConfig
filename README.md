@@ -72,7 +72,7 @@ myConfig["Video"]["Formats"].SetValue( new string[] { "RGB32", "RGBA32" } );
 // Get the values just to test.
 int width = myConfig["Video"]["Width"].IntValue;
 int height = myConfig["Video"]["Height"].IntValue;
-string[] formats = myConfig["Video"]["Formats"].GetValueArray<string>();
+string[] formats = myConfig["Video"]["Formats"].StringValueArray;
 // ...
 ```
 
