@@ -88,5 +88,6 @@ myConfig.SaveToBinaryStream(myStream);      // Save to a binary stream.
 More!
 ---
 SharpConfig has more features, such as **arrays**, **enums** and **object mapping**.
+
 For details and examples, please visit the [Wiki](https://github.com/cemdervis/SharpConfig/wiki).
 There are also use case examples available in the [Example File](https://github.com/cemdervis/SharpConfig/blob/master/Example/Program.cs).
