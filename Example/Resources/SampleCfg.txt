@@ -25,5 +25,3 @@ ABooleanArray = {on,off,yes,no,true,false}
 
 AnEmptyArray = {}
 AnotherEmptyArray = {      }
-
-ArrayWithMixedTypes = {1, 3.0, "Hello!", true}

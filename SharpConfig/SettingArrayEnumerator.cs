@@ -33,7 +33,7 @@ namespace SharpConfig
             int subStrBegin;
             int subStrEnd;
 
-            int nextElementIdx = mRawValue.IndexOf(',', mLastElementIdx + 1);
+            int nextElementIdx = mRawValue.IndexOf(Configuration.ArrayElementSeparator, mLastElementIdx + 1);
             if (nextElementIdx < 0)
             {
                 // Last element.

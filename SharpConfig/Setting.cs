@@ -17,6 +17,7 @@ namespace SharpConfig
         private string mRawValue = string.Empty;
         private int mCachedArraySize = 0;
         private bool mShouldCalculateArraySize = false;
+        private char mCachedArrayElementSeparator;
 
         #endregion
 
@@ -25,8 +26,8 @@ namespace SharpConfig
         /// <summary>
         /// Initializes a new instance of the <see cref="Setting"/> class.
         /// </summary>
-        public Setting(string name) :
-            this(name, string.Empty)
+        public Setting(string name)
+            : this(name, string.Empty)
         { }
 
         /// <summary>
@@ -39,6 +40,7 @@ namespace SharpConfig
             : base(name)
         {
             SetValue(value);
+            mCachedArrayElementSeparator = Configuration.ArrayElementSeparator;
         }
 
         #endregion
@@ -181,6 +183,14 @@ namespace SharpConfig
         {
             get
             {
+                // If the user changed the array element separator during the lifetime
+                // of this setting, we have to recalculate the array size.
+                if (mCachedArrayElementSeparator != Configuration.ArrayElementSeparator)
+                {
+                    mCachedArrayElementSeparator = Configuration.ArrayElementSeparator;
+                    mShouldCalculateArraySize = true;
+                }
+
                 if (mShouldCalculateArraySize)
                 {
                     mCachedArraySize = CalculateArraySize();
@@ -219,10 +229,11 @@ namespace SharpConfig
 
             int arraySize = 0;
 
-            // Naive algorithm; assume the number of commas equals the number of elements + 1.
+            // Naive algorithm; assume the number of array element delimiters
+            // equals the number of elements + 1.
             for (int i = 0; i < mRawValue.Length; ++i)
             {
-                if (mRawValue[i] == ',')
+                if (mRawValue[i] == Configuration.ArrayElementSeparator)
                     ++arraySize;
             }
 

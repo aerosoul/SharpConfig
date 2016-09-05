@@ -25,6 +25,7 @@ namespace SharpConfig
         private static NumberFormatInfo mNumberFormat;
         private static DateTimeFormatInfo mDateTimeFormat;
         private static char[] mValidCommentChars;
+        private static char mArrayElementSeparator;
         private static ITypeStringConverter mFallbackConverter;
         private static Dictionary<Type, ITypeStringConverter> mTypeStringConverters;
 
@@ -39,6 +40,7 @@ namespace SharpConfig
             mNumberFormat = CultureInfo.InvariantCulture.NumberFormat;
             mDateTimeFormat = CultureInfo.InvariantCulture.DateTimeFormat;
             mValidCommentChars = new[] { '#', ';', '\'' };
+            mArrayElementSeparator = ',';
 
             mFallbackConverter = new FallbackStringConverter();
             mTypeStringConverters = new Dictionary<Type, ITypeStringConverter>()
@@ -97,6 +99,8 @@ namespace SharpConfig
         /// Adds a section to the configuration.
         /// </summary>
         /// <param name="section">The section to add.</param>
+        /// <exception cref="ArgumentNullException">When <paramref name="section"/> is null.</exception>
+        /// <exception cref="ArgumentException">When the section already exists in the configuration.</exception>
         public void Add(Section section)
         {
             if (section == null)
@@ -114,6 +118,7 @@ namespace SharpConfig
         /// To remove all sections that have the name name, use the RemoveAllNamed() method instead.
         /// </summary>
         /// <param name="sectionName">The case-sensitive name of the section to remove.</param>
+        /// <exception cref="ArgumentNullException">When <paramref name="sectionName"/> is null or empty.</exception>
         public void Remove(string sectionName)
         {
             if (string.IsNullOrEmpty(sectionName))
@@ -136,6 +141,7 @@ namespace SharpConfig
         /// Removes all sections that have a specific name.
         /// </summary>
         /// <param name="sectionName">The case-sensitive name of the sections to remove.</param>
+        /// <exception cref="ArgumentNullException">When <paramref name="sectionName"/> is null or empty.</exception>
         public void RemoveAllNamed(string sectionName)
         {
             if (string.IsNullOrEmpty(sectionName))
@@ -210,7 +216,7 @@ namespace SharpConfig
         /// <summary>
         /// Deregisters a type converter from setting value conversion.
         /// </summary>
-        /// <param name="converter">The converter to deregister.</param>
+        /// <param name="type">The type whose associated converter to deregister.</param>
         public static void DeregisterTypeStringConverter(Type type)
         {
             if (type == null)
@@ -265,6 +271,9 @@ namespace SharpConfig
         /// <returns>
         /// The loaded <see cref="Configuration"/> object.
         /// </returns>
+        /// 
+        /// <exception cref="ArgumentNullException">When <paramref name="filename"/> is null or empty.</exception>
+        /// <exception cref="FileNotFoundException">When the specified configuration file is not found.</exception>
         public static Configuration LoadFromFile(string filename, Encoding encoding)
         {
             if (string.IsNullOrEmpty(filename))
@@ -303,6 +312,8 @@ namespace SharpConfig
         /// <returns>
         /// The loaded <see cref="Configuration"/> object.
         /// </returns>
+        /// 
+        /// <exception cref="ArgumentNullException">When <paramref name="stream"/> is null.</exception>
         public static Configuration LoadFromStream(Stream stream, Encoding encoding)
         {
             if (stream == null)
@@ -329,6 +340,8 @@ namespace SharpConfig
         /// <returns>
         /// The loaded <see cref="Configuration"/> object.
         /// </returns>
+        /// 
+        /// <exception cref="ArgumentNullException">When <paramref name="source"/> is null.</exception>
         public static Configuration LoadFromString(string source)
         {
             if (source == null)
@@ -350,6 +363,8 @@ namespace SharpConfig
         /// <returns>
         /// The loaded configuration.
         /// </returns>
+        /// 
+        /// <exception cref="ArgumentNullException">When <paramref name="filename"/> is null or empty.</exception>
         public static Configuration LoadFromBinaryFile(string filename)
         {
             if (string.IsNullOrEmpty(filename))
@@ -368,6 +383,8 @@ namespace SharpConfig
         /// <returns>
         /// The loaded configuration.
         /// </returns>
+        /// 
+        /// <exception cref="ArgumentNullException">When <paramref name="filename"/> is null or empty.</exception>
         public static Configuration LoadFromBinaryFile(string filename, BinaryReader reader)
         {
             if (string.IsNullOrEmpty(filename))
@@ -385,6 +402,8 @@ namespace SharpConfig
         /// <returns>
         /// The loaded configuration.
         /// </returns>
+        /// 
+        /// <exception cref="ArgumentNullException">When <paramref name="stream"/> is null.</exception>
         public static Configuration LoadFromBinaryStream(Stream stream)
         {
             if (stream == null)
@@ -403,6 +422,8 @@ namespace SharpConfig
         /// <returns>
         /// The loaded configuration.
         /// </returns>
+        /// 
+        /// <exception cref="ArgumentNullException">When <paramref name="stream"/> is null.</exception>
         public static Configuration LoadFromBinaryStream(Stream stream, BinaryReader reader)
         {
             if (stream == null)
@@ -523,6 +544,8 @@ namespace SharpConfig
         /// Gets or sets the number format that is used for value conversion in SharpConfig.
         /// The default value is CultureInfo.InvariantCulture.NumberFormat.
         /// </summary>
+        /// 
+        /// <exception cref="ArgumentNullException">When a null reference is set as the value.</exception>
         public static NumberFormatInfo NumberFormat
         {
             get { return mNumberFormat; }
@@ -537,8 +560,10 @@ namespace SharpConfig
 
         /// <summary>
         /// Gets or sets the DateTime format that is used for value conversion in SharpConfig.
-        /// The default value is CultureInfo.InvariantCulture.NumberFormat.
+        /// The default value is CultureInfo.InvariantCulture.DateTimeFormat.
         /// </summary>
+        /// 
+        /// <exception cref="ArgumentNullException">When a null reference is set as the value.</exception>
         public static DateTimeFormatInfo DateTimeFormat
         {
             get { return mDateTimeFormat; }
@@ -554,6 +579,9 @@ namespace SharpConfig
         /// <summary>
         /// Gets or sets the array that contains all comment delimiting characters.
         /// </summary>
+        /// 
+        /// <exception cref="ArgumentNullException">When a null reference is set as the value.</exception>
+        /// <exception cref="ArgumentException">When an empty array is set as the value.</exception>
         public static char[] ValidCommentChars
         {
             get { return mValidCommentChars; }
@@ -570,6 +598,26 @@ namespace SharpConfig
                 }
 
                 mValidCommentChars = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the array element separator character for settings.
+        /// The default value is ','.
+        /// NOTE: remember that after you change this value while <see cref="Setting"/> instances exist,
+        /// to expect their ArraySize and other array-related values to return different values.
+        /// </summary>
+        /// 
+        /// <exception cref="ArgumentException">When a zero-character ('\0') is set as the value.</exception>
+        public static char ArrayElementSeparator
+        {
+            get { return mArrayElementSeparator; }
+            set
+            {
+                if (value == '\0')
+                    throw new ArgumentException("Zero-character is not allowed.");
+
+                mArrayElementSeparator = value;
             }
         }
 
@@ -602,6 +650,8 @@ namespace SharpConfig
         /// The section at the specified index.
         /// Note: no section is created when using this accessor.
         /// </returns>
+        /// 
+        /// <exception cref="ArgumentOutOfRangeException">When the index is out of range.</exception>
         public Section this[int index]
         {
             get

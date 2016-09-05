@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SharpConfig
 {
-    public sealed class FallbackStringConverter : ITypeStringConverter
+    internal sealed class FallbackStringConverter : ITypeStringConverter
     {
         public string ConvertToString(object value)
         {
@@ -22,7 +22,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class BoolStringConverter : TypeStringConverter<bool>
+    internal sealed class BoolStringConverter : TypeStringConverter<bool>
     {
         public override string ConvertToString(object value)
         {
@@ -49,7 +49,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class ByteStringConverter : TypeStringConverter<byte>
+    internal sealed class ByteStringConverter : TypeStringConverter<byte>
     {
         public override string ConvertToString(object value)
         {
@@ -62,7 +62,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class CharStringConverter : TypeStringConverter<char>
+    internal sealed class CharStringConverter : TypeStringConverter<char>
     {
         public override string ConvertToString(object value)
         {
@@ -75,7 +75,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class DateTimeStringConverter : TypeStringConverter<DateTime>
+    internal sealed class DateTimeStringConverter : TypeStringConverter<DateTime>
     {
         public override string ConvertToString(object value)
         {
@@ -88,7 +88,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class DecimalStringConverter : TypeStringConverter<decimal>
+    internal sealed class DecimalStringConverter : TypeStringConverter<decimal>
     {
         public override string ConvertToString(object value)
         {
@@ -101,7 +101,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class DoubleStringConverter : TypeStringConverter<double>
+    internal sealed class DoubleStringConverter : TypeStringConverter<double>
     {
         public override string ConvertToString(object value)
         {
@@ -114,7 +114,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class EnumStringConverter : TypeStringConverter<Enum>
+    internal sealed class EnumStringConverter : TypeStringConverter<Enum>
     {
         public override string ConvertToString(object value)
         {
@@ -139,7 +139,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class Int16StringConverter : TypeStringConverter<short>
+    internal sealed class Int16StringConverter : TypeStringConverter<short>
     {
         public override string ConvertToString(object value)
         {
@@ -152,7 +152,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class Int32StringConverter : TypeStringConverter<int>
+    internal sealed class Int32StringConverter : TypeStringConverter<int>
     {
         public override string ConvertToString(object value)
         {
@@ -165,7 +165,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class Int64StringConverter : TypeStringConverter<long>
+    internal sealed class Int64StringConverter : TypeStringConverter<long>
     {
         public override string ConvertToString(object value)
         {
@@ -178,7 +178,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class SByteStringConverter : TypeStringConverter<sbyte>
+    internal sealed class SByteStringConverter : TypeStringConverter<sbyte>
     {
         public override string ConvertToString(object value)
         {
@@ -191,7 +191,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class SingleStringConverter : TypeStringConverter<float>
+    internal sealed class SingleStringConverter : TypeStringConverter<float>
     {
         public override string ConvertToString(object value)
         {
@@ -204,7 +204,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class StringStringConverter : TypeStringConverter<string>
+    internal sealed class StringStringConverter : TypeStringConverter<string>
     {
         public override string ConvertToString(object value)
         {
@@ -217,7 +217,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class UInt16StringConverter : TypeStringConverter<ushort>
+    internal sealed class UInt16StringConverter : TypeStringConverter<ushort>
     {
         public override string ConvertToString(object value)
         {
@@ -230,7 +230,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class UInt32StringConverter : TypeStringConverter<uint>
+    internal sealed class UInt32StringConverter : TypeStringConverter<uint>
     {
         public override string ConvertToString(object value)
         {
@@ -243,7 +243,7 @@ namespace SharpConfig
         }
     }
 
-    public sealed class UInt64StringConverter : TypeStringConverter<ulong>
+    internal sealed class UInt64StringConverter : TypeStringConverter<ulong>
     {
         public override string ConvertToString(object value)
         {

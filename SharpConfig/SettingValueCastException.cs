@@ -5,6 +5,9 @@ using System;
 
 namespace SharpConfig
 {
+    /// <summary>
+    /// Represents an error that occurs when a string value could not be converted to a specific instance.
+    /// </summary>
     [Serializable]
     public sealed class SettingValueCastException : Exception
     {
