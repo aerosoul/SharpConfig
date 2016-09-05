@@ -2,9 +2,8 @@
 
 SharpConfig is an easy-to-use CFG/INI configuration library for .NET.
 
-You can use SharpConfig in your .NET applications to add the functionality
-to read, modify and save configuration files and streams, in either text or binary format.
-The library is backward compatible up to .NET 2.0.
+You can use SharpConfig to read, modify and save configuration files and streams, in either text or binary format.
+The library is fully compatible with .NET 2.0 and higher, and the Mono Framework.
 
 > If SharpConfig has helped you and you feel like donating, [feel free](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=WWN94LMDN5HMC)!
 > Donations help to keep the development of SharpConfig active.
@@ -67,12 +66,12 @@ myConfig["Video"]["Width"].IntValue = 1920;
 myConfig["Video"]["Height"].IntValue = 1080;
 
 // Set an array value.
-myConfig["Video"]["Formats"].SetValue( new string[] { "RGB32", "RGBA32" } );
+myConfig["Video"]["Formats"].StringValueArray = new[] { "RGB32", "RGBA32" };
 
 // Get the values just to test.
 int width = myConfig["Video"]["Width"].IntValue;
 int height = myConfig["Video"]["Height"].IntValue;
-string[] formats = myConfig["Video"]["Formats"].GetValueArray<string>();
+string[] formats = myConfig["Video"]["Formats"].StringValueArray;
 // ...
 ```
 
@@ -86,8 +85,9 @@ myConfig.SaveToBinaryFile("myConfig.cfg");  // Save to a binary file.
 myConfig.SaveToBinaryStream(myStream);      // Save to a binary stream.
 ```
 
-More
+More!
 ---
-SharpConfig has more features, such as support for **arrays**, **enums** and **object mapping**.
+SharpConfig has more features, such as **arrays**, **enums** and **object mapping**.
+
 For details and examples, please visit the [Wiki](https://github.com/cemdervis/SharpConfig/wiki).
 There are also use case examples available in the [Example File](https://github.com/cemdervis/SharpConfig/blob/master/Example/Program.cs).
