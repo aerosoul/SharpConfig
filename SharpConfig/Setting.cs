@@ -239,7 +239,7 @@ namespace SharpConfig
 
             if (arraySize == 0)
             {
-                // There were no commas in the array expression.
+                // There were no element separators in the array expression.
                 // That does not mean that there are no elements.
                 // Check if there is at least something.
                 // If so, that is the single element of the array.
@@ -254,9 +254,9 @@ namespace SharpConfig
             }
             else if (arraySize > 0)
             {
-                // If there were any commas in the array expression,
+                // If there were any element separators in the array expression,
                 // we have to increment the array size, as we assumed
-                // that the number of commas equaled the number of elements + 1.
+                // that the number of element separators equaled the number of elements + 1.
                 ++arraySize;
             }
 
