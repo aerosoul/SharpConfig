@@ -3,6 +3,7 @@
 SharpConfig is an easy-to-use CFG/INI configuration library for .NET.
 
 You can use SharpConfig to read, modify and save configuration files and streams, in either text or binary format.
+
 The library is fully compatible with .NET 2.0 and higher, and the Mono Framework.
 
 Installing via NuGet
