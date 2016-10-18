@@ -85,24 +85,10 @@ namespace SharpConfig
         /// or are of a type that is marked with that attribute, are ignored.
         /// </summary>
         /// 
-        /// <returns>The created object.</returns>
-        /// 
-        /// <remarks>
-        /// The specified type must have a public default constructor
-        /// in order to be created.
-        /// </remarks>
-        [Obsolete("consider using ToObject<T>()")]
-        public T CreateObject<T>() where T : new()
-        {
-            return ToObject<T>();
-        }
-
-        /// <summary>
-        /// Creates an object of a specific type, and maps the settings
-        /// in this section to the public properties and writable fields of the object.
-        /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
-        /// or are of a type that is marked with that attribute, are ignored.
-        /// </summary>
+        /// <typeparam name="T">
+        /// The type of object to create.
+        /// Note: the type must be default-constructible, meaning it has a public default constructor.
+        /// </typeparam>
         /// 
         /// <returns>The created object.</returns>
         /// 
@@ -112,8 +98,8 @@ namespace SharpConfig
         /// </remarks>
         public T ToObject<T>() where T : new()
         {
-            var type = typeof(T);
-            var obj = this.ToObject(type);
+            var obj = Activator.CreateInstance<T>();
+            SetValuesTo(obj);
             return obj;
         }
 
@@ -123,6 +109,11 @@ namespace SharpConfig
         /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
         /// or are of a type that is marked with that attribute, are ignored.
         /// </summary>
+        /// 
+        /// <param name="type">
+        /// The type of object to create.
+        /// Note: the type must be default-constructible, meaning it has a public default constructor.
+        /// </param>
         /// 
         /// <returns>The created object.</returns>
         /// 
@@ -138,20 +129,6 @@ namespace SharpConfig
             var obj = Activator.CreateInstance(type);
             SetValuesTo(obj);
             return obj;
-        }
-
-        /// <summary>
-        /// Assigns the values of an object's public properties and fields to the corresponding
-        /// <b>already existing</b> settings in this section.
-        /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
-        /// or are of a type that is marked with that attribute, are ignored.
-        /// </summary>
-        /// 
-        /// <param name="obj">The object from which the values are obtained.</param>
-        [Obsolete("consider using GetValuesFrom<T>()")]
-        public void MapFrom<T>(T obj)
-        {
-            GetValuesFrom(obj);
         }
 
         /// <summary>
@@ -197,19 +174,6 @@ namespace SharpConfig
                     setting.SetValue(value);
                 }
             }
-        }
-
-        /// <summary>
-        /// Assigns the values of this section to an object's public properties and fields.
-        /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
-        /// or are of a type that is marked with that attribute, are ignored.
-        /// </summary>
-        /// 
-        /// <param name="obj">The object that is modified based on the section.</param>
-        [Obsolete("consider using SetValuesTo<T>()")]
-        public void MapTo<T>(T obj)
-        {
-            SetValuesTo(obj);
         }
 
         /// <summary>
