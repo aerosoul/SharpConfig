@@ -39,7 +39,7 @@ namespace SharpConfig
         /// <param name="name">The name of the section.</param>
         /// <param name="obj"></param>
         /// <returns>The newly created section.</returns>
-        public static Section FromObject<T>(string name, T obj)
+        public static Section FromObject(string name, object obj)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentException("The section name must not be null or empty.", "name");
@@ -48,7 +48,7 @@ namespace SharpConfig
                 throw new ArgumentNullException("obj", "obj must not be null.");
 
             var section = new Section(name);
-            var type = typeof(T);
+            var type = obj.GetType();
 
             foreach (var prop in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
             {
@@ -139,12 +139,12 @@ namespace SharpConfig
         /// </summary>
         /// 
         /// <param name="obj">The object from which the values are obtained.</param>
-        public void GetValuesFrom<T>(T obj)
+        public void GetValuesFrom(object obj)
         {
             if (obj == null)
                 throw new ArgumentNullException("obj");
 
-            var type = typeof(T);
+            var type = obj.GetType();
 
             // Scan the type's properties.
             foreach (var prop in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
@@ -196,12 +196,12 @@ namespace SharpConfig
         /// </summary>
         /// 
         /// <param name="obj">The object that is modified based on the section.</param>
-        public void SetValuesTo<T>(T obj)
+        public void SetValuesTo(object obj)
         {
             if (obj == null)
                 throw new ArgumentNullException("obj");
 
-            var type = typeof(T);
+            var type = obj.GetType();
 
             // Scan the type's properties.
             foreach (var prop in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
