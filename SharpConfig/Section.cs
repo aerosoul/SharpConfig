@@ -112,7 +112,30 @@ namespace SharpConfig
         /// </remarks>
         public T ToObject<T>() where T : new()
         {
-            T obj = Activator.CreateInstance<T>();
+            var type = typeof(T);
+            var obj = this.ToObject(type);
+            return obj;
+        }
+
+        /// <summary>
+        /// Creates an object of a specific type, and maps the settings
+        /// in this section to the public properties and writable fields of the object.
+        /// Properties and fields that are marked with the <see cref="IgnoreAttribute"/> attribute
+        /// or are of a type that is marked with that attribute, are ignored.
+        /// </summary>
+        /// 
+        /// <returns>The created object.</returns>
+        /// 
+        /// <remarks>
+        /// The specified type must have a public default constructor
+        /// in order to be created.
+        /// </remarks>
+        public object ToObject(Type type)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            var obj = Activator.CreateInstance(type);
             SetValuesTo(obj);
             return obj;
         }
