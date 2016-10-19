@@ -456,12 +456,13 @@ namespace SharpConfig
         /// <param name="value">The value to set.</param>
         public void SetValue(object value)
         {
-            var type = value.GetType();
             if (value == null)
             {
                 SetEmptyValue();
+                return;
             }
-            else if (type.IsArray)
+            var type = value.GetType();
+            if (type.IsArray)
             {
                 if (type.GetElementType().IsArray)
                     throw new ArgumentException("Jagged arrays are not supported.");
