@@ -4,7 +4,7 @@ using SharpConfig;
 
 namespace Example
 {
-    class SomeStructure
+    class SomeClass
     {
         public string SomeString { get; set; }
         public int SomeInt { get; set; }
@@ -105,7 +105,7 @@ namespace Example
             cfg["SomeStructure"]["SomeDate"].DateTimeValue = DateTime.Now;
 
             // Now create an object from it.
-            var p = cfg["SomeStructure"].ToObject<SomeStructure>();
+            var p = cfg["SomeStructure"].ToObject<SomeClass>();
 
             // Test.
             Console.WriteLine("SomeString:   " + p.SomeString);
@@ -122,7 +122,7 @@ namespace Example
             var cfg = new Configuration();
 
             // Create an object.
-            var p = new SomeStructure();
+            var p = new SomeClass();
             p.SomeString = "foobar";
             p.SomeInt = 2000;
             p.SomeInts = new[] { 1, 2, 3 };
