@@ -163,7 +163,6 @@ namespace SharpConfig
             // Scan the type's fields.
             foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public))
             {
-                // Skip readonly fields.
                 if (ShouldIgnoreMappingFor(field))
                     continue;
 
