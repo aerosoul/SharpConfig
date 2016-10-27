@@ -124,7 +124,7 @@ namespace SharpConfig
         public object ToObject(Type type)
         {
             if (type == null)
-                throw new ArgumentNullException(nameof(type));
+                throw new ArgumentNullException(type.Name);
 
             var obj = Activator.CreateInstance(type);
             SetValuesTo(obj);
