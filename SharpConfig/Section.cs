@@ -312,17 +312,37 @@ namespace SharpConfig
         /// To remove all settings that have the name name, use the RemoveAllNamed() method instead.
         /// </summary>
         /// <param name="settingName">The case-sensitive name of the setting to remove.</param>
-        public void Remove(string settingName)
+        /// <returns>True if a setting with the specified name was removed; false otherwise.</returns>
+        public bool Remove(string settingName)
         {
             if (string.IsNullOrEmpty(settingName))
                 throw new ArgumentNullException("settingName");
 
             var setting = FindSetting(settingName);
 
-            if (setting == null)
-                throw new ArgumentException(string.Format("A setting named '{0}' does not exist in the section.", settingName));
+            if (setting != null)
+                return Remove(setting);
+            else
+                return false;
+        }
 
-            mSettings.Remove(setting);
+        /// <summary>
+        /// Removes a setting from the section.
+        /// </summary>
+        /// <param name="setting">The setting to remove.</param>
+        /// <returns>True if the setting was removed; false otherwise.</returns>
+        public bool Remove(Setting setting)
+        {
+            if (setting == null)
+                throw new ArgumentNullException("setting");
+
+            if (mSettings.Contains(setting))
+            {
+                mSettings.Remove(setting);
+                return true;
+            }
+            else
+                return false;
         }
 
         /// <summary>
@@ -334,26 +354,7 @@ namespace SharpConfig
             if (string.IsNullOrEmpty(settingName))
                 throw new ArgumentNullException("settingName");
 
-            for (int i = mSettings.Count - 1; i >= 0; i--)
-            {
-                if (string.Equals(mSettings[i].Name, settingName, StringComparison.OrdinalIgnoreCase))
-                    mSettings.RemoveAt(i);
-            }
-        }
-
-        /// <summary>
-        /// Removes a setting from the section.
-        /// </summary>
-        /// <param name="setting">The setting to remove.</param>
-        public void Remove(Setting setting)
-        {
-            if (setting == null)
-                throw new ArgumentNullException("setting");
-
-            if (!Contains(setting))
-                throw new ArgumentException("The specified setting does not exist in the section.");
-
-            mSettings.Remove(setting);
+            while (Remove(settingName)) ;
         }
 
         /// <summary>

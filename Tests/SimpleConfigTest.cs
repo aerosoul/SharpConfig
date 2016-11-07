@@ -94,7 +94,15 @@ namespace Tests
             });
             Assert.Throws<InvalidOperationException>(() =>
             {
+                cfg["TestSection"]["IntArray"].GetValue(typeof(int[][]));
+            });
+            Assert.Throws<InvalidOperationException>(() =>
+            {
                 cfg["TestSection"]["IntArray"].GetValue<int[]>();
+            });
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                cfg["TestSection"]["IntArray"].GetValue<int[][]>();
             });
 
             // Verify that wrong usage of GetValueArray throws.
@@ -105,6 +113,14 @@ namespace Tests
             Assert.Throws<ArgumentException>(() =>
             {
                 cfg["TestSection"]["IntArray"].GetValueArray<int[]>();
+            });
+            Assert.Throws<ArgumentException>(() =>
+            {
+                cfg["TestSection"]["IntArray"].GetValueArray(typeof(int[][]));
+            });
+            Assert.Throws<ArgumentException>(() =>
+            {
+                cfg["TestSection"]["IntArray"].GetValueArray<int[][]>();
             });
         }
 
@@ -146,6 +162,37 @@ namespace Tests
             cfg.RemoveAllNamed("Section1");
 
             Assert.IsTrue(!cfg.Contains("Section1"));
+        }
+
+        [Test]
+        public void SetValueOverload()
+        {
+            var cfg = new Configuration();
+            
+            object[] obj = new object[] { 1, 2, 3 };
+
+            var setting = cfg["TestSection"]["TestSetting"];
+            setting.SetValue(obj);
+
+            // GetValue should throw, because the setting is an array now.
+            // It should notify us to use GetValueArray() instead.
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                setting.GetValue(typeof(int));
+            });
+
+            // Now get the array object and check.
+            object[] intsNonGeneric = setting.GetValueArray(typeof(int));
+            int[] intsGeneric = setting.GetValueArray<int>();
+
+            Assert.AreEqual(obj.Length, intsGeneric.Length);
+            Assert.AreEqual(intsGeneric.Length, intsNonGeneric.Length);
+
+            for (int i = 0; i < obj.Length; i++)
+            {
+                Assert.AreEqual(obj[i], intsGeneric[i]);
+                Assert.AreEqual(intsGeneric[i], intsNonGeneric[i]);
+            }
         }
     }
 }
