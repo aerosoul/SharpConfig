@@ -420,52 +420,52 @@ namespace SharpConfig
 
         #region SetValue
 
-        ///// <summary>
-        ///// Sets the value of this setting via an object.
-        ///// </summary>
-        ///// 
-        ///// <param name="value">The value to set.</param>
-        //public void SetValue<T>(T value)
-        //{
-        //    if (value == null)
-        //    {
-        //        SetEmptyValue();
-        //    }
-        //    else
-        //    {
-        //        var converter = Configuration.FindTypeStringConverter(typeof(T));
-        //        mRawValue = converter.ConvertToString(value);
-        //        mShouldCalculateArraySize = true;
-        //    }
-        //}
+        /// <summary>
+        /// Sets the value of this setting via an object.
+        /// </summary>
+        /// 
+        /// <param name="value">The value to set.</param>
+        public void SetValue<T>(T value)
+        {
+            if (value == null)
+            {
+                SetEmptyValue();
+            }
+            else
+            {
+                var converter = Configuration.FindTypeStringConverter(typeof(T));
+                mRawValue = converter.ConvertToString(value);
+                mShouldCalculateArraySize = true;
+            }
+        }
 
-        ///// <summary>
-        ///// Sets the value of this setting via an array.
-        ///// </summary>
-        ///// 
-        ///// <param name="values">The values to set.</param>
-        //public void SetValue<T>(T[] values)
-        //{
-        //    if (typeof(T).IsArray)
-        //        throw new ArgumentException("Jagged arrays are not supported.");
+        /// <summary>
+        /// Sets the value of this setting via an array.
+        /// </summary>
+        /// 
+        /// <param name="values">The values to set.</param>
+        public void SetValue<T>(T[] values)
+        {
+            if (typeof(T).IsArray)
+                throw new ArgumentException("Jagged arrays are not supported.");
 
-        //    if (values == null)
-        //    {
-        //        SetEmptyValue();
-        //    }
-        //    else
-        //    {
-        //        var strings = new string[values.Length];
+            if (values == null)
+            {
+                SetEmptyValue();
+            }
+            else
+            {
+                var strings = new string[values.Length];
 
-        //        var converter = Configuration.FindTypeStringConverter(typeof(T));
-        //        for (int i = 0; i < values.Length; ++i)
-        //            strings[i] = converter.ConvertToString(values[i]);
+                var converter = Configuration.FindTypeStringConverter(typeof(T));
+                for (int i = 0; i < values.Length; ++i)
+                    strings[i] = converter.ConvertToString(values[i]);
 
-        //        mRawValue = string.Format("{{{0}}}", string.Join(Configuration.ArrayElementSeparator.ToString(), strings));
-        //        mCachedArraySize = values.Length;
-        //        mShouldCalculateArraySize = false;
-        //    }
-        //}
+                mRawValue = string.Format("{{{0}}}", string.Join(Configuration.ArrayElementSeparator.ToString(), strings));
+                mCachedArraySize = values.Length;
+                mShouldCalculateArraySize = false;
+            }
+        }
 
         /// <summary>
         /// Sets the value of this setting via an object.
@@ -495,7 +495,7 @@ namespace SharpConfig
                     strings[i] = converter.ConvertToString(elemValue);
                 }
 
-                mRawValue = string.Format("{{{0}}}", string.Join(",", strings));
+                mRawValue = string.Format("{{{0}}}", string.Join(Configuration.ArrayElementSeparator.ToString(), strings));
                 mCachedArraySize = values.Length;
                 mShouldCalculateArraySize = false;
             }
