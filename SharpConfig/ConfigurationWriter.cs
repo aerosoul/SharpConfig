@@ -4,31 +4,45 @@
 using System;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 
 namespace SharpConfig
 {
-    public partial class Configuration
+    internal static class ConfigurationWriter
     {
-        private void Serialize(string filename, Encoding encoding)
+        // We need this, as we never want to close the stream the user has given us.
+        // But we also want to call the specified writer's Dispose() method.
+        // We wouldn't need this if we were targeting .NET 4+, because BinaryWriter
+        // gives us the option to leave the stream open after Dispose(), but not
+        // on .NET lower than 4.0.
+        // To circumvent this, we just define our own writer that does not close
+        // the underlying stream in Dispose().
+        private class NonClosingBinaryWriter : BinaryWriter
         {
-            if (string.IsNullOrEmpty(filename))
-                throw new ArgumentNullException("filename");
+            public NonClosingBinaryWriter(Stream stream)
+                : base(stream)
+            { }
 
-            using (var stream = new FileStream(filename, FileMode.Create, FileAccess.Write))
-                Serialize(stream, encoding);
+            protected override void Dispose(bool disposing)
+            { }
         }
 
-        private void Serialize(Stream stream, Encoding encoding)
+        public static void WriteToStreamTextual(Configuration cfg, Stream stream, Encoding encoding)
         {
+            Debug.Assert(cfg != null);
+
             if (stream == null)
                 throw new ArgumentNullException("stream");
+
+            if (encoding == null)
+                encoding = new UTF8Encoding();
 
             var sb = new StringBuilder();
 
             // Write all sections.
             bool isFirstSection = true;
 
-            foreach (var section in this)
+            foreach (var section in cfg)
             {
                 if (!isFirstSection)
                     sb.AppendLine();
@@ -54,66 +68,49 @@ namespace SharpConfig
                 isFirstSection = false;
             }
 
-            // Write to stream.
-            var writer = (encoding == null) ?
-                new StreamWriter(stream) :
-                new StreamWriter(stream, encoding);
+            string str = sb.ToString();
 
-            using (writer)
-                writer.Write(sb.ToString());
+            // Encode & write the string.
+            var byteBuffer = new byte[encoding.GetByteCount(str)];
+            int byteCount = encoding.GetBytes(str, 0, str.Length, byteBuffer, 0);
+
+            stream.Write(byteBuffer, 0, byteCount);
+            stream.Flush();
         }
 
-        private void SerializeBinary(BinaryWriter writer, string filename)
+        public static void WriteToStreamBinary(Configuration cfg, Stream stream, BinaryWriter writer)
         {
-            if (string.IsNullOrEmpty(filename))
-                throw new ArgumentNullException("filename");
+            Debug.Assert(cfg != null);
 
-            using (var stream = new FileStream(filename, FileMode.Create, FileAccess.Write))
-                SerializeBinary(writer, stream);
-        }
-
-        private void SerializeBinary(BinaryWriter writer, Stream stream)
-        {
             if (stream == null)
                 throw new ArgumentNullException("stream");
 
-            bool ownWriter = false;
-
             if (writer == null)
-            {
-                writer = new BinaryWriter(stream);
-                ownWriter = true;
-            }
+                writer = new NonClosingBinaryWriter(stream);
 
-            try
-            {
-                writer.Write(SectionCount);
+            writer.Write(cfg.SectionCount);
 
-                foreach (var section in this)
+            foreach (var section in cfg)
+            {
+                writer.Write(section.Name);
+                writer.Write(section.SettingCount);
+
+                WriteCommentsBinary(writer, section);
+
+                // Write the section's settings.
+                foreach (var setting in section)
                 {
-                    writer.Write(section.Name);
-                    writer.Write(section.SettingCount);
+                    writer.Write(setting.Name);
+                    writer.Write(setting.StringValue);
 
-                    SerializeComments(writer, section);
-
-                    // Write the section's settings.
-                    foreach (var setting in section)
-                    {
-                        writer.Write(setting.Name);
-                        writer.Write(setting.StringValue);
-
-                        SerializeComments(writer, setting);
-                    }
+                    WriteCommentsBinary(writer, setting);
                 }
             }
-            finally
-            {
-                if (ownWriter)
-                    writer.Close();
-            }
+            
+            writer.Close();
         }
 
-        private static void SerializeComments(BinaryWriter writer, ConfigurationElement element)
+        private static void WriteCommentsBinary(BinaryWriter writer, ConfigurationElement element)
         {
             // Write the comment.
             var commentNullable = element.Comment;

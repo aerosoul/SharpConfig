@@ -29,7 +29,7 @@ namespace SharpConfig
         private static ITypeStringConverter mFallbackConverter;
         private static Dictionary<Type, ITypeStringConverter> mTypeStringConverters;
 
-        private List<Section> mSections;
+        internal List<Section> mSections;
 
         #endregion
 
@@ -118,23 +118,37 @@ namespace SharpConfig
         /// To remove all sections that have the name name, use the RemoveAllNamed() method instead.
         /// </summary>
         /// <param name="sectionName">The case-sensitive name of the section to remove.</param>
-        /// <exception cref="ArgumentNullException">When <paramref name="sectionName"/> is null or empty.</exception>
-        public void Remove(string sectionName)
+        /// <returns>True if a section with the specified name was removed; false otherwise.</returns>
+        public bool Remove(string sectionName)
         {
             if (string.IsNullOrEmpty(sectionName))
                 throw new ArgumentNullException("sectionName");
 
             var section = FindSection(sectionName);
 
-            if (section == null)
-            {
-                throw new ArgumentException(string.Format(
-                    "A section named '{0}' does not exist in the configuration.",
-                    sectionName
-                    ));
-            }
+            if (section != null)
+                return Remove(section);
+            else
+                return false;
+        }
 
-            Remove(section);
+        /// <summary>
+        /// Removes a section from the configuration.
+        /// </summary>
+        /// <param name="section">The section to remove.</param>
+        /// <returns>True if the section was removed; false otherwise.</returns>
+        public bool Remove(Section section)
+        {
+            if (section == null)
+                throw new ArgumentNullException("section");
+
+            if (mSections.Contains(section))
+            {
+                mSections.Remove(section);
+                return true;
+            }
+            else
+                return false;
         }
 
         /// <summary>
@@ -147,26 +161,7 @@ namespace SharpConfig
             if (string.IsNullOrEmpty(sectionName))
                 throw new ArgumentNullException("sectionName");
 
-            for (int i = mSections.Count - 1; i >= 0; i--)
-            {
-                if (string.Equals(mSections[i].Name, sectionName, StringComparison.OrdinalIgnoreCase))
-                    mSections.RemoveAt(i);
-            }
-        }
-
-        /// <summary>
-        /// Removes a section from the configuration.
-        /// </summary>
-        /// <param name="section">The section to remove.</param>
-        public void Remove(Section section)
-        {
-            if (section == null)
-                throw new ArgumentNullException("section");
-
-            if (!Contains(section))
-                throw new ArgumentException("The specified section does not exist in the section.");
-
-            mSections.Remove(section);
+            while (Remove(sectionName)) ;
         }
 
         /// <summary>
@@ -347,7 +342,7 @@ namespace SharpConfig
             if (source == null)
                 throw new ArgumentNullException("source");
 
-            return Parse(source);
+            return ConfigurationReader.ReadFromString(source);
         }
 
         #endregion
@@ -367,10 +362,7 @@ namespace SharpConfig
         /// <exception cref="ArgumentNullException">When <paramref name="filename"/> is null or empty.</exception>
         public static Configuration LoadFromBinaryFile(string filename)
         {
-            if (string.IsNullOrEmpty(filename))
-                throw new ArgumentNullException("filename");
-
-            return DeserializeBinary(null, filename);
+            return LoadFromBinaryFile(filename, null);
         }
 
         /// <summary>
@@ -390,7 +382,8 @@ namespace SharpConfig
             if (string.IsNullOrEmpty(filename))
                 throw new ArgumentNullException("filename");
 
-            return DeserializeBinary(reader, filename);
+            using (var stream = File.OpenRead(filename))
+                return LoadFromBinaryStream(stream, reader);
         }
 
         /// <summary>
@@ -406,10 +399,7 @@ namespace SharpConfig
         /// <exception cref="ArgumentNullException">When <paramref name="stream"/> is null.</exception>
         public static Configuration LoadFromBinaryStream(Stream stream)
         {
-            if (stream == null)
-                throw new ArgumentNullException("stream");
-
-            return DeserializeBinary(null, stream);
+            return LoadFromBinaryStream(stream, null);
         }
 
         /// <summary>
@@ -429,7 +419,7 @@ namespace SharpConfig
             if (stream == null)
                 throw new ArgumentNullException("stream");
 
-            return DeserializeBinary(reader, stream);
+            return ConfigurationReader.ReadFromBinaryStream(stream, reader);
         }
 
         #endregion
@@ -457,7 +447,8 @@ namespace SharpConfig
             if (string.IsNullOrEmpty(filename))
                 throw new ArgumentNullException("filename");
 
-            Serialize(filename, encoding);
+            using (var stream = new FileStream(filename, FileMode.Create, FileAccess.Write))
+                SaveToStream(stream, encoding);
         }
 
         /// <summary>
@@ -481,7 +472,7 @@ namespace SharpConfig
             if (stream == null)
                 throw new ArgumentNullException("stream");
 
-            Serialize(stream, encoding);
+            ConfigurationWriter.WriteToStreamTextual(this, stream, encoding);
         }
 
         #endregion
@@ -509,7 +500,8 @@ namespace SharpConfig
             if (string.IsNullOrEmpty(filename))
                 throw new ArgumentNullException("filename");
 
-            SerializeBinary(writer, filename);
+            using (var stream = new FileStream(filename, FileMode.Create, FileAccess.Write))
+                SaveToBinaryStream(stream, writer);
         }
 
         /// <summary>
@@ -533,7 +525,7 @@ namespace SharpConfig
             if (stream == null)
                 throw new ArgumentNullException("stream");
 
-            SerializeBinary(writer, stream);
+            ConfigurationWriter.WriteToStreamBinary(this, stream, writer);
         }
 
         #endregion

@@ -172,7 +172,7 @@ namespace SharpConfig
         /// </summary>
         public bool IsArray
         {
-            get { return ArraySize >= 0; }
+            get { return (ArraySize >= 0); }
         }
 
         /// <summary>
@@ -196,6 +196,7 @@ namespace SharpConfig
                     mCachedArraySize = CalculateArraySize();
                     mShouldCalculateArraySize = false;
                 }
+
                 return mCachedArraySize;
             }
         }
@@ -214,28 +215,22 @@ namespace SharpConfig
             // There may only be spaces between the beginning
             // of the string and the first left bracket.
             for (int i = 0; i < arrayStartIdx; ++i)
-            {
                 if (mRawValue[i] != ' ')
                     return -1;
-            }
 
             // Also, there may only be spaces between the last
             // right brace and the end of the string.
             for (int i = arrayEndIdx + 1; i < mRawValue.Length; ++i)
-            {
                 if (mRawValue[i] != ' ')
                     return -1;
-            }
 
             int arraySize = 0;
 
             // Naive algorithm; assume the number of array element delimiters
             // equals the number of elements + 1.
             for (int i = 0; i < mRawValue.Length; ++i)
-            {
                 if (mRawValue[i] == Configuration.ArrayElementSeparator)
                     ++arraySize;
-            }
 
             if (arraySize == 0)
             {
@@ -271,6 +266,67 @@ namespace SharpConfig
         /// Gets this setting's value as a specific type.
         /// </summary>
         ///
+        /// <param name="type">The type of the object to retrieve.</param>
+        public object GetValue(Type type)
+        {
+            if (type == null)
+                throw new ArgumentNullException("type");
+
+            if (type.IsArray)
+                throw new InvalidOperationException("To obtain an array value, use GetValueArray() instead of GetValue().");
+
+            if (this.IsArray)
+                throw new InvalidOperationException("The setting represents an array. Use GetValueArray() to obtain its value.");
+
+            return type.IsArray ?
+                GetValueArray(type.GetElementType()) :
+                CreateObjectFromString(mRawValue, type);
+        }
+
+        /// <summary>
+        /// Gets this setting's value as an array of a specific type.
+        /// Note: this only works if the setting represents an array. If it is not, then null is returned.
+        /// </summary>
+        /// <param name="elementType">
+        ///     The type of elements in the array. All values in the array are going to be converted to objects of this type.
+        ///     If the conversion of an element fails, an exception is thrown.
+        /// </param>
+        /// <returns>The values of this setting as an array.</returns>
+        public object[] GetValueArray(Type elementType)
+        {
+            if (elementType.IsArray)
+            {
+                // Determine the underlying element type.
+                Type realElementType = elementType.GetElementType();
+                while (realElementType.IsArray)
+                    realElementType = realElementType.GetElementType();
+
+                throw new ArgumentException(string.Format(
+                    "Jagged arrays are not supported. The type you have specified is '{0}', but '{1}' was expected.",
+                    elementType.Name, realElementType.Name
+                    ));
+            }
+
+            int myArraySize = this.ArraySize;
+            if (ArraySize < 0)
+                return null;
+
+            var values = new object[myArraySize];
+
+            if (myArraySize > 0)
+            {
+                var enumerator = new SettingArrayEnumerator(mRawValue);
+                while (enumerator.Next())
+                    values[enumerator.Index] = CreateObjectFromString(enumerator.Current, elementType);
+            }
+
+            return values;
+        }
+
+        /// <summary>
+        /// Gets this setting's value as a specific type.
+        /// </summary>
+        ///
         /// <typeparam name="T">The type of the object to retrieve.</typeparam>
         public T GetValue<T>()
         {
@@ -286,26 +342,6 @@ namespace SharpConfig
         }
 
         /// <summary>
-        /// Gets this setting's value as a specific type.
-        /// </summary>
-        ///
-        /// <param name="type">The type of the object to retrieve.</param>
-        public object GetValue(Type type)
-        {
-            if (type == null)
-                throw new ArgumentNullException("type");
-
-            if (type.IsArray)
-            {
-                return GetValueArray(type.GetElementType());
-            }
-            else
-            {
-                return CreateObjectFromString(mRawValue, type);
-            }
-        }
-
-        /// <summary>
         /// Gets this setting's value as an array of a specific type.
         /// Note: this only works if the setting represents an array. If it is not, then null is returned.
         /// </summary>
@@ -316,8 +352,20 @@ namespace SharpConfig
         /// <returns>The values of this setting as an array.</returns>
         public T[] GetValueArray<T>()
         {
-            if (typeof(T).IsArray)
-                throw new ArgumentException("Jagged arrays are not supported.");
+            var type = typeof(T);
+
+            if (type.IsArray)
+            {
+                // Determine the underlying element type.
+                Type elementType = type.GetElementType();
+                while (elementType.IsArray)
+                    elementType = elementType.GetElementType();
+
+                throw new ArgumentException(string.Format(
+                    "Jagged arrays are not supported. The type you have specified is '{0}', but '{1}' was expected.",
+                    type.Name, elementType.Name
+                    ));
+            }
 
             int myArraySize = this.ArraySize;
             if (myArraySize < 0)
@@ -329,37 +377,7 @@ namespace SharpConfig
             {
                 var enumerator = new SettingArrayEnumerator(mRawValue);
                 while (enumerator.Next())
-                    values[enumerator.Index] = (T)CreateObjectFromString(enumerator.Current, typeof(T));
-            }
-
-            return values;
-        }
-
-        /// <summary>
-        /// Gets this setting's value as an array of a specific type.
-        /// Note: this only works if the setting represents an array. If it is not, then null is returned.
-        /// </summary>
-        /// <param name="elementType">
-        ///     The type of elements in the array. All values in the array are going to be converted to objects of this type.
-        ///     If the conversion of an element fails, an exception is thrown.
-        /// </param>
-        /// <returns>The values of this setting as an array.</returns>
-        public object[] GetValueArray(Type elementType)
-        {
-            if (elementType.IsArray)
-                throw new ArgumentException("Jagged arrays are not supported.");
-
-            int myArraySize = this.ArraySize;
-            if (ArraySize < 0)
-                return null;
-
-            var values = new object[myArraySize];
-
-            if (myArraySize > 0)
-            {
-                var enumerator = new SettingArrayEnumerator(mRawValue);
-                while (enumerator.Next())
-                    values[enumerator.Index] = CreateObjectFromString(enumerator.Current, elementType);
+                    values[enumerator.Index] = (T)CreateObjectFromString(enumerator.Current, type);
             }
 
             return values;
@@ -392,7 +410,7 @@ namespace SharpConfig
             {
                 return converter.ConvertFromString(value, dstType);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw SettingValueCastException.Create(value, dstType, ex);
             }
@@ -402,52 +420,52 @@ namespace SharpConfig
 
         #region SetValue
 
-        /// <summary>
-        /// Sets the value of this setting via an object.
-        /// </summary>
-        /// 
-        /// <param name="value">The value to set.</param>
-        public void SetValue<T>(T value)
-        {
-            if (value == null)
-            {
-                SetEmptyValue();
-            }
-            else
-            {
-                var converter = Configuration.FindTypeStringConverter(typeof(T));
-                mRawValue = converter.ConvertToString(value);
-                mShouldCalculateArraySize = true;
-            }
-        }
+        ///// <summary>
+        ///// Sets the value of this setting via an object.
+        ///// </summary>
+        ///// 
+        ///// <param name="value">The value to set.</param>
+        //public void SetValue<T>(T value)
+        //{
+        //    if (value == null)
+        //    {
+        //        SetEmptyValue();
+        //    }
+        //    else
+        //    {
+        //        var converter = Configuration.FindTypeStringConverter(typeof(T));
+        //        mRawValue = converter.ConvertToString(value);
+        //        mShouldCalculateArraySize = true;
+        //    }
+        //}
 
-        /// <summary>
-        /// Sets the value of this setting via an array.
-        /// </summary>
-        /// 
-        /// <param name="values">The values to set.</param>
-        public void SetValue<T>(T[] values)
-        {
-            if (typeof(T).IsArray)
-                throw new ArgumentException("Jagged arrays are not supported.");
+        ///// <summary>
+        ///// Sets the value of this setting via an array.
+        ///// </summary>
+        ///// 
+        ///// <param name="values">The values to set.</param>
+        //public void SetValue<T>(T[] values)
+        //{
+        //    if (typeof(T).IsArray)
+        //        throw new ArgumentException("Jagged arrays are not supported.");
 
-            if (values == null)
-            {
-                SetEmptyValue();
-            }
-            else
-            {
-                var strings = new string[values.Length];
+        //    if (values == null)
+        //    {
+        //        SetEmptyValue();
+        //    }
+        //    else
+        //    {
+        //        var strings = new string[values.Length];
 
-                var converter = Configuration.FindTypeStringConverter(typeof(T));
-                for (int i = 0; i < values.Length; ++i)
-                    strings[i] = converter.ConvertToString(values[i]);
+        //        var converter = Configuration.FindTypeStringConverter(typeof(T));
+        //        for (int i = 0; i < values.Length; ++i)
+        //            strings[i] = converter.ConvertToString(values[i]);
 
-                mRawValue = string.Format("{{{0}}}", string.Join(",", strings));
-                mCachedArraySize = values.Length;
-                mShouldCalculateArraySize = false;
-            }
-        }
+        //        mRawValue = string.Format("{{{0}}}", string.Join(Configuration.ArrayElementSeparator.ToString(), strings));
+        //        mCachedArraySize = values.Length;
+        //        mShouldCalculateArraySize = false;
+        //    }
+        //}
 
         /// <summary>
         /// Sets the value of this setting via an object.
@@ -512,8 +530,8 @@ namespace SharpConfig
                     var converter = Configuration.FindTypeStringConverter(values[i].GetType());
                     strings[i] = converter.ConvertToString(values[i]);
                 }
-
-                mRawValue = string.Format("{{{0}}}", string.Join(",", strings));
+                
+                mRawValue = string.Format("{{{0}}}", string.Join(Configuration.ArrayElementSeparator.ToString(), strings));
                 mCachedArraySize = values.Length;
                 mShouldCalculateArraySize = false;
             }

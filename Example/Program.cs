@@ -27,7 +27,7 @@ namespace Example
         {
             // Call the methods in this file here to see their effect.
 
-            HowToLoadAConfig();
+            //HowToLoadAConfig();
             //HowToCreateAConfig();
             //HowToSaveAConfig(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TestCfg.ini"));
             //HowToCreateObjectsFromSections();

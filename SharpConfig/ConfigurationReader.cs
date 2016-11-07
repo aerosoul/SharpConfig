@@ -1,16 +1,16 @@
 ﻿// Copyright (c) 2013-2016 Cemalettin Dervis, MIT License.
 // https://github.com/cemdervis/SharpConfig
 
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace SharpConfig
 {
-    public partial class Configuration
+    internal static class ConfigurationReader
     {
-        // Parses a configuration from a source string.
-        // This is the core parsing function.
-        private static Configuration Parse(string source)
+        public static Configuration ReadFromString(string source)
         {
             int lineNumber = 0;
 
@@ -37,14 +37,14 @@ namespace SharpConfig
                     int commentIndex = 0;
                     var comment = ParseComment(line, out commentIndex);
 
-                    if (!IgnorePreComments && commentIndex == 0)
+                    if (!Configuration.IgnorePreComments && commentIndex == 0)
                     {
                         // This is a comment line (pre-comment).
                         // Add it to the list of pre-comments.
                         preComments.Add(comment.Value);
                         continue;
                     }
-                    else if (!IgnoreInlineComments && commentIndex > 0)
+                    else if (!Configuration.IgnoreInlineComments && commentIndex > 0)
                     {
                         // Strip away the comments of this line.
                         line = line.Remove(commentIndex).Trim();
@@ -55,10 +55,10 @@ namespace SharpConfig
                     {
                         currentSection = ParseSection(line, lineNumber);
 
-                        if (!IgnoreInlineComments)
+                        if (!Configuration.IgnoreInlineComments)
                             currentSection.Comment = comment;
 
-                        if (!IgnorePreComments && preComments.Count > 0)
+                        if (!Configuration.IgnorePreComments && preComments.Count > 0)
                         {
                             currentSection.mPreComments = new List<Comment>(preComments);
                             preComments.Clear();
@@ -70,7 +70,7 @@ namespace SharpConfig
                     {
                         var setting = ParseSetting(line, lineNumber);
 
-                        if (!IgnoreInlineComments)
+                        if (!Configuration.IgnoreInlineComments)
                             setting.Comment = comment;
 
                         if (currentSection == null)
@@ -80,7 +80,7 @@ namespace SharpConfig
                                 setting.Name), lineNumber);
                         }
 
-                        if (!IgnorePreComments && preComments.Count > 0)
+                        if (!Configuration.IgnorePreComments && preComments.Count > 0)
                         {
                             setting.mPreComments = new List<Comment>(preComments);
                             preComments.Clear();
@@ -88,7 +88,6 @@ namespace SharpConfig
 
                         currentSection.Add(setting);
                     }
-
                 }
             }
 
@@ -125,7 +124,7 @@ namespace SharpConfig
 
             do
             {
-                commentIndex = line.IndexOfAny(ValidCommentChars, commentIndex + 1);
+                commentIndex = line.IndexOfAny(Configuration.ValidCommentChars, commentIndex + 1);
 
                 if (commentIndex < 0)
                     break;
@@ -204,5 +203,67 @@ namespace SharpConfig
             return new Setting(settingName, settingValue);
         }
 
+        public static Configuration ReadFromBinaryStream(Stream stream, BinaryReader reader)
+        {
+            if (stream == null)
+                throw new ArgumentNullException("stream");
+
+            if (reader == null)
+                reader = new BinaryReader(stream);
+
+            var config = new Configuration();
+
+            int sectionCount = reader.ReadInt32();
+
+            for (int i = 0; i < sectionCount; ++i)
+            {
+                string sectionName = reader.ReadString();
+                int settingCount = reader.ReadInt32();
+
+                var section = new Section(sectionName);
+
+                ReadCommentsBinary(reader, section);
+
+                for (int j = 0; j < settingCount; j++)
+                {
+                    var setting = new Setting(
+                        reader.ReadString(),
+                        reader.ReadString());
+
+                    ReadCommentsBinary(reader, setting);
+
+                    section.Add(setting);
+                }
+
+                config.Add(section);
+            }
+
+            return config;
+        }
+
+        private static void ReadCommentsBinary(BinaryReader reader, ConfigurationElement element)
+        {
+            bool hasComment = reader.ReadBoolean();
+            if (hasComment)
+            {
+                char symbol = reader.ReadChar();
+                string commentValue = reader.ReadString();
+                element.Comment = new Comment(commentValue, symbol);
+            }
+
+            int preCommentCount = reader.ReadInt32();
+
+            if (preCommentCount > 0)
+            {
+                element.mPreComments = new List<Comment>(preCommentCount);
+
+                for (int i = 0; i < preCommentCount; ++i)
+                {
+                    char symbol = reader.ReadChar();
+                    string commentValue = reader.ReadString();
+                    element.mPreComments.Add(new Comment(commentValue, symbol));
+                }
+            }
+        }
     }
 }
