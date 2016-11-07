@@ -443,7 +443,7 @@ namespace SharpConfig
                 for (int i = 0; i < values.Length; ++i)
                     strings[i] = converter.ConvertToString(values[i]);
 
-                mRawValue = string.Format("{{{0}}}", string.Join(",", strings));
+                mRawValue = string.Format("{{{0}}}", string.Join(Configuration.ArrayElementSeparator.ToString(), strings));
                 mCachedArraySize = values.Length;
                 mShouldCalculateArraySize = false;
             }
@@ -477,7 +477,7 @@ namespace SharpConfig
                     strings[i] = converter.ConvertToString(elemValue);
                 }
 
-                mRawValue = string.Format("{{{0}}}", string.Join(",", strings));
+                mRawValue = string.Format("{{{0}}}", string.Join(Configuration.ArrayElementSeparator.ToString(), strings));
                 mCachedArraySize = values.Length;
                 mShouldCalculateArraySize = false;
             }
