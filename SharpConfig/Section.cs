@@ -434,7 +434,7 @@ namespace SharpConfig
                 if (setting == null)
                 {
                     setting = new Setting(name);
-                    Add(setting);
+                    mSettings.Add(setting);
                 }
 
                 return setting;
