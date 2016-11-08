@@ -139,16 +139,7 @@ namespace SharpConfig
         /// <returns>True if the section was removed; false otherwise.</returns>
         public bool Remove(Section section)
         {
-            if (section == null)
-                throw new ArgumentNullException("section");
-
-            if (mSections.Contains(section))
-            {
-                mSections.Remove(section);
-                return true;
-            }
-            else
-                return false;
+            return mSections.Remove(section);
         }
 
         /// <summary>

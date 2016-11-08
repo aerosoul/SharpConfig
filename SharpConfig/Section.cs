@@ -333,16 +333,7 @@ namespace SharpConfig
         /// <returns>True if the setting was removed; false otherwise.</returns>
         public bool Remove(Setting setting)
         {
-            if (setting == null)
-                throw new ArgumentNullException("setting");
-
-            if (mSettings.Contains(setting))
-            {
-                mSettings.Remove(setting);
-                return true;
-            }
-            else
-                return false;
+            return mSettings.Remove(setting);
         }
 
         /// <summary>
