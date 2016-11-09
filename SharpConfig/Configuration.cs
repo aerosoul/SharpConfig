@@ -124,12 +124,7 @@ namespace SharpConfig
             if (string.IsNullOrEmpty(sectionName))
                 throw new ArgumentNullException("sectionName");
 
-            var section = FindSection(sectionName);
-
-            if (section != null)
-                return Remove(section);
-            else
-                return false;
+            return Remove(FindSection(sectionName));
         }
 
         /// <summary>
