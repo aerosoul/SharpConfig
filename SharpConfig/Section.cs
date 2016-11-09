@@ -318,12 +318,7 @@ namespace SharpConfig
             if (string.IsNullOrEmpty(settingName))
                 throw new ArgumentNullException("settingName");
 
-            var setting = FindSetting(settingName);
-
-            if (setting != null)
-                return Remove(setting);
-            else
-                return false;
+            return Remove(FindSetting(settingName));
         }
 
         /// <summary>
