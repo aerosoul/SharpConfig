@@ -25,6 +25,7 @@ SomeString = Hello World!
 SomeInteger = 10 # an inline comment
 SomeFloat = 20.05
 SomeBoolean = true
+SomeArray = { 1, 2, 3 }
 ```
 
 To read these values, your C# code would look like:
@@ -36,6 +37,9 @@ string someString = section["SomeString"].StringValue;
 int someInteger = section["SomeInteger"].IntValue;
 float someFloat = section["SomeFloat"].FloatValue;
 bool someBool = section["SomeBoolean"].BoolValue;
+int[] someIntArray = section["SomeArray"].IntValueArray;
+string[] someStringArray = section["SomeArray"].StringValueArray;
+// ...
 ```
 
 Iterating through a Configuration
