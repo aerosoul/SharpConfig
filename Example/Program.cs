@@ -1,5 +1,7 @@
-﻿using System;
-using System.IO;
+﻿// Copyright (c) 2013-2016 Cemalettin Dervis, MIT License.
+// https://github.com/cemdervis/SharpConfig
+
+using System;
 using SharpConfig;
 
 namespace Example

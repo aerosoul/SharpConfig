@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace SharpConfig
 {
@@ -190,7 +189,7 @@ namespace SharpConfig
 
             // Trim the setting name and value.
             string settingName = line.Substring(0, indexOfAssignOp).Trim();
-            string settingValue = line.Substring(indexOfAssignOp + 1, line.Length - indexOfAssignOp - 1);
+            string settingValue = line.Substring(indexOfAssignOp + 1);
             settingValue = settingValue.Trim();
 
             // Check if non-null name / value is given.

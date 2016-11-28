@@ -2,7 +2,6 @@
 // https://github.com/cemdervis/SharpConfig
 
 using System;
-using System.Collections.Generic;
 
 namespace SharpConfig
 {
@@ -278,9 +277,7 @@ namespace SharpConfig
             if (this.IsArray)
                 throw new InvalidOperationException("The setting represents an array. Use GetValueArray() to obtain its value.");
 
-            return type.IsArray ?
-                GetValueArray(type.GetElementType()) :
-                CreateObjectFromString(mRawValue, type);
+            return CreateObjectFromString(mRawValue, type);
         }
 
         /// <summary>
