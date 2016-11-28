@@ -8,8 +8,7 @@ The library is fully compatible with .NET 2.0 and higher, and the Mono Framework
 
 Installing via NuGet
 ---
-You can install SharpConfig via the following NuGet command:
-> Install-Package sharpconfig
+You can install SharpConfig via the following NuGet command: `Install-Package sharpconfig`
 
 [NuGet Page](https://www.nuget.org/packages/sharpconfig/)
 
@@ -26,6 +25,7 @@ SomeInteger = 10 # an inline comment
 SomeFloat = 20.05
 SomeBoolean = true
 SomeArray = { 1, 2, 3 }
+Day = Monday
 ```
 
 To read these values, your C# code would look like:
@@ -39,6 +39,7 @@ float someFloat = section["SomeFloat"].FloatValue;
 bool someBool = section["SomeBoolean"].BoolValue;
 int[] someIntArray = section["SomeArray"].IntValueArray;
 string[] someStringArray = section["SomeArray"].StringValueArray;
+DayOfWeek day = section["Day"].GetValue<DayOfWeek>();
 // ...
 ```
 
