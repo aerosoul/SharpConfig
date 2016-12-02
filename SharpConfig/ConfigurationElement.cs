@@ -13,16 +13,12 @@ namespace SharpConfig
     /// </summary>
     public abstract class ConfigurationElement
     {
-        private string mName;
-        private Comment? mComment;
-        internal List<Comment> mPreComments;
-
         internal ConfigurationElement(string name)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
-            mName = name;
+            Name = name;
         }
 
         /// <summary>
@@ -30,30 +26,102 @@ namespace SharpConfig
         /// </summary>
         public string Name
         {
-            get { return mName; }
+            get;
+            private set;
         }
 
         /// <summary>
         /// Gets or sets the comment of this element.
         /// </summary>
-        public Comment? Comment
+        public string Comment
         {
-            get { return mComment; }
-            set { mComment = value; }
+            get; set;
         }
 
         /// <summary>
-        /// Gets the list of comments above this element.
+        /// Gets the comment above this element.
         /// </summary>
-        public List<Comment> PreComments
+        public string PreComment
         {
-            get
-            {
-                if (mPreComments == null)
-                    mPreComments = new List<Comment>();
-
-                return mPreComments;
-            }
+            get; set;
         }
+
+        /// <summary>
+        /// Gets the string representation of the element without its comments.
+        /// </summary>
+        public override string ToString()
+        {
+            return ToString(false);
+        }
+
+        /// <summary>
+        /// Gets the string representation of the element.
+        /// </summary>
+        ///
+        /// <param name="includeComments">Specify true to include the comments in the string; false otherwise.</param>
+        public string ToString(bool includeComments)
+        {
+            string stringExpr = GetStringExpression();
+
+            if (includeComments)
+            {
+                if (Comment != null && PreComment != null)
+                {
+                    // Include inline comment and pre-comments.
+                    return string.Format("{0}{1}{2} {3}",
+                        GetFormattedPreComment(),   // {0}
+                        Environment.NewLine,        // {1}
+                        stringExpr,                 // {2}
+                        GetFormattedComment()       // {3}
+                        );
+                }
+                else if (Comment != null)
+                {
+                    // Include only the inline comment.
+                    return string.Format("{0} {1}",
+                        stringExpr,                 // {0}
+                        GetFormattedComment()       // {1}
+                        );
+                }
+                else if (PreComment != null)
+                {
+                    // Include only the pre-comments.
+                    return string.Format("{0}{1}{2}",
+                        GetFormattedPreComment(),   // {0}
+                        Environment.NewLine,        // {1}
+                        stringExpr                  // {2}
+                        );
+                }
+            }
+
+            // In every other case, just return the expression.
+            return stringExpr;
+        }
+
+        // Gets a formatted comment string that is ready
+        // to be written to a config file.
+        private string GetFormattedComment()
+        {
+            return (Configuration.PreferredCommentChar + " " + Comment);
+        }
+
+        // Gets a formatted pre-comment string that is ready
+        // to be written to a config file.
+        private string GetFormattedPreComment()
+        {
+            string[] lines = PreComment.Split(
+                new[] { Environment.NewLine },
+                StringSplitOptions.None
+                );
+
+            return string.Join(
+                Environment.NewLine,
+                Array.ConvertAll(lines, s => Configuration.PreferredCommentChar + " " + s)
+                );
+        }
+
+        // Gets the element's expression as a string.
+        // An example for a section would be "[Section]".
+        protected abstract string GetStringExpression();
     }
 }

@@ -447,64 +447,11 @@ namespace SharpConfig
 
         #endregion
 
-        #region Public Methods
-
-        /// <summary>
-        /// Gets the string representation of the setting, without its comments.
-        /// </summary>
-        public override string ToString()
+        protected override string GetStringExpression()
         {
-            return ToString(false);
-        }
-
-        /// <summary>
-        /// Gets the string representation of the setting.
-        /// </summary>
-        ///
-        /// <param name="includeComment">Specify true to include the comments in the string; false otherwise.</param>
-        public string ToString(bool includeComment)
-        {
-            if (includeComment)
-            {
-                bool hasPreComments = mPreComments != null && mPreComments.Count > 0;
-
-                string[] preCommentStrings = hasPreComments ?
-                    mPreComments.ConvertAll(c => c.ToString()).ToArray() : null;
-
-                if (Comment != null && hasPreComments)
-                {
-                    // Include inline comment and pre-comments.
-                    return string.Format("{0}{1}{2} = {3} {4}",
-                        string.Join(Environment.NewLine, preCommentStrings), // {0}
-                        Environment.NewLine,    // {1}
-                        Name,                   // {2}
-                        mRawValue,              // {3}
-                        Comment.ToString()      // {4}
-                        );
-                }
-                else if (Comment != null)
-                {
-                    // Include only the inline comment.
-                    return string.Format("{0} = {1} {2}", Name, mRawValue, Comment.ToString());
-                }
-                else if (hasPreComments)
-                {
-                    // Include only the pre-comments.
-                    return string.Format("{0}{1}{2} = {3}",
-                        string.Join(Environment.NewLine, preCommentStrings), // {0}
-                        Environment.NewLine,    // {1}
-                        Name,                   // {2}
-                        mRawValue               // {3}
-                        );
-                }
-            }
-
-            // In every other case, include just the assignment in the string.
             return string.Format("{0} = {1}", Name, mRawValue);
         }
 
-        #endregion
-        
         private static ArgumentException CreateJaggedArraysNotSupportedEx(Type type)
         {
             // Determine the underlying element type.

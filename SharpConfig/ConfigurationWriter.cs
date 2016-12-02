@@ -49,21 +49,14 @@ namespace SharpConfig
 
                 // Leave some space between this section and the element that is above,
                 // if this section has pre-comments and isn't the first section in the configuration.
-                if (!isFirstSection && section.mPreComments != null && section.mPreComments.Count > 0)
+                if (!isFirstSection && section.PreComment != null)
                     sb.AppendLine();
 
                 sb.AppendLine(section.ToString(true));
 
                 // Write all settings.
                 foreach (var setting in section)
-                {
-                    // Leave some space between this setting and the element that is above,
-                    // if this element has pre-comments.
-                    if (setting.mPreComments != null && setting.mPreComments.Count > 0)
-                        sb.AppendLine();
-
                     sb.AppendLine(setting.ToString(true));
-                }
 
                 isFirstSection = false;
             }
@@ -106,39 +99,27 @@ namespace SharpConfig
                     WriteCommentsBinary(writer, setting);
                 }
             }
-            
+
             writer.Close();
         }
 
         private static void WriteCommentsBinary(BinaryWriter writer, ConfigurationElement element)
         {
-            // Write the comment.
-            var commentNullable = element.Comment;
-
-            writer.Write(commentNullable.HasValue);
-            if (commentNullable.HasValue)
+            writer.Write(element.Comment != null);
+            if (element.Comment != null)
             {
-                var comment = commentNullable.Value;
-                writer.Write(comment.Symbol);
-                writer.Write(comment.Value);
+                // SharpConfig <3.0 wrote the comment char here.
+                // We'll just write a single char for backwards-compatibility.
+                writer.Write(' ');
+                writer.Write(element.Comment);
             }
 
-            // Write the pre-comments.
-            // Note: do not access the PreComments property of element,
-            // as it will lazily create a new List of pre-comments.
-            // Access the private field instead.
-            var preComments = element.mPreComments;
-            bool hasPreComments = (preComments != null && preComments.Count > 0);
-
-            writer.Write(hasPreComments ? preComments.Count : 0);
-
-            if (hasPreComments)
+            writer.Write(element.PreComment != null);
+            if (element.PreComment != null)
             {
-                foreach (var preComment in preComments)
-                {
-                    writer.Write(preComment.Symbol);
-                    writer.Write(preComment.Value);
-                }
+                // Same as with inline comments above.
+                writer.Write(' ');
+                writer.Write(element.PreComment);
             }
         }
 

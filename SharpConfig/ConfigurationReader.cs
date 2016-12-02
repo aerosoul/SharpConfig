@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 
 namespace SharpConfig
 {
@@ -15,7 +16,9 @@ namespace SharpConfig
 
             var config = new Configuration();
             Section currentSection = null;
-            var preComments = new List<Comment>();
+            var preCommentBuilder = new StringBuilder();
+
+            int newlineLength = Environment.NewLine.Length;
 
             using (var reader = new StringReader(source))
             {
@@ -26,21 +29,20 @@ namespace SharpConfig
                 {
                     lineNumber++;
 
-                    // Remove all leading / trailing white-spaces.
+                    // Remove all leading/trailing white-spaces.
                     line = line.Trim();
 
-                    // Empty line? If so, skip.
+                    // Skip emoty lines.
                     if (string.IsNullOrEmpty(line))
                         continue;
 
                     int commentIndex = 0;
                     var comment = ParseComment(line, out commentIndex);
-
+                    
                     if (!Configuration.IgnorePreComments && commentIndex == 0)
                     {
                         // This is a comment line (pre-comment).
-                        // Add it to the list of pre-comments.
-                        preComments.Add(comment.Value);
+                        preCommentBuilder.AppendLine(comment);
                         continue;
                     }
                     else if (!Configuration.IgnoreInlineComments && commentIndex > 0)
@@ -49,23 +51,24 @@ namespace SharpConfig
                         line = line.Remove(commentIndex).Trim();
                     }
 
-                    // Sections start with a '['.
-                    if (line.StartsWith("["))
+                    if (line.StartsWith("[")) // Section
                     {
                         currentSection = ParseSection(line, lineNumber);
 
                         if (!Configuration.IgnoreInlineComments)
                             currentSection.Comment = comment;
 
-                        if (!Configuration.IgnorePreComments && preComments.Count > 0)
+                        if (!Configuration.IgnorePreComments && preCommentBuilder.Length > 0)
                         {
-                            currentSection.mPreComments = new List<Comment>(preComments);
-                            preComments.Clear();
+                            // Remove the last line.
+                            preCommentBuilder.Remove(preCommentBuilder.Length - newlineLength, newlineLength);
+                            currentSection.PreComment = preCommentBuilder.ToString();
+                            preCommentBuilder.Length = 0; // Clear the SB
                         }
 
                         config.mSections.Add(currentSection);
                     }
-                    else
+                    else // Setting
                     {
                         var setting = ParseSetting(line, lineNumber);
 
@@ -79,10 +82,12 @@ namespace SharpConfig
                                 setting.Name), lineNumber);
                         }
 
-                        if (!Configuration.IgnorePreComments && preComments.Count > 0)
+                        if (!Configuration.IgnorePreComments && preCommentBuilder.Length > 0)
                         {
-                            setting.mPreComments = new List<Comment>(preComments);
-                            preComments.Clear();
+                            // Remove the last line.
+                            preCommentBuilder.Remove(preCommentBuilder.Length - newlineLength, newlineLength);
+                            setting.PreComment = preCommentBuilder.ToString();
+                            preCommentBuilder.Length = 0; // Clear the SB
                         }
 
                         currentSection.Add(setting);
@@ -116,9 +121,9 @@ namespace SharpConfig
             return (left && right);
         }
 
-        private static Comment? ParseComment(string line, out int commentIndex)
+        private static string ParseComment(string line, out int commentIndex)
         {
-            Comment? comment = null;
+            string comment = null;
             commentIndex = -1;
 
             do
@@ -142,9 +147,7 @@ namespace SharpConfig
                 if (IsInQuoteMarks(line, commentIndex))
                     continue;
 
-                comment = new Comment(
-                    value: line.Substring(commentIndex + 1).Trim(),
-                    symbol: line[commentIndex]);
+                comment = line.Substring(commentIndex + 1).Trim();
 
                 break;
             }
@@ -245,23 +248,18 @@ namespace SharpConfig
             bool hasComment = reader.ReadBoolean();
             if (hasComment)
             {
-                char symbol = reader.ReadChar();
-                string commentValue = reader.ReadString();
-                element.Comment = new Comment(commentValue, symbol);
+                // Read the comment char, but don't do anything with it.
+                // This is just for backwards-compatibility.
+                reader.ReadChar();
+                element.Comment = reader.ReadString();
             }
 
-            int preCommentCount = reader.ReadInt32();
-
-            if (preCommentCount > 0)
+            bool hasPreComment = reader.ReadBoolean();
+            if (hasPreComment)
             {
-                element.mPreComments = new List<Comment>(preCommentCount);
-
-                for (int i = 0; i < preCommentCount; ++i)
-                {
-                    char symbol = reader.ReadChar();
-                    string commentValue = reader.ReadString();
-                    element.mPreComments.Add(new Comment(commentValue, symbol));
-                }
+                // Same as above.
+                reader.ReadChar();
+                element.PreComment = reader.ReadString();
             }
         }
     }

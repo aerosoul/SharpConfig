@@ -46,7 +46,6 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Comment.cs" />
     <Compile Include="ConfigurationReader.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="ConfigurationWriter.cs" />

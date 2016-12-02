@@ -24,7 +24,8 @@ namespace SharpConfig
 
         private static NumberFormatInfo mNumberFormat;
         private static DateTimeFormatInfo mDateTimeFormat;
-        private static char[] mValidCommentChars;
+        private static char[] mValidCommentChars = new[] { '#', ';' };
+        private static char mPreferredCommentChar = '#';
         private static char mArrayElementSeparator;
         private static ITypeStringConverter mFallbackConverter;
         private static Dictionary<Type, ITypeStringConverter> mTypeStringConverters;
@@ -167,7 +168,7 @@ namespace SharpConfig
         {
             if (section == null)
                 throw new ArgumentNullException("section");
-        
+
             return mSections.Contains(section);
         }
 
@@ -180,10 +181,10 @@ namespace SharpConfig
         {
             if (sectionName == null)
                 throw new ArgumentNullException("sectionName");
-        
+
             return FindSection(sectionName) != null;
         }
-        
+
         /// <summary>
         /// Determines whether a specifically named section is contained in the configuration,
         /// and whether that section in turn contains a specifically named setting.
@@ -195,10 +196,10 @@ namespace SharpConfig
         {
             if (sectionName == null)
                 throw new ArgumentNullException("sectionName");
-                
+
             if (settingName == null)
                 throw new ArgumentNullException("settingName");
-        
+
             Section section = FindSection(sectionName);
             return section != null && section.Contains(settingName);
         }
@@ -548,7 +549,7 @@ namespace SharpConfig
         /// The default value is CultureInfo.InvariantCulture.NumberFormat.
         /// </summary>
         /// 
-        /// <exception cref="ArgumentNullException">When a null reference is set as the value.</exception>
+        /// <exception cref="ArgumentNullException">When a null reference is set.</exception>
         public static NumberFormatInfo NumberFormat
         {
             get { return mNumberFormat; }
@@ -566,7 +567,7 @@ namespace SharpConfig
         /// The default value is CultureInfo.InvariantCulture.DateTimeFormat.
         /// </summary>
         /// 
-        /// <exception cref="ArgumentNullException">When a null reference is set as the value.</exception>
+        /// <exception cref="ArgumentNullException">When a null reference is set.</exception>
         public static DateTimeFormatInfo DateTimeFormat
         {
             get { return mDateTimeFormat; }
@@ -580,27 +581,27 @@ namespace SharpConfig
         }
 
         /// <summary>
-        /// Gets or sets the array that contains all comment delimiting characters.
+        /// Gets the array that contains all valid comment delimiting characters.
         /// </summary>
-        /// 
-        /// <exception cref="ArgumentNullException">When a null reference is set as the value.</exception>
-        /// <exception cref="ArgumentException">When an empty array is set as the value.</exception>
         public static char[] ValidCommentChars
         {
             get { return mValidCommentChars; }
+        }
+
+        /// <summary>
+        /// Gets or sets the pref
+        /// </summary>
+        /// 
+        /// <exception cref="ArgumentException">When an invalid character is set.</exception>
+        public static char PreferredCommentChar
+        {
+            get { return mPreferredCommentChar; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException("value");
+                if (!Array.Exists(mValidCommentChars, c => c == value))
+                    throw new ArgumentException("The specified char '" + value + "' is not allowed as a comment char.");
 
-                if (value.Length == 0)
-                {
-                    throw new ArgumentException(
-                        "The comment chars array must not be empty.",
-                        "value");
-                }
-
-                mValidCommentChars = value;
+                mPreferredCommentChar = value;
             }
         }
 
@@ -611,7 +612,7 @@ namespace SharpConfig
         /// to expect their ArraySize and other array-related values to return different values.
         /// </summary>
         /// 
-        /// <exception cref="ArgumentException">When a zero-character ('\0') is set as the value.</exception>
+        /// <exception cref="ArgumentException">When a zero-character ('\0') is set.</exception>
         public static char ArrayElementSeparator
         {
             get { return mArrayElementSeparator; }

@@ -459,55 +459,10 @@ namespace SharpConfig
             return null;
         }
 
-        /// <summary>
-        /// Gets the string representation of the section, without its comments.
-        /// </summary>
-        public override string ToString()
+        protected override string GetStringExpression()
         {
-            return ToString(false);
-        }
-
-        /// <summary>
-        /// Gets the string representation of the section.
-        /// </summary>
-        ///
-        /// <param name="includeComment">True to include, false to exclude the comment.</param>
-        public string ToString(bool includeComment)
-        {
-            if (includeComment)
-            {
-                bool hasPreComments = mPreComments != null && mPreComments.Count > 0;
-
-                string[] preCommentStrings = hasPreComments ?
-                    mPreComments.ConvertAll(c => c.ToString()).ToArray() : null;
-
-                if (Comment != null && hasPreComments)
-                {
-                    // Include inline comment and pre-comments.
-                    return string.Format("{0}{1}[{2}] {3}",
-                        string.Join(Environment.NewLine, preCommentStrings),    // {0}
-                        Environment.NewLine,    // {1}
-                        Name,                   // {2}
-                        Comment.ToString()      // {3}
-                        );
-                }
-                else if (Comment != null)
-                {
-                    // Include only the inline comment.
-                    return string.Format("[{0}] {1}", Name, Comment.ToString());
-                }
-                else if (hasPreComments)
-                {
-                    // Include only the pre-comments.
-                    return string.Format("{0}{1}[{2}]",
-                        string.Join(Environment.NewLine, preCommentStrings),    // {0}
-                        Environment.NewLine,    // {1}
-                        Name                    // {2}
-                        );
-                }
-            }
-
             return string.Format("[{0}]", Name);
         }
+
     }
 }
