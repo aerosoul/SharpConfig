@@ -9,7 +9,7 @@ namespace SharpConfig
     /// <summary>
     /// Represents the base class of all elements
     /// that exist in a <see cref="Configuration"/>,
-    /// for example sections and settings.
+    /// such as sections and settings.
     /// </summary>
     public abstract class ConfigurationElement
     {

@@ -39,13 +39,16 @@ namespace SharpConfig
         /// <param name="name">The name of the section.</param>
         /// <param name="obj"></param>
         /// <returns>The newly created section.</returns>
+        /// 
+        /// <exception cref="ArgumentException">When <paramref name="name"/> is null or empty.</exception>
+        /// <exception cref="ArgumentNullException">When <paramref name="obj"/> is null.</exception>
         public static Section FromObject(string name, object obj)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentException("The section name must not be null or empty.", "name");
 
             if (obj == null)
-                throw new ArgumentNullException("obj", "obj must not be null.");
+                throw new ArgumentNullException("obj");
 
             var section = new Section(name);
             var type = obj.GetType();
@@ -58,7 +61,7 @@ namespace SharpConfig
                     continue;
                 }
 
-                Setting setting = new Setting(prop.Name, prop.GetValue(obj, null));
+                var setting = new Setting(prop.Name, prop.GetValue(obj, null));
                 section.mSettings.Add(setting);
             }
 
@@ -71,7 +74,7 @@ namespace SharpConfig
                     continue;
                 }
 
-                Setting setting = new Setting(field.Name, field.GetValue(obj));
+                var setting = new Setting(field.Name, field.GetValue(obj));
                 section.mSettings.Add(setting);
             }
 
@@ -121,6 +124,8 @@ namespace SharpConfig
         /// The specified type must have a public default constructor
         /// in order to be created.
         /// </remarks>
+        /// 
+        /// <exception cref="ArgumentNullException">When <paramref name="type"/> is null.</exception>
         public object ToObject(Type type)
         {
             if (type == null)
@@ -139,6 +144,8 @@ namespace SharpConfig
         /// </summary>
         /// 
         /// <param name="obj">The object from which the values are obtained.</param>
+        /// 
+        /// <exception cref="ArgumentNullException">When <paramref name="obj"/> is null.</exception>
         public void GetValuesFrom(object obj)
         {
             if (obj == null)
@@ -182,6 +189,8 @@ namespace SharpConfig
         /// </summary>
         /// 
         /// <param name="obj">The object that is modified based on the section.</param>
+        /// 
+        /// <exception cref="ArgumentNullException">When <paramref name="obj"/> is null.</exception>
         public void SetValuesTo(object obj)
         {
             if (obj == null)
@@ -255,6 +264,7 @@ namespace SharpConfig
             }
         }
 
+        // Determines whether a member should be ignored.
         private static bool ShouldIgnoreMappingFor(MemberInfo member)
         {
             if (member.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0)
@@ -295,6 +305,9 @@ namespace SharpConfig
         /// Adds a setting to the section.
         /// </summary>
         /// <param name="setting">The setting to add.</param>
+        /// 
+        /// <exception cref="ArgumentNullException">When <paramref name="setting"/> is null.</exception>
+        /// <exception cref="ArgumentException">When the specified setting already exists in the section.</exception>
         public void Add(Setting setting)
         {
             if (setting == null)
@@ -302,7 +315,7 @@ namespace SharpConfig
 
             if (Contains(setting))
                 throw new ArgumentException("The specified setting already exists in the section.");
-
+            
             mSettings.Add(setting);
         }
 
@@ -313,6 +326,8 @@ namespace SharpConfig
         /// </summary>
         /// <param name="settingName">The case-sensitive name of the setting to remove.</param>
         /// <returns>True if a setting with the specified name was removed; false otherwise.</returns>
+        /// 
+        /// <exception cref="ArgumentNullException">When <paramref name="settingName"/> is null or empty.</exception>
         public bool Remove(string settingName)
         {
             if (string.IsNullOrEmpty(settingName))
@@ -335,6 +350,8 @@ namespace SharpConfig
         /// Removes all settings that have a specific name.
         /// </summary>
         /// <param name="settingName">The case-sensitive name of the settings to remove.</param>
+        /// 
+        /// <exception cref="ArgumentNullException">When <paramref name="settingName"/> is null or empty.</exception>
         public void RemoveAllNamed(string settingName)
         {
             if (string.IsNullOrEmpty(settingName))
@@ -366,8 +383,13 @@ namespace SharpConfig
         /// </summary>
         /// <param name="settingName">The case-sensitive name of the setting.</param>
         /// <returns>True if the setting is contained in the section; false otherwise.</returns>
+        ///
+        /// <exception cref="ArgumentNullException">When <paramref name="settingName"/> is null or empty.</exception>
         public bool Contains(string settingName)
         {
+            if (string.IsNullOrEmpty(settingName))
+                throw new ArgumentNullException("settingName");
+
             return FindSetting(settingName) != null;
         }
 
@@ -388,6 +410,8 @@ namespace SharpConfig
         /// The setting at the specified index.
         /// Note: no setting is created when using this accessor.
         /// </returns>
+        /// 
+        /// <exception cref="ArgumentOutOfRangeException">When <paramref name="index"/> is out of range.</exception>
         public Setting this[int index]
         {
             get
@@ -416,7 +440,6 @@ namespace SharpConfig
             get
             {
                 var setting = FindSetting(name);
-
                 if (setting == null)
                 {
                     setting = new Setting(name);
@@ -463,6 +486,5 @@ namespace SharpConfig
         {
             return string.Format("[{0}]", Name);
         }
-
     }
 }

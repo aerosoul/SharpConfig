@@ -266,6 +266,10 @@ namespace SharpConfig
         /// </summary>
         ///
         /// <param name="type">The type of the object to retrieve.</param>
+        /// 
+        /// <exception cref="ArgumentNullException">When <paramref name="type"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">When <paramref name="type"/> is an array type.</exception>
+        /// <exception cref="InvalidOperationException">When the setting represents an array.</exception>
         public object GetValue(Type type)
         {
             if (type == null)
@@ -315,6 +319,9 @@ namespace SharpConfig
         /// </summary>
         ///
         /// <typeparam name="T">The type of the object to retrieve.</typeparam>
+        /// 
+        /// <exception cref="InvalidOperationException">When <paramref name="T"/> is an array type.</exception>
+        /// <exception cref="InvalidOperationException">When the setting represents an array.</exception>
         public T GetValue<T>()
         {
             var type = typeof(T);

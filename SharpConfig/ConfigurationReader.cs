@@ -10,7 +10,7 @@ namespace SharpConfig
 {
     internal static class ConfigurationReader
     {
-        public static Configuration ReadFromString(string source)
+        internal static Configuration ReadFromString(string source)
         {
             int lineNumber = 0;
 
@@ -32,7 +32,7 @@ namespace SharpConfig
                     // Remove all leading/trailing white-spaces.
                     line = line.Trim();
 
-                    // Skip emoty lines.
+                    // Skip empty lines.
                     if (string.IsNullOrEmpty(line))
                         continue;
 
@@ -141,7 +141,7 @@ namespace SharpConfig
                 // 2. Is the comment symbol backslashed (an escaping value)? If so, ignore also.
 
                 // If the char before the comment is a backslash, it's not a comment.
-                if (commentIndex >= 1 && line[commentIndex - 1] == '\\')
+                if (commentIndex > 0 && line[commentIndex - 1] == '\\')
                     return null;
 
                 if (IsInQuoteMarks(line, commentIndex))
@@ -205,7 +205,7 @@ namespace SharpConfig
             return new Setting(settingName, settingValue);
         }
 
-        public static Configuration ReadFromBinaryStream(Stream stream, BinaryReader reader)
+        internal static Configuration ReadFromBinaryStream(Stream stream, BinaryReader reader)
         {
             if (stream == null)
                 throw new ArgumentNullException("stream");

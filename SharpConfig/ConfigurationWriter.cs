@@ -27,7 +27,7 @@ namespace SharpConfig
             { }
         }
 
-        public static void WriteToStreamTextual(Configuration cfg, Stream stream, Encoding encoding)
+        internal static void WriteToStreamTextual(Configuration cfg, Stream stream, Encoding encoding)
         {
             Debug.Assert(cfg != null);
 
@@ -71,7 +71,7 @@ namespace SharpConfig
             stream.Flush();
         }
 
-        public static void WriteToStreamBinary(Configuration cfg, Stream stream, BinaryWriter writer)
+        internal static void WriteToStreamBinary(Configuration cfg, Stream stream, BinaryWriter writer)
         {
             Debug.Assert(cfg != null);
 
