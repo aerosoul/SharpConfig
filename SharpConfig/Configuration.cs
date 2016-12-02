@@ -165,17 +165,42 @@ namespace SharpConfig
         /// <returns>True if the section is contained in the configuration; false otherwise.</returns>
         public bool Contains(Section section)
         {
+            if (section == null)
+                throw new ArgumentNullException("section");
+        
             return mSections.Contains(section);
         }
 
         /// <summary>
-        /// Determines whether a specifically named setting is contained in the section.
+        /// Determines whether a specifically named section is contained in the configuration.
         /// </summary>
         /// <param name="sectionName">The name of the section.</param>
-        /// <returns>True if the setting is contained in the section; false otherwise.</returns>
+        /// <returns>True if the section is contained in the configuration; false otherwise.</returns>
         public bool Contains(string sectionName)
         {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+        
             return FindSection(sectionName) != null;
+        }
+        
+        /// <summary>
+        /// Determines whether a specifically named section is contained in the configuration,
+        /// and whether that section in turn contains a specifically named setting.
+        /// </summary>
+        /// <param name="sectionName">The name of the section.</param>
+        /// <param name="settingName">The name of the setting.</param>
+        /// <returns>True if the section and the respective setting was found; false otherwise.</returns>
+        public bool Contains(string sectionName, string settingName)
+        {
+            if (sectionName == null)
+                throw new ArgumentNullException("sectionName");
+                
+            if (settingName == null)
+                throw new ArgumentNullException("settingName");
+        
+            Section section = FindSection(sectionName);
+            return section != null && section.Contains(settingName);
         }
 
         /// <summary>
