@@ -45,7 +45,14 @@ namespace SharpConfig
         /// </summary>
         public override string ToString()
         {
-            return string.Format("{0} {1}", Symbol, Value ?? string.Empty);
+            char symbol = Symbol;
+            return string.Join(
+                System.Environment.NewLine,
+                System.Array.ConvertAll(
+                    (Value ?? string.Empty).Split(new string[] { "\r\n", "\n" }, System.StringSplitOptions.None),
+                    s => string.Format("{0} {1}", symbol, s)
+                )
+            );
         }
     }
 }
