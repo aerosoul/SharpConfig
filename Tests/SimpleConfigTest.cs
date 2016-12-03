@@ -4,6 +4,7 @@
 using System;
 using SharpConfig;
 using NUnit.Framework;
+using System.IO;
 
 namespace Tests
 {
@@ -82,7 +83,7 @@ namespace Tests
             Assert.AreEqual(intsNonGeneric.Length, intsGeneric.Length);
             Assert.AreEqual(intsGeneric.Length, ints.Length);
 
-            for (int i=0;i< intsNonGeneric.Length;i++)
+            for (int i = 0; i < intsNonGeneric.Length; i++)
             {
                 Assert.AreEqual(intsNonGeneric[i], intsGeneric[i]);
                 Assert.AreEqual(intsGeneric[i], ints[i]);
@@ -150,7 +151,7 @@ namespace Tests
             {
                 var sections = cfg.GetSectionsNamed("Section1");
                 int actualCount = 0;
-                foreach(var sec in sections)
+                foreach (var sec in sections)
                 {
                     Assert.AreEqual(sec.Name, "Section1");
                     actualCount++;
@@ -169,13 +170,13 @@ namespace Tests
         public void SetValueOverload()
         {
             var cfg = new Configuration();
-            
+
             object[] obj = new object[] { 1, 2, 3 };
 
             var setting = cfg["TestSection"]["TestSetting"];
             setting.SetValue(obj);
 
-            // GetValue should throw, because the setting is an array now.
+            // GetValue() should throw, because the setting is an array now.
             // It should notify us to use GetValueArray() instead.
             Assert.Throws<InvalidOperationException>(() =>
             {
@@ -194,6 +195,82 @@ namespace Tests
                 Assert.AreEqual(obj[i], intsGeneric[i]);
                 Assert.AreEqual(intsGeneric[i], intsNonGeneric[i]);
             }
+        }
+
+        [Test]
+        public void SaveAndLoadComments()
+        {
+            var cfgStr =
+                "# Line1" + Environment.NewLine +
+                "; Line2" + Environment.NewLine +
+                "#" + Environment.NewLine +
+                "# Line4" + Environment.NewLine +
+                "[Section] # InlineComment1" + Environment.NewLine +
+                "Setting = Value ; InlineComment2" + Environment.NewLine +
+                Environment.NewLine +
+                "# Line1   " + Environment.NewLine +
+                "#Line2 " + Environment.NewLine +
+                "## ###" + Environment.NewLine +
+                ";Line4" + Environment.NewLine +
+                "[Section2]" + Environment.NewLine +
+                "Setting=\"Val;#ue\"# InlineComment3";
+
+            var cfg = Configuration.LoadFromString(cfgStr);
+
+            SaveAndLoadComments_Check(cfg);
+
+            var filename = Path.GetTempFileName();
+            try
+            {
+                cfg.SaveToFile(filename);
+                cfg = Configuration.LoadFromFile(filename);
+                SaveAndLoadComments_Check(cfg);
+            }
+            finally
+            {
+                if (File.Exists(filename))
+                    File.Delete(filename);
+            }
+        }
+
+        private static void SaveAndLoadComments_Check(Configuration cfg)
+        {
+            Assert.AreEqual(2, cfg.SectionCount);
+            Assert.IsTrue(cfg.Contains("Section"));
+            Assert.IsTrue(cfg.Contains("Section2"));
+            Assert.IsTrue(cfg.Contains("Section", "Setting"));
+            Assert.IsTrue(cfg.Contains("Section2", "Setting"));
+
+            var section = cfg["Section"];
+            var section2 = cfg["Section2"];
+
+            Assert.IsNotNull(section.PreComment);
+            Assert.IsNotNull(section2.PreComment);
+
+            Assert.AreEqual(
+                "Line1" + Environment.NewLine +
+                "Line2" + Environment.NewLine +
+                Environment.NewLine +
+                "Line4",
+                section.PreComment
+                );
+
+            Assert.AreEqual(
+                "Line1" + Environment.NewLine +
+                "Line2" + Environment.NewLine +
+                "# ###" + Environment.NewLine +
+                "Line4",
+                section2.PreComment
+                );
+
+            Assert.AreEqual("InlineComment1", section.Comment);
+            Assert.AreEqual("InlineComment2", section["Setting"].Comment);
+
+            Assert.IsNull(section2.Comment);
+            Assert.AreEqual("InlineComment3", section2["Setting"].Comment);
+
+            Assert.AreEqual("Value", section["Setting"].StringValue);
+            Assert.AreEqual("\"Val;#ue\"", section2["Setting"].StringValue);
         }
     }
 }
