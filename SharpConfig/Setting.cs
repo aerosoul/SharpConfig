@@ -202,59 +202,12 @@ namespace SharpConfig
 
         private int CalculateArraySize()
         {
-            if (string.IsNullOrEmpty(mRawValue))
-                return -1;
+            int size = 0;
+            var enumerator = new SettingArrayEnumerator(mRawValue, false);
+            while (enumerator.Next())
+                ++size;
 
-            int arrayStartIdx = mRawValue.IndexOf('{');
-            int arrayEndIdx = mRawValue.LastIndexOf('}');
-
-            if (arrayStartIdx < 0 || arrayEndIdx < 0)
-                return -1; // Not an array.
-
-            // There may only be spaces between the beginning
-            // of the string and the first left bracket.
-            for (int i = 0; i < arrayStartIdx; ++i)
-                if (mRawValue[i] != ' ')
-                    return -1;
-
-            // Also, there may only be spaces between the last
-            // right brace and the end of the string.
-            for (int i = arrayEndIdx + 1; i < mRawValue.Length; ++i)
-                if (mRawValue[i] != ' ')
-                    return -1;
-
-            int arraySize = 0;
-
-            // Naive algorithm; assume the number of array element delimiters
-            // equals the number of elements + 1.
-            for (int i = 0; i < mRawValue.Length; ++i)
-                if (mRawValue[i] == Configuration.ArrayElementSeparator)
-                    ++arraySize;
-
-            if (arraySize == 0)
-            {
-                // There were no element separators in the array expression.
-                // That does not mean that there are no elements.
-                // Check if there is at least something.
-                // If so, that is the single element of the array.
-                for (int i = arrayStartIdx + 1; i < arrayEndIdx; ++i)
-                {
-                    if (mRawValue[i] != ' ')
-                    {
-                        ++arraySize;
-                        break;
-                    }
-                }
-            }
-            else if (arraySize > 0)
-            {
-                // If there were any element separators in the array expression,
-                // we have to increment the array size, as we assumed
-                // that the number of element separators equaled the number of elements + 1.
-                ++arraySize;
-            }
-
-            return arraySize;
+            return (enumerator.IsValid ? size : -1);
         }
 
         #endregion
@@ -306,9 +259,13 @@ namespace SharpConfig
 
             if (myArraySize > 0)
             {
-                var enumerator = new SettingArrayEnumerator(mRawValue);
+                var enumerator = new SettingArrayEnumerator(mRawValue, true);
+                int iElem = 0;
                 while (enumerator.Next())
-                    values[enumerator.Index] = CreateObjectFromString(enumerator.Current, elementType);
+                {
+                    values[iElem] = CreateObjectFromString(enumerator.Current, elementType);
+                    ++iElem;
+                }
             }
 
             return values;
@@ -359,9 +316,13 @@ namespace SharpConfig
 
             if (myArraySize > 0)
             {
-                var enumerator = new SettingArrayEnumerator(mRawValue);
+                var enumerator = new SettingArrayEnumerator(mRawValue, true);
+                int iElem = 0;
                 while (enumerator.Next())
-                    values[enumerator.Index] = (T)CreateObjectFromString(enumerator.Current, type);
+                {
+                    values[iElem] = (T)CreateObjectFromString(enumerator.Current, type);
+                    ++iElem;
+                }
             }
 
             return values;
