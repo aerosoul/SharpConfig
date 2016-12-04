@@ -88,11 +88,17 @@ namespace SharpConfig
             return stringExpr;
         }
 
-        // Gets a formatted comment string that is ready
-        // to be written to a config file.
+        // Gets a formatted comment string that is ready to be written to a config file.
         private string GetFormattedComment()
         {
-            return (Configuration.PreferredCommentChar + " " + Comment);
+            // Only get the first line of the inline comment.
+            string comment = Comment;
+
+            int iNewLine = Comment.IndexOfAny(Environment.NewLine.ToCharArray());
+            if (iNewLine >= 0)
+                comment = comment.Substring(0, iNewLine);
+
+            return (Configuration.PreferredCommentChar + " " + comment);
         }
 
         // Gets a formatted pre-comment string that is ready
@@ -109,7 +115,7 @@ namespace SharpConfig
                 Array.ConvertAll(lines, s => Configuration.PreferredCommentChar + " " + s)
                 );
         }
-        
+
         /// <summary>
         /// Gets the element's expression as a string.
         /// An example for a section would be "[Section]".
