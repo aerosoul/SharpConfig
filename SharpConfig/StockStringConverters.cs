@@ -206,7 +206,7 @@ namespace SharpConfig
     {
         public override string ConvertToString(object value)
         {
-            return value.ToString();
+            return value.ToString().Trim();
         }
 
         public override object ConvertFromString(string value, Type hint)

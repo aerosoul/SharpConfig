@@ -24,13 +24,12 @@ namespace SharpConfig
 
         private static NumberFormatInfo mNumberFormat;
         private static DateTimeFormatInfo mDateTimeFormat;
-        private static char[] mValidCommentChars;
         private static char mPreferredCommentChar;
         private static char mArrayElementSeparator;
         private static ITypeStringConverter mFallbackConverter;
         private static Dictionary<Type, ITypeStringConverter> mTypeStringConverters;
 
-        internal List<Section> mSections;
+        internal readonly List<Section> mSections;
 
         #endregion
 
@@ -40,7 +39,7 @@ namespace SharpConfig
         {
             mNumberFormat = CultureInfo.InvariantCulture.NumberFormat;
             mDateTimeFormat = CultureInfo.InvariantCulture.DateTimeFormat;
-            mValidCommentChars = new[] { '#', ';', '\'' };
+            ValidCommentChars = new[] { '#', ';', '\'' };
             mPreferredCommentChar = '#';
             mArrayElementSeparator = ',';
 
@@ -604,10 +603,7 @@ namespace SharpConfig
         /// <summary>
         /// Gets the array that contains all valid comment delimiting characters.
         /// </summary>
-        public static char[] ValidCommentChars
-        {
-            get { return mValidCommentChars; }
-        }
+        public static char[] ValidCommentChars { get; private set; }
 
         /// <summary>
         /// Gets or sets the preferred comment char when saving configurations.
@@ -620,7 +616,7 @@ namespace SharpConfig
             get { return mPreferredCommentChar; }
             set
             {
-                if (!Array.Exists(mValidCommentChars, c => c == value))
+                if (!Array.Exists(ValidCommentChars, c => c == value))
                     throw new ArgumentException("The specified char '" + value + "' is not allowed as a comment char.");
 
                 mPreferredCommentChar = value;

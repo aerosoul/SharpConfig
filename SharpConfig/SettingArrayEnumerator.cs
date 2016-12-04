@@ -168,16 +168,8 @@ namespace SharpConfig
             return false;
         }
 
-        public string Current
-        {
-            get;
-            private set;
-        }
+        public string Current { get; private set; }
 
-        public bool IsValid
-        {
-            get;
-            private set;
-        }
+        public bool IsValid { get; private set; }
     }
 }

@@ -24,27 +24,17 @@ namespace SharpConfig
         /// <summary>
         /// Gets the name of this element.
         /// </summary>
-        public string Name
-        {
-            get;
-            private set;
-        }
+        public string Name { get; private set; }
 
         /// <summary>
         /// Gets or sets the comment of this element.
         /// </summary>
-        public string Comment
-        {
-            get; set;
-        }
+        public string Comment { get; set; }
 
         /// <summary>
         /// Gets the comment above this element.
         /// </summary>
-        public string PreComment
-        {
-            get; set;
-        }
+        public string PreComment { get; set; }
 
         /// <summary>
         /// Gets the string representation of the element without its comments.

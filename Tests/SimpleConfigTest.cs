@@ -272,5 +272,52 @@ namespace Tests
             Assert.AreEqual("Value", section["Setting"].StringValue);
             Assert.AreEqual("\"Val;#ue\"", section2["Setting"].StringValue);
         }
+
+        [Test]
+        public void ArrayParsing()
+        {
+            var cfg = new Configuration();
+            var section = cfg["Section"];
+
+            section["Setting1"].StringValue = "{1,2,3}";
+            section["Setting2"].StringValue = "   {1,2,3}   ";
+            section["Setting3"].StringValue = " d {1,2,3} d ";
+            section["Setting4"].StringValue = "{ 1,2,   3  }";
+            section["Setting5"].StringValue = "{ 123, 456, 789 }";
+            section["Setting6"].StringValue = "{}";
+            section["Setting7"].StringValue = "{,}";
+            section["Setting8"].StringValue = "{13,}";
+            section["Setting9"].StringValue = "{{1},{2},{3}}";
+            section["Setting10"].StringValue = "{ {123}, 456, {{789}} }";
+            section["Setting11"].StringValue = "{\"12,34\", 5678}";
+            section["Setting12"].StringValue = "{\"{123}\", 456}";
+
+            AssertArraysAreEqual(new[] { "1", "2", "3" }, section["Setting1"].StringValueArray);
+            AssertArraysAreEqual(new[] { "1", "2", "3" }, section["Setting2"].StringValueArray);
+
+            Assert.IsFalse(section["Setting3"].IsArray);
+            Assert.AreEqual("d {1,2,3} d", section["Setting3"].StringValue);
+
+            AssertArraysAreEqual(new[] { "1", "2", "3" }, section["Setting4"].StringValueArray);
+            AssertArraysAreEqual(new[] { "123", "456", "789" }, section["Setting5"].StringValueArray);
+
+            Assert.IsTrue(section["Setting6"].IsArray);
+            Assert.AreEqual(0, section["Setting6"].ArraySize);
+
+            Assert.IsFalse(section["Setting7"].IsArray);
+            Assert.IsFalse(section["Setting8"].IsArray);
+
+            AssertArraysAreEqual(new[] { "{1}", "{2}", "{3}" }, section["Setting9"].StringValueArray);
+            AssertArraysAreEqual(new[] { "{123}", "456", "{{789}}" }, section["Setting10"].StringValueArray);
+            AssertArraysAreEqual(new[] { "\"12,34\"", "5678" }, section["Setting11"].StringValueArray);
+            AssertArraysAreEqual(new[] { "\"{123}\"", "456" }, section["Setting12"].StringValueArray);
+        }
+
+        private static void AssertArraysAreEqual(string[] expected, string[] actual)
+        {
+            Assert.AreEqual(expected.Length, actual.Length);
+            for (int i = 0; i < expected.Length; ++i)
+                Assert.AreEqual(expected[i], actual[i]);
+        }
     }
 }

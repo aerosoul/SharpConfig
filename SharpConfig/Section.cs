@@ -13,7 +13,7 @@ namespace SharpConfig
     /// </summary>
     public sealed class Section : ConfigurationElement, IEnumerable<Setting>
     {
-        private List<Setting> mSettings;
+        private readonly List<Setting> mSettings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Section"/> class.
