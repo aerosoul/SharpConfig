@@ -109,9 +109,12 @@ namespace SharpConfig
                 Array.ConvertAll(lines, s => Configuration.PreferredCommentChar + " " + s)
                 );
         }
-
-        // Gets the element's expression as a string.
-        // An example for a section would be "[Section]".
+        
+        /// <summary>
+        /// Gets the element's expression as a string.
+        /// An example for a section would be "[Section]".
+        /// </summary>
+        /// <returns>The element's expression as a string.</returns>
         protected abstract string GetStringExpression();
     }
 }

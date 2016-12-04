@@ -482,6 +482,11 @@ namespace SharpConfig
             return null;
         }
 
+        /// <summary>
+        /// Gets the element's expression as a string.
+        /// An example for a section would be "[Section]".
+        /// </summary>
+        /// <returns>The element's expression as a string.</returns>
         protected override string GetStringExpression()
         {
             return string.Format("[{0}]", Name);

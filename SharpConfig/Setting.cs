@@ -277,7 +277,7 @@ namespace SharpConfig
         ///
         /// <typeparam name="T">The type of the object to retrieve.</typeparam>
         /// 
-        /// <exception cref="InvalidOperationException">When <paramref name="T"/> is an array type.</exception>
+        /// <exception cref="InvalidOperationException">When <typeparamref name="T"/> is an array type.</exception>
         /// <exception cref="InvalidOperationException">When the setting represents an array.</exception>
         public T GetValue<T>()
         {
@@ -415,6 +415,11 @@ namespace SharpConfig
 
         #endregion
 
+        /// <summary>
+        /// Gets the element's expression as a string.
+        /// An example for a section would be "[Section]".
+        /// </summary>
+        /// <returns>The element's expression as a string.</returns>
         protected override string GetStringExpression()
         {
             return string.Format("{0} = {1}", Name, mRawValue);
