@@ -106,10 +106,10 @@ namespace SharpConfig
         private string GetFormattedPreComment()
         {
             string[] lines = PreComment.Split(
-                new[] { Environment.NewLine },
+                new[] { "\r\n", "\n" },
                 StringSplitOptions.None
                 );
-
+            
             return string.Join(
                 Environment.NewLine,
                 Array.ConvertAll(lines, s => Configuration.PreferredCommentChar + " " + s)
