@@ -32,8 +32,8 @@ Day = Monday
 
 To read these values, your C# code would look like:
 ```csharp
-Configuration config = Configuration.LoadFromFile("sample.cfg");
-Section section = config["General"];
+var config = Configuration.LoadFromFile("sample.cfg");
+var section = config["General"];
 
 string someString = section["SomeString"].StringValue;
 int someInteger = section["SomeInteger"].IntValue;
