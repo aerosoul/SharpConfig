@@ -1,6 +1,6 @@
 ![sharpconfig_logo.png](SharpConfigLogo.png)
 
-[sharpconfig.net](http://www.sharpconfig.net)
+[sharpconfig.net](http://sharpconfig.net)
 
 SharpConfig is an easy-to-use CFG/INI configuration library for .NET.
 
