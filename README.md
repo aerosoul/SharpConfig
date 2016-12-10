@@ -28,6 +28,10 @@ SomeFloat = 20.05
 SomeBoolean = true
 SomeArray = { 1, 2, 3 }
 Day = Monday
+
+[Person]
+Name = Peter
+Age = 50
 ```
 
 To read these values, your C# code would look like:
@@ -42,6 +46,10 @@ bool someBool = section["SomeBoolean"].BoolValue;
 int[] someIntArray = section["SomeArray"].IntValueArray;
 string[] someStringArray = section["SomeArray"].StringValueArray;
 DayOfWeek day = section["Day"].GetValue<DayOfWeek>();
+
+// Entire user-defined objects can be created from sections and vice versa.
+// See the wiki for more details.
+var person = config["Person"].ToObject<Person>();
 // ...
 ```
 
