@@ -1,17 +1,17 @@
 ![sharpconfig_logo.png](SharpConfigLogo.png)
 
+[sharpconfig.net](http://sharpconfig.net)
+
+
 SharpConfig is an easy-to-use CFG/INI configuration library for .NET.
 
 You can use SharpConfig to read, modify and save configuration files and streams, in either text or binary format.
 
 The library is fully compatible with .NET 2.0 and higher, and the Mono Framework.
 
-Installing via NuGet
----
-You can install SharpConfig via the following NuGet command: `Install-Package sharpconfig`
+> SharpConfig is also available at [NuGet](https://www.nuget.org/packages/sharpconfig/)! Just search for `sharpconfig`. 
 
-[NuGet Page](https://www.nuget.org/packages/sharpconfig/)
-
+-
 
 
 An example Configuration
@@ -26,12 +26,16 @@ SomeFloat = 20.05
 SomeBoolean = true
 SomeArray = { 1, 2, 3 }
 Day = Monday
+
+[Person]
+Name = Peter
+Age = 50
 ```
 
 To read these values, your C# code would look like:
 ```csharp
-Configuration config = Configuration.LoadFromFile("sample.cfg");
-Section section = config["General"];
+var config = Configuration.LoadFromFile("sample.cfg");
+var section = config["General"];
 
 string someString = section["SomeString"].StringValue;
 int someInteger = section["SomeInteger"].IntValue;
@@ -40,6 +44,10 @@ bool someBool = section["SomeBoolean"].BoolValue;
 int[] someIntArray = section["SomeArray"].IntValueArray;
 string[] someStringArray = section["SomeArray"].StringValueArray;
 DayOfWeek day = section["Day"].GetValue<DayOfWeek>();
+
+// Entire user-defined objects can be created from sections and vice versa.
+// See the wiki for more details.
+var person = config["Person"].ToObject<Person>();
 // ...
 ```
 
