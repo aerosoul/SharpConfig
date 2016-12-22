@@ -39,7 +39,7 @@ namespace SharpConfig
         {
             mNumberFormat = CultureInfo.InvariantCulture.NumberFormat;
             mDateTimeFormat = CultureInfo.InvariantCulture.DateTimeFormat;
-            ValidCommentChars = new[] { '#', ';', '\'' };
+            ValidCommentChars = new[] { '#', ';' };
             mPreferredCommentChar = '#';
             mArrayElementSeparator = ',';
 
