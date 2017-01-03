@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace SharpConfig
 {
@@ -6,12 +7,28 @@ namespace SharpConfig
     {
         public string ConvertToString(object value)
         {
-            return value.ToString();
+            try
+            {
+                var converter = TypeDescriptor.GetConverter(value);
+                return converter.ConvertToString(null, Configuration.CultureInfo, value);
+            }
+            catch (Exception ex)
+            {
+                throw SettingValueCastException.Create(value.ToString(), value.GetType(), ex);
+            }
         }
 
         public object ConvertFromString(string value, Type hint)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var converter = TypeDescriptor.GetConverter(hint);
+                return converter.ConvertFrom(null, Configuration.CultureInfo, value);
+            }
+            catch (Exception ex)
+            {
+                throw SettingValueCastException.Create(value, hint, ex);
+            }
         }
 
         public Type ConvertibleType
@@ -43,7 +60,7 @@ namespace SharpConfig
                     return true;
             }
 
-            throw new ArgumentException(string.Format("The value cannot be converted to type '{0}'.", hint.FullName), "value");
+            throw SettingValueCastException.Create(value, hint, null);
         }
     }
 
@@ -56,7 +73,7 @@ namespace SharpConfig
 
         public override object ConvertFromString(string value, Type hint)
         {
-            return sbyte.Parse(value, Configuration.NumberFormat);
+            return sbyte.Parse(value, Configuration.CultureInfo.NumberFormat);
         }
     }
 
@@ -77,12 +94,12 @@ namespace SharpConfig
     {
         public override string ConvertToString(object value)
         {
-            return ((DateTime)value).ToString(Configuration.DateTimeFormat);
+            return ((DateTime)value).ToString(Configuration.CultureInfo.DateTimeFormat);
         }
 
         public override object ConvertFromString(string value, Type hint)
         {
-            return DateTime.Parse(value, Configuration.DateTimeFormat);
+            return DateTime.Parse(value, Configuration.CultureInfo.DateTimeFormat);
         }
     }
 
@@ -90,12 +107,12 @@ namespace SharpConfig
     {
         public override string ConvertToString(object value)
         {
-            return ((decimal)value).ToString(Configuration.NumberFormat);
+            return ((decimal)value).ToString(Configuration.CultureInfo.NumberFormat);
         }
 
         public override object ConvertFromString(string value, Type hint)
         {
-            return decimal.Parse(value, Configuration.NumberFormat);
+            return decimal.Parse(value, Configuration.CultureInfo.NumberFormat);
         }
     }
 
@@ -103,12 +120,12 @@ namespace SharpConfig
     {
         public override string ConvertToString(object value)
         {
-            return ((double)value).ToString(Configuration.NumberFormat);
+            return ((double)value).ToString(Configuration.CultureInfo.NumberFormat);
         }
 
         public override object ConvertFromString(string value, Type hint)
         {
-            return double.Parse(value, Configuration.NumberFormat);
+            return double.Parse(value, Configuration.CultureInfo.NumberFormat);
         }
     }
 
@@ -141,12 +158,12 @@ namespace SharpConfig
     {
         public override string ConvertToString(object value)
         {
-            return ((short)value).ToString(Configuration.NumberFormat);
+            return ((short)value).ToString(Configuration.CultureInfo.NumberFormat);
         }
 
         public override object ConvertFromString(string value, Type hint)
         {
-            return short.Parse(value, Configuration.NumberFormat);
+            return short.Parse(value, Configuration.CultureInfo.NumberFormat);
         }
     }
 
@@ -154,12 +171,12 @@ namespace SharpConfig
     {
         public override string ConvertToString(object value)
         {
-            return ((int)value).ToString(Configuration.NumberFormat);
+            return ((int)value).ToString(Configuration.CultureInfo.NumberFormat);
         }
 
         public override object ConvertFromString(string value, Type hint)
         {
-            return int.Parse(value, Configuration.NumberFormat);
+            return int.Parse(value, Configuration.CultureInfo.NumberFormat);
         }
     }
 
@@ -167,12 +184,12 @@ namespace SharpConfig
     {
         public override string ConvertToString(object value)
         {
-            return ((long)value).ToString(Configuration.NumberFormat);
+            return ((long)value).ToString(Configuration.CultureInfo.NumberFormat);
         }
 
         public override object ConvertFromString(string value, Type hint)
         {
-            return long.Parse(value, Configuration.NumberFormat);
+            return long.Parse(value, Configuration.CultureInfo.NumberFormat);
         }
     }
 
@@ -180,12 +197,12 @@ namespace SharpConfig
     {
         public override string ConvertToString(object value)
         {
-            return ((sbyte)value).ToString(Configuration.NumberFormat);
+            return ((sbyte)value).ToString(Configuration.CultureInfo.NumberFormat);
         }
 
         public override object ConvertFromString(string value, Type hint)
         {
-            return sbyte.Parse(value, Configuration.NumberFormat);
+            return sbyte.Parse(value, Configuration.CultureInfo.NumberFormat);
         }
     }
 
@@ -193,12 +210,12 @@ namespace SharpConfig
     {
         public override string ConvertToString(object value)
         {
-            return ((float)value).ToString(Configuration.NumberFormat);
+            return ((float)value).ToString(Configuration.CultureInfo.NumberFormat);
         }
 
         public override object ConvertFromString(string value, Type hint)
         {
-            return float.Parse(value, Configuration.NumberFormat);
+            return float.Parse(value, Configuration.CultureInfo.NumberFormat);
         }
     }
 
@@ -219,12 +236,12 @@ namespace SharpConfig
     {
         public override string ConvertToString(object value)
         {
-            return ((ushort)value).ToString(Configuration.NumberFormat);
+            return ((ushort)value).ToString(Configuration.CultureInfo.NumberFormat);
         }
 
         public override object ConvertFromString(string value, Type hint)
         {
-            return ushort.Parse(value, Configuration.NumberFormat);
+            return ushort.Parse(value, Configuration.CultureInfo.NumberFormat);
         }
     }
 
@@ -232,12 +249,12 @@ namespace SharpConfig
     {
         public override string ConvertToString(object value)
         {
-            return ((uint)value).ToString(Configuration.NumberFormat);
+            return ((uint)value).ToString(Configuration.CultureInfo.NumberFormat);
         }
 
         public override object ConvertFromString(string value, Type hint)
         {
-            return uint.Parse(value, Configuration.NumberFormat);
+            return uint.Parse(value, Configuration.CultureInfo.NumberFormat);
         }
     }
 
@@ -245,12 +262,12 @@ namespace SharpConfig
     {
         public override string ConvertToString(object value)
         {
-            return ((ulong)value).ToString(Configuration.NumberFormat);
+            return ((ulong)value).ToString(Configuration.CultureInfo.NumberFormat);
         }
 
         public override object ConvertFromString(string value, Type hint)
         {
-            return ulong.Parse(value, Configuration.NumberFormat);
+            return ulong.Parse(value, Configuration.CultureInfo.NumberFormat);
         }
     }
 }

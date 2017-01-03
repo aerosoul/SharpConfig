@@ -21,9 +21,8 @@ namespace SharpConfig
     public partial class Configuration : IEnumerable<Section>
     {
         #region Fields
-
-        private static NumberFormatInfo mNumberFormat;
-        private static DateTimeFormatInfo mDateTimeFormat;
+        
+        private static CultureInfo mCultureInfo;
         private static char mPreferredCommentChar;
         private static char mArrayElementSeparator;
         private static ITypeStringConverter mFallbackConverter;
@@ -37,8 +36,11 @@ namespace SharpConfig
 
         static Configuration()
         {
-            mNumberFormat = CultureInfo.InvariantCulture.NumberFormat;
-            mDateTimeFormat = CultureInfo.InvariantCulture.DateTimeFormat;
+            // For now, clone the invariant culture so that the
+            // deprecated DateTimeFormat/NumberFormat properties still work,
+            // but without modifying the real invariant culture instance.
+            mCultureInfo = (CultureInfo)CultureInfo.InvariantCulture.Clone();
+
             ValidCommentChars = new[] { '#', ';' };
             mPreferredCommentChar = '#';
             mArrayElementSeparator = ',';
@@ -573,15 +575,16 @@ namespace SharpConfig
         /// </summary>
         /// 
         /// <exception cref="ArgumentNullException">When a null reference is set.</exception>
+        [Obsolete("consider using Configuration.CultureInfo instead")]
         public static NumberFormatInfo NumberFormat
         {
-            get { return mNumberFormat; }
+            get { return mCultureInfo.NumberFormat; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException("value");
 
-                mNumberFormat = value;
+                mCultureInfo.NumberFormat = value;
             }
         }
 
@@ -591,15 +594,34 @@ namespace SharpConfig
         /// </summary>
         /// 
         /// <exception cref="ArgumentNullException">When a null reference is set.</exception>
+        [Obsolete("consider using Configuration.CultureInfo instead")]
         public static DateTimeFormatInfo DateTimeFormat
         {
-            get { return mDateTimeFormat; }
+            get { return mCultureInfo.DateTimeFormat; }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException("value");
 
-                mDateTimeFormat = value;
+                mCultureInfo.DateTimeFormat = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the CultureInfo that is used for value conversion in SharpConfig.
+        /// The default value is CultureInfo.InvariantCulture.
+        /// </summary>
+        /// 
+        /// <exception cref="ArgumentNullException">When a null reference is set.</exception>
+        public static CultureInfo CultureInfo
+        {
+            get { return mCultureInfo; }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException("value");
+
+                mCultureInfo = value;
             }
         }
 

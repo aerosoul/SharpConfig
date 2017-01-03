@@ -343,13 +343,6 @@ namespace SharpConfig
             }
 
             var converter = Configuration.FindTypeStringConverter(dstType);
-            if (converter == Configuration.FallbackConverter)
-            {
-                // The fallback converter is not able to create arbitrary objects
-                // from strings, so this means that there is no type converter
-                // registered for dstType.
-                throw SettingValueCastException.CreateBecauseConverterMissing(value, dstType);
-            }
 
             try
             {
