@@ -39,7 +39,7 @@ namespace SharpConfig
         {
             mNumberFormat = CultureInfo.InvariantCulture.NumberFormat;
             mDateTimeFormat = CultureInfo.InvariantCulture.DateTimeFormat;
-            ValidCommentChars = new[] { '#', ';', '\'' };
+            ValidCommentChars = new[] { '#', ';' };
             mPreferredCommentChar = '#';
             mArrayElementSeparator = ',';
 
@@ -249,6 +249,9 @@ namespace SharpConfig
 
         internal static ITypeStringConverter FindTypeStringConverter(Type type)
         {
+            if (type.IsEnum)
+                type = typeof(Enum);
+
             ITypeStringConverter converter = null;
             if (!mTypeStringConverters.TryGetValue(type, out converter))
                 converter = mFallbackConverter;
