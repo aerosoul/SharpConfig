@@ -17,7 +17,7 @@ The library is fully compatible with .NET 2.0 and higher, and the Mono Framework
 An example Configuration
 ---
 
-```cfg
+```ini
 [General]
 # a comment
 SomeString = Hello World!
