@@ -11,8 +11,6 @@ The library is fully compatible with .NET 2.0 and higher, and the Mono Framework
 
 > SharpConfig is also available at [NuGet](https://www.nuget.org/packages/sharpconfig/)! Just search for `sharpconfig`. 
 
--
-
 
 An example Configuration
 ---
