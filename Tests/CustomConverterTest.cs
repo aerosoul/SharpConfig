@@ -7,55 +7,55 @@ using NUnit.Framework;
 
 namespace Tests
 {
-    class Person
+  class Person
+  {
+    public string Name { get; set; }
+    public int Age { get; set; }
+  }
+
+  class PersonStringConverter : TypeStringConverter<Person>
+  {
+    // This method is responsible for converting a Person object to a string.
+    public override string ConvertToString(object value)
     {
-        public string Name { get; set; }
-        public int Age { get; set; }
+      var person = (Person)value;
+      return string.Format("[{0};{1}]", person.Name, person.Age);
     }
 
-    class PersonStringConverter : TypeStringConverter<Person>
+    // This method is responsible for converting a string to a Person object.
+    public override object ConvertFromString(string value, Type hint)
     {
-        // This method is responsible for converting a Person object to a string.
-        public override string ConvertToString(object value)
-        {
-            var person = (Person)value;
-            return string.Format("[{0};{1}]", person.Name, person.Age);
-        }
+      var split = value.Trim('[', ']').Split(';');
 
-        // This method is responsible for converting a string to a Person object.
-        public override object ConvertFromString(string value, Type hint)
-        {
-            var split = value.Trim('[', ']').Split(';');
+      var person = new Person();
+      person.Name = split[0];
+      person.Age = int.Parse(split[1]);
 
-            var person = new Person();
-            person.Name = split[0];
-            person.Age = int.Parse(split[1]);
-
-            return person;
-        }
+      return person;
     }
+  }
 
-    [TestFixture]
-    public sealed class CustomConverterTest
+  [TestFixture]
+  public sealed class CustomConverterTest
+  {
+    [Test]
+    public void CustomConverter()
     {
-        [Test]
-        public void CustomConverter()
-        {
-            Configuration.RegisterTypeStringConverter(new PersonStringConverter());
+      Configuration.RegisterTypeStringConverter(new PersonStringConverter());
 
-            var p = new Person()
-            {
-                Name = "TestPerson",
-                Age = 123
-            };
+      var p = new Person()
+      {
+        Name = "TestPerson",
+        Age = 123
+      };
 
-            var cfg = new Configuration();
-            cfg["TestSection"]["Person"].SetValue(p);
+      var cfg = new Configuration();
+      cfg["TestSection"]["Person"].SetValue(p);
 
-            var pp = cfg["TestSection"]["Person"].GetValue<Person>();
+      var pp = cfg["TestSection"]["Person"].GetValue<Person>();
 
-            Assert.AreEqual(p.Name, pp.Name);
-            Assert.AreEqual(p.Age, pp.Age);
-        }
+      Assert.AreEqual(p.Name, pp.Name);
+      Assert.AreEqual(p.Age, pp.Age);
     }
+  }
 }
