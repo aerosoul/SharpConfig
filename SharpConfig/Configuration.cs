@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2016 Cemalettin Dervis, MIT License.
+﻿// Copyright (c) 2013-2017 Cemalettin Dervis, MIT License.
 // https://github.com/cemdervis/SharpConfig
 
 using System;
@@ -49,24 +49,24 @@ namespace SharpConfig
 
       // Add all stock converters.
       mTypeStringConverters = new Dictionary<Type, ITypeStringConverter>()
-            {
-                { typeof(bool), new BoolStringConverter() },
-                { typeof(byte), new ByteStringConverter() },
-                { typeof(char), new CharStringConverter() },
-                { typeof(DateTime), new DateTimeStringConverter() },
-                { typeof(decimal), new DecimalStringConverter() },
-                { typeof(double), new DoubleStringConverter() },
-                { typeof(Enum), new EnumStringConverter() },
-                { typeof(short), new Int16StringConverter() },
-                { typeof(int), new Int32StringConverter() },
-                { typeof(long), new Int64StringConverter() },
-                { typeof(sbyte), new SByteStringConverter() },
-                { typeof(float), new SingleStringConverter() },
-                { typeof(string), new StringStringConverter() },
-                { typeof(ushort), new UInt16StringConverter() },
-                { typeof(uint), new UInt32StringConverter() },
-                { typeof(ulong), new UInt64StringConverter() }
-            };
+      {
+        { typeof(bool), new BoolStringConverter() },
+        { typeof(byte), new ByteStringConverter() },
+        { typeof(char), new CharStringConverter() },
+        { typeof(DateTime), new DateTimeStringConverter() },
+        { typeof(decimal), new DecimalStringConverter() },
+        { typeof(double), new DoubleStringConverter() },
+        { typeof(Enum), new EnumStringConverter() },
+        { typeof(short), new Int16StringConverter() },
+        { typeof(int), new Int32StringConverter() },
+        { typeof(long), new Int64StringConverter() },
+        { typeof(sbyte), new SByteStringConverter() },
+        { typeof(float), new SingleStringConverter() },
+        { typeof(string), new StringStringConverter() },
+        { typeof(ushort), new UInt16StringConverter() },
+        { typeof(uint), new UInt32StringConverter() },
+        { typeof(ulong), new UInt64StringConverter() }
+      };
 
       IgnoreInlineComments = false;
       IgnorePreComments = false;

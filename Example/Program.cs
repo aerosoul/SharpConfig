@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2016 Cemalettin Dervis, MIT License.
+﻿// Copyright (c) 2013-2017 Cemalettin Dervis, MIT License.
 // https://github.com/cemdervis/SharpConfig
 
 using System;
@@ -29,7 +29,7 @@ namespace Example
     {
       // Call the methods in this file here to see their effect.
 
-      HowToLoadAConfig();
+      //HowToLoadAConfig();
       //HowToCreateAConfig();
       //HowToSaveAConfig(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "TestCfg.ini"));
       //HowToCreateObjectsFromSections();

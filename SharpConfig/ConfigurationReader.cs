@@ -1,8 +1,7 @@
-﻿// Copyright (c) 2013-2016 Cemalettin Dervis, MIT License.
+﻿// Copyright (c) 2013-2017 Cemalettin Dervis, MIT License.
 // https://github.com/cemdervis/SharpConfig
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
