@@ -570,44 +570,6 @@ namespace SharpConfig
     #region Properties
 
     /// <summary>
-    /// Gets or sets the number format that is used for value conversion in SharpConfig.
-    /// The default value is CultureInfo.InvariantCulture.NumberFormat.
-    /// </summary>
-    /// 
-    /// <exception cref="ArgumentNullException">When a null reference is set.</exception>
-    [Obsolete("consider using Configuration.CultureInfo instead")]
-    public static NumberFormatInfo NumberFormat
-    {
-      get { return mCultureInfo.NumberFormat; }
-      set
-      {
-        if (value == null)
-          throw new ArgumentNullException("value");
-
-        mCultureInfo.NumberFormat = value;
-      }
-    }
-
-    /// <summary>
-    /// Gets or sets the DateTime format that is used for value conversion in SharpConfig.
-    /// The default value is CultureInfo.InvariantCulture.DateTimeFormat.
-    /// </summary>
-    /// 
-    /// <exception cref="ArgumentNullException">When a null reference is set.</exception>
-    [Obsolete("consider using Configuration.CultureInfo instead")]
-    public static DateTimeFormatInfo DateTimeFormat
-    {
-      get { return mCultureInfo.DateTimeFormat; }
-      set
-      {
-        if (value == null)
-          throw new ArgumentNullException("value");
-
-        mCultureInfo.DateTimeFormat = value;
-      }
-    }
-
-    /// <summary>
     /// Gets or sets the CultureInfo that is used for value conversion in SharpConfig.
     /// The default value is CultureInfo.InvariantCulture.
     /// </summary>
