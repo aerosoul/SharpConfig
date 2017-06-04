@@ -80,6 +80,17 @@ namespace SharpConfig
       }
     }
 
+    private void UpdateElementString(int idx)
+    {
+      Current = mStringValue.Substring(
+        mPrevElemIdxInString,
+        idx - mPrevElemIdxInString
+        );
+
+      Current = Current.Trim(new[] { ' ', '\"' });
+      Current = Current.Replace("\\\"", "\"");
+    }
+
     public bool Next()
     {
       if (mIsDone)
@@ -106,10 +117,7 @@ namespace SharpConfig
             }
             else if (mShouldCalcElemString)
             {
-              Current = mStringValue.Substring(
-                  mPrevElemIdxInString,
-                  idx - mPrevElemIdxInString
-                  ).Trim();
+              UpdateElementString(idx);
             }
             mIsDone = true;
             break;
@@ -118,13 +126,15 @@ namespace SharpConfig
         else if (ch == '\"')
         {
           int iNextQuoteMark = mStringValue.IndexOf('\"', idx + 1);
-          if (iNextQuoteMark > 0)
+          if (iNextQuoteMark > 0 && mStringValue[iNextQuoteMark - 1] != '\\')
           {
             idx = iNextQuoteMark;
             mIsInQuotes = false;
           }
           else
+          {
             mIsInQuotes = true;
+          }
         }
         else if (ch == Configuration.ArrayElementSeparator && mBraceBalance == 1 && !mIsInQuotes)
         {
@@ -135,10 +145,7 @@ namespace SharpConfig
           }
           else if (mShouldCalcElemString)
           {
-            Current = mStringValue.Substring(
-                mPrevElemIdxInString,
-                idx - mPrevElemIdxInString
-                ).Trim();
+            UpdateElementString(idx);
           }
 
           mPrevElemIdxInString = idx + 1;
