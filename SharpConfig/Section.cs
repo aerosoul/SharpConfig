@@ -241,7 +241,10 @@ namespace SharpConfig
         if (setting == null)
           continue;
 
-        object value = setting.GetValue(field.FieldType);
+        object value = field.FieldType.IsArray ?
+          setting.GetValueArray(field.FieldType.GetElementType()) :
+          setting.GetValue(field.FieldType);
+
         if (value is Array)
         {
           var settingArray = value as Array;
