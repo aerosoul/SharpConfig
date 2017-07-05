@@ -47,6 +47,14 @@ namespace SharpConfig
     #region Properties
 
     /// <summary>
+    /// Gets a value indicating whether this setting's value is empty.
+    /// </summary>
+    public bool IsEmpty
+    {
+      get { return string.IsNullOrEmpty(mRawValue); }
+    }
+
+    /// <summary>
     /// Gets or sets the value of this setting as a string.
     /// Note: this is a shortcut to GetValue and SetValue.
     /// </summary>
