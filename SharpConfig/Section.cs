@@ -179,7 +179,7 @@ namespace SharpConfig
       {
         object value = null;
 
-        if (info is MemberInfo)
+        if (info is FieldInfo)
         {
           value = ((FieldInfo)info).GetValue(instance);
         }
