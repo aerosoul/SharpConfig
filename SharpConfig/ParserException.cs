@@ -14,6 +14,13 @@ namespace SharpConfig
   {
     internal ParserException(string message, int line)
         : base(string.Format("Line {0}: {1}", line, message))
-    { }
+    {
+      Line = line;
+    }
+    
+    /// <summary>
+    /// Gets the line in the configuration that caused the exception.
+    /// </summary>
+    public int Line { get; private set; }
   }
 }
