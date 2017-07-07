@@ -336,6 +336,31 @@ namespace SharpConfig
     }
 
     /// <summary>
+    /// Adds a setting with a specific name and empty value to the section.
+    /// </summary>
+    /// <param name="settingName">The name of the setting to add.</param>
+    /// <returns>The added setting.</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="settingName"/> is null or empty.</exception>
+    public Setting Add(string settingName)
+    {
+      return Add(settingName, string.Empty);
+    }
+
+    /// <summary>
+    /// Adds a setting with a specific name and value to the section.
+    /// </summary>
+    /// <param name="settingName">The name of the setting to add.</param>
+    /// <param name="settingValue">The initial value of the setting to add.</param>
+    /// <returns>The added setting.</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="settingName"/> is null or empty.</exception>
+    public Setting Add(string settingName, object settingValue)
+    {
+      var setting = new Setting(settingName, settingValue);
+      Add(setting);
+      return setting;
+    }
+
+    /// <summary>
     /// Removes a setting from the section by its name.
     /// If there are multiple settings with the same name, only the first setting is removed.
     /// To remove all settings that have the name name, use the RemoveAllNamed() method instead.
