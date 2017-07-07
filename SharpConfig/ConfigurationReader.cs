@@ -11,90 +11,95 @@ namespace SharpConfig
   {
     internal static Configuration ReadFromString(string source)
     {
-      int lineNumber = 0;
-
       var config = new Configuration();
+
+      using (var reader = new StringReader(source))
+      {
+        Parse(reader, config);
+      }
+
+      return config;
+    }
+
+    private static void Parse(StringReader reader, Configuration config)
+    {
       Section currentSection = null;
       var preCommentBuilder = new StringBuilder();
 
       int newlineLength = Environment.NewLine.Length;
 
-      using (var reader = new StringReader(source))
+      string line = null;
+      int lineNumber = 0;
+
+      // Read until EOF.
+      while ((line = reader.ReadLine()) != null)
       {
-        string line = null;
+        lineNumber++;
 
-        // Read until EOF.
-        while ((line = reader.ReadLine()) != null)
+        // Remove all leading/trailing white-spaces.
+        line = line.Trim();
+
+        // Skip empty lines.
+        if (string.IsNullOrEmpty(line))
+          continue;
+
+        int commentIndex = 0;
+        var comment = ParseComment(line, out commentIndex);
+
+        if (!Configuration.IgnorePreComments && commentIndex == 0)
         {
-          lineNumber++;
+          // This is a comment line (pre-comment).
+          preCommentBuilder.AppendLine(comment);
+          continue;
+        }
+        else if (!Configuration.IgnoreInlineComments && commentIndex > 0)
+        {
+          // Strip away the comments of this line.
+          line = line.Remove(commentIndex).Trim();
+        }
 
-          // Remove all leading/trailing white-spaces.
-          line = line.Trim();
+        if (line.StartsWith("[")) // Section
+        {
+          currentSection = ParseSection(line, lineNumber);
 
-          // Skip empty lines.
-          if (string.IsNullOrEmpty(line))
-            continue;
+          if (!Configuration.IgnoreInlineComments)
+            currentSection.Comment = comment;
 
-          int commentIndex = 0;
-          var comment = ParseComment(line, out commentIndex);
-
-          if (!Configuration.IgnorePreComments && commentIndex == 0)
+          if (!Configuration.IgnorePreComments && preCommentBuilder.Length > 0)
           {
-            // This is a comment line (pre-comment).
-            preCommentBuilder.AppendLine(comment);
-            continue;
+            // Remove the last line.
+            preCommentBuilder.Remove(preCommentBuilder.Length - newlineLength, newlineLength);
+            currentSection.PreComment = preCommentBuilder.ToString();
+            preCommentBuilder.Length = 0; // Clear the SB
           }
-          else if (!Configuration.IgnoreInlineComments && commentIndex > 0)
+
+          config.mSections.Add(currentSection);
+        }
+        else // Setting
+        {
+          var setting = ParseSetting(line, lineNumber);
+
+          if (!Configuration.IgnoreInlineComments)
+            setting.Comment = comment;
+
+          if (currentSection == null)
           {
-            // Strip away the comments of this line.
-            line = line.Remove(commentIndex).Trim();
+            throw new ParserException(string.Format(
+                "The setting '{0}' has to be in a section.",
+                setting.Name), lineNumber);
           }
 
-          if (line.StartsWith("[")) // Section
+          if (!Configuration.IgnorePreComments && preCommentBuilder.Length > 0)
           {
-            currentSection = ParseSection(line, lineNumber);
-
-            if (!Configuration.IgnoreInlineComments)
-              currentSection.Comment = comment;
-
-            if (!Configuration.IgnorePreComments && preCommentBuilder.Length > 0)
-            {
-              // Remove the last line.
-              preCommentBuilder.Remove(preCommentBuilder.Length - newlineLength, newlineLength);
-              currentSection.PreComment = preCommentBuilder.ToString();
-              preCommentBuilder.Length = 0; // Clear the SB
-            }
-
-            config.mSections.Add(currentSection);
+            // Remove the last line.
+            preCommentBuilder.Remove(preCommentBuilder.Length - newlineLength, newlineLength);
+            setting.PreComment = preCommentBuilder.ToString();
+            preCommentBuilder.Length = 0; // Clear the SB
           }
-          else // Setting
-          {
-            var setting = ParseSetting(line, lineNumber);
 
-            if (!Configuration.IgnoreInlineComments)
-              setting.Comment = comment;
-
-            if (currentSection == null)
-            {
-              throw new ParserException(string.Format(
-                  "The setting '{0}' has to be in a section.",
-                  setting.Name), lineNumber);
-            }
-
-            if (!Configuration.IgnorePreComments && preCommentBuilder.Length > 0)
-            {
-              // Remove the last line.
-              preCommentBuilder.Remove(preCommentBuilder.Length - newlineLength, newlineLength);
-              setting.PreComment = preCommentBuilder.ToString();
-              preCommentBuilder.Length = 0; // Clear the SB
-            }
-
-            currentSection.Add(setting);
-          }
+          currentSection.Add(setting);
         }
       }
-
-      return config;
     }
 
     private static bool IsInQuoteMarks(string line, int startIndex)
@@ -157,10 +162,11 @@ namespace SharpConfig
 
     private static Section ParseSection(string line, int lineNumber)
     {
-      line = line.Trim();
+      // Format(s) of a section:
+      // 1) [<name>]
+      //      name may contain any char, including '[' and ']'
 
-      int closingBracketIndex = line.IndexOf(']');
-
+      int closingBracketIndex = line.LastIndexOf(']');
       if (closingBracketIndex < 0)
         throw new ParserException("closing bracket missing.", lineNumber);
 
@@ -174,7 +180,7 @@ namespace SharpConfig
             lineNumber);
       }
 
-      // Read the section name, and trim all leading / trailing white-spaces.
+      // Extract the section name, and trim all leading / trailing white-spaces.
       string sectionName = line.Substring(1, line.Length - 2).Trim();
 
       // Otherwise, return a fresh section.
@@ -183,24 +189,62 @@ namespace SharpConfig
 
     private static Setting ParseSetting(string line, int lineNumber)
     {
-      // Find the assignment operator.
-      int indexOfAssignOp = line.IndexOf('=');
+      // Format(s) of a setting:
+      // 1) <name> = <value>
+      //      name may not contain a '='
+      // 2) "<name>" = <value>
+      //      name may contain any char, including '='
 
-      if (indexOfAssignOp < 0)
+      string settingName = null;
+      
+      int equalSignIndex = -1;
+
+      // Parse the name first.
+      bool isQuotedName = line.StartsWith("\"");
+
+      if (isQuotedName)
+      {
+        // Format 2
+        int index = 0;
+        do
+        {
+          index = line.IndexOf('\"', index + 1);
+        }
+        while (index > 0 && line[index - 1] == '\\');
+
+        if (index < 0)
+        {
+          throw new ParserException("closing quote mark expected.", lineNumber);
+        }
+
+        // Don't trim the name. Quoted names should be taken verbatim.
+        settingName = line.Substring(1, index - 1);
+
+        equalSignIndex = line.IndexOf('=', index + 1);
+      }
+      else
+      {
+        // Format 1
+        equalSignIndex = line.IndexOf('=');
+      }
+
+      // Find the assignment operator.
+      if (equalSignIndex < 0)
         throw new ParserException("setting assignment expected.", lineNumber);
 
+      if (!isQuotedName)
+      {
+        settingName = line.Substring(0, equalSignIndex).Trim();
+      }
+
       // Trim the setting name and value.
-      string settingName = line.Substring(0, indexOfAssignOp).Trim();
-      string settingValue = line.Substring(indexOfAssignOp + 1);
+      string settingValue = line.Substring(equalSignIndex + 1);
       settingValue = settingValue.Trim();
 
       // Check if non-null name / value is given.
       if (string.IsNullOrEmpty(settingName))
         throw new ParserException("setting name expected.", lineNumber);
-
-      if (settingValue == null)
-        settingValue = string.Empty;
-
+      
       return new Setting(settingName, settingValue);
     }
 
