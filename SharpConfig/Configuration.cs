@@ -118,6 +118,19 @@ namespace SharpConfig
     }
 
     /// <summary>
+    /// Adds a section with a specific name to the configuration.
+    /// </summary>
+    /// <param name="sectionName">The name of the section to add.</param>
+    /// <returns>The added section.</returns>
+    /// <exception cref="ArgumentNullException">When <paramref name="sectionName"/> is null or empty.</exception>
+    public Section Add(string sectionName)
+    {
+      var section = new Section(sectionName);
+      Add(section);
+      return section;
+    }
+
+    /// <summary>
     /// Removes a section from the configuration by its name.
     /// If there are multiple sections with the same name, only the first section is removed.
     /// To remove all sections that have the name name, use the RemoveAllNamed() method instead.
