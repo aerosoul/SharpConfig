@@ -156,29 +156,39 @@ namespace SharpConfig
       // Scan the type's properties.
       foreach (var prop in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
       {
-        if (!prop.CanRead || ShouldIgnoreMappingFor(prop))
+        if (!prop.CanRead)
           continue;
 
-        var setting = FindSetting(prop.Name);
-        if (setting != null)
-        {
-          object value = prop.GetValue(obj, null);
-          setting.SetValue(value);
-        }
+        SetSettingValueFromMemberInfo(prop, obj);
       }
 
       // Scan the type's fields.
       foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public))
       {
-        if (ShouldIgnoreMappingFor(field))
-          continue;
+        SetSettingValueFromMemberInfo(field, obj);
+      }
+    }
 
-        var setting = FindSetting(field.Name);
-        if (setting != null)
+    private void SetSettingValueFromMemberInfo(MemberInfo info, object instance)
+    {
+      if (ShouldIgnoreMappingFor(info))
+        return;
+
+      var setting = FindSetting(info.Name);
+      if (setting != null)
+      {
+        object value = null;
+
+        if (info is MemberInfo)
         {
-          object value = field.GetValue(obj);
-          setting.SetValue(value);
+          value = ((FieldInfo)info).GetValue(instance);
         }
+        else if (info is PropertyInfo)
+        {
+          value = ((PropertyInfo)info).GetValue(instance, null);
+        }
+
+        setting.SetValue(value);
       }
     }
 
@@ -208,8 +218,11 @@ namespace SharpConfig
         if (setting == null)
           continue;
 
-        object value = setting.GetValue(prop.PropertyType);
-        if (value is Array)
+        object value = prop.PropertyType.IsArray ?
+          setting.GetValueArray(prop.PropertyType.GetElementType()) :
+          setting.GetValue(prop.PropertyType);
+
+        if (prop.PropertyType.IsArray)
         {
           var settingArray = value as Array;
           var propArray = prop.GetValue(obj, null) as Array;
@@ -245,7 +258,7 @@ namespace SharpConfig
           setting.GetValueArray(field.FieldType.GetElementType()) :
           setting.GetValue(field.FieldType);
 
-        if (value is Array)
+        if (field.FieldType.IsArray)
         {
           var settingArray = value as Array;
           var fieldArray = field.GetValue(obj) as Array;
