@@ -317,6 +317,35 @@ namespace Tests
       AssertArraysAreEqual(new[] { "\"first \"second", "third fourth", "fifth" }, section["Setting13"].StringValueArray);
     }
 
+    sealed class SectionTestObject
+    {
+      public string[] SomeArrayProp { get; set; }
+      public string[] SomeArrayField = null;
+    }
+
+    [Test]
+    public void SectionObjectMapping()
+    {
+      var cfg = new Configuration();
+
+      var section = cfg["Section"];
+      section["SomeArrayProp"].StringValue = "{1,2,3}";
+      section["SomeArrayField"].StringValue = "{4,5,6}";
+
+      var obj = section.ToObject<SectionTestObject>();
+
+      AssertArraysAreEqual(new[] { "1", "2", "3" }, obj.SomeArrayProp);
+      AssertArraysAreEqual(new[] { "4", "5", "6" }, obj.SomeArrayField);
+
+      section = cfg["Section2"];
+      section.Add("SomeArrayProp");
+      section.Add("SomeArrayField");
+      section.GetValuesFrom(obj);
+
+      AssertArraysAreEqual(new[] { "1", "2", "3" }, section["SomeArrayProp"].StringValueArray);
+      AssertArraysAreEqual(new[] { "4", "5", "6" }, section["SomeArrayField"].StringValueArray);
+    }
+
     private static void AssertArraysAreEqual(string[] expected, string[] actual)
     {
       Assert.AreEqual(expected.Length, actual.Length);
