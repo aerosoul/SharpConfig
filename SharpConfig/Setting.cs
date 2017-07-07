@@ -55,6 +55,22 @@ namespace SharpConfig
     }
 
     /// <summary>
+    /// Gets the value of this setting as a string, with quotes removed if present.
+    /// </summary>
+    public string StringValueTrimmed
+    {
+      get
+      {
+        string value = StringValue;
+
+        if (value[0] == '\"')
+          value = value.Trim('\"');
+
+        return value;
+      }
+    }
+
+    /// <summary>
     /// Gets or sets the value of this setting as a string.
     /// Note: this is a shortcut to GetValue and SetValue.
     /// </summary>
