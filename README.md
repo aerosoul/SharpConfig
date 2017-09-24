@@ -91,9 +91,104 @@ myConfig.SaveToBinaryFile("myConfig.cfg");  // Save to a binary file.
 myConfig.SaveToBinaryStream(myStream);      // Save to a binary stream.
 ```
 
-More!
+Ignoring properties, fields and types
 ---
-SharpConfig has more features, such as **arrays**, **enums** and **object mapping**.
 
-For details and examples, please visit the [Wiki](https://github.com/cemdervis/SharpConfig/wiki).
-There are also use case examples available in the [Example File](https://github.com/cemdervis/SharpConfig/blob/master/Example/Program.cs).
+Suppose you have the following class:
+```csharp
+class SomeClass
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+
+    [SharpConfig.Ignore]
+    public int SomeInt { get; set; }
+}
+```
+
+SharpConfig will now ignore the **SomeInt** property when creating sections from objects of type **SomeClass** and vice versa.
+Now suppose you have a type in your project that should always be ignored.
+You would have to mark every property that returns this type with a [SharpConfig.Ignore] attribute.
+An easier solution is to just apply the [SharpConfig.Ignore] attribute to the type.
+
+Example:
+```csharp
+[SharpConfig.Ignore]
+class ThisTypeShouldAlwaysBeIgnored
+{
+    // ...
+}
+```
+**instead of**:
+```csharp
+[SharpConfig.Ignore]
+class SomeClass
+{
+    [SharpConfig.Ignore]
+    public ThisTypeShouldAlwaysBeIngored T1 { get; set; }
+
+    [SharpConfig.Ignore]
+    public ThisTypeShouldAlwaysBeIngored T2 { get; set; }
+
+    [SharpConfig.Ignore]
+    public ThisTypeShouldAlwaysBeIngored T3 { get; set; }
+}
+```
+
+This ignoring mechanism works the same way for public fields.
+
+
+Adding custom object converters
+---
+
+There may be cases where you want to implement conversion rules for a custom type, with specific requirements.
+This is easy and involves two steps, which are illustrated using the Person example:
+
+```csharp
+public class Person
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+}
+```
+
+Step 1: Create a custom converter class that derives from **SharpConfig.TypeStringConverter\<T\>**:
+
+```csharp
+using SharpConfig;
+public class PersonStringConverter : TypeStringConverter<Person>
+{
+    // This method is responsible for converting a Person object to a string.
+    public override string ConvertToString(object value)
+    {
+        var person = (Person)value;
+        return string.Format("[{0};{1}]", person.Name, person.Age);
+    }
+    
+    // This method is responsible for converting a string to a Person object.
+    public override object ConvertFromString(string value, Type hint)
+    {
+        var split = value.Trim('[', ']').Split(';');
+
+        var person = new Person();
+        person.Name = split[0];
+        person.Age = int.Parse(split[1]);
+
+        return person;
+     }
+}
+```
+
+Step 2: Register the PersonStringConverter (anywhere you like):
+
+```csharp
+using SharpConfig;
+Configuration.RegisterTypeStringConverter(new PersonStringConverter());
+```
+
+That's it!
+
+Whenever a Person object is used on a Setting (via GetValue() and SetValue()), your converter is
+selected to take care of the conversion.
+This also automatically works with SetValue() for arrays and GetValueArray().
+
