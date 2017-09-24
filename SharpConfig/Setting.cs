@@ -439,7 +439,7 @@ namespace SharpConfig
     /// <returns>The element's expression as a string.</returns>
     protected override string GetStringExpression()
     {
-      return string.Format("{0} = {1}", Name, mRawValue);
+      return string.Format("{0}={1}", Name, mRawValue);
     }
 
     private static ArgumentException CreateJaggedArraysNotSupportedEx(Type type)
