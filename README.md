@@ -109,7 +109,7 @@ The following properties are the current ones:
   
 * char **Configuration.ArrayElementSeparator** { get; set; }
   * Gets or sets the array element separator character for settings. The default value is ','.
-  * **Remember** that after you change this value while <see cref="Setting"/> instances exist, to expect their ArraySize and other array-related values to return different values.
+  * **Remember** that after you change this value while **Setting** instances exist, to expect their ArraySize and other array-related values to return different values.
   
 * bool **Configuration.IgnoreInlineComments** { get; set; }
   * Gets or sets a value indicating whether inline-comments should be ignored when parsing a configuration.
