@@ -91,6 +91,32 @@ myConfig.SaveToBinaryFile("myConfig.cfg");  // Save to a binary file.
 myConfig.SaveToBinaryStream(myStream);      // Save to a binary stream.
 ```
 
+Options
+---
+
+Sometimes a project has special configuration files or other needs, for example ignoring all comments in a file.
+To allow for greater flexibility, SharpConfig's behavior is modifiable using static properties of the Configuration class.
+The following properties are the current ones:
+
+* CultureInfo **Configuration.CultureInfo** { get; set; }
+  * Gets or sets the CultureInfo that is used for value conversion in SharpConfig. The default value is _CultureInfo.InvariantCulture_.
+  
+* char[] **Configuration.ValidCommentChars** { get; }
+  * Gets the array that contains all valid comment delimiting characters. The current value is { '#', ';' }.
+
+* char **Configuration.PreferredCommentChar** { get; set; }
+  * Gets or sets the preferred comment char when saving configurations. The default value is '#'.
+  
+* char **Configuration.ArrayElementSeparator** { get; set; }
+  * Gets or sets the array element separator character for settings. The default value is ','.
+  * **Remember** that after you change this value while <see cref="Setting"/> instances exist, to expect their ArraySize and other array-related values to return different values.
+  
+* bool **Configuration.IgnoreInlineComments** { get; set; }
+  * Gets or sets a value indicating whether inline-comments should be ignored when parsing a configuration.
+  
+* bool **Configuration.IgnorePreComments** { get; set; }
+  * Gets or sets a value indicating whether pre-comments should be ignored when parsing a configuration.
+
 Ignoring properties, fields and types
 ---
 
