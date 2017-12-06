@@ -57,6 +57,7 @@ namespace SharpConfig
     /// <summary>
     /// Gets the value of this setting as a string, with quotes removed if present.
     /// </summary>
+    [Obsolete("Use StringValue instead")]
     public string StringValueTrimmed
     {
       get
@@ -227,7 +228,7 @@ namespace SharpConfig
     private int CalculateArraySize()
     {
       int size = 0;
-      var enumerator = new SettingArrayEnumerator(mRawValue, false);
+      var enumerator = new SettingArrayEnumerator(mRawValue, false, false);
       while (enumerator.Next())
         ++size;
 
@@ -283,7 +284,7 @@ namespace SharpConfig
 
       if (myArraySize > 0)
       {
-        var enumerator = new SettingArrayEnumerator(mRawValue, true);
+        var enumerator = new SettingArrayEnumerator(mRawValue, true, false);
         int iElem = 0;
         while (enumerator.Next())
         {
@@ -340,7 +341,7 @@ namespace SharpConfig
 
       if (myArraySize > 0)
       {
-        var enumerator = new SettingArrayEnumerator(mRawValue, true);
+        var enumerator = new SettingArrayEnumerator(mRawValue, true, false);
         int iElem = 0;
         while (enumerator.Next())
         {
@@ -439,7 +440,7 @@ namespace SharpConfig
     /// <returns>The element's expression as a string.</returns>
     protected override string GetStringExpression()
     {
-      return string.Format("{0}={1}", Name, mRawValue);
+      return string.Format("{0}=\"{1}\"", Name, mRawValue);
     }
 
     private static ArgumentException CreateJaggedArraysNotSupportedEx(Type type)
