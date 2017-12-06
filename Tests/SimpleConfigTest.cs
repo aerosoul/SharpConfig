@@ -219,11 +219,18 @@ namespace Tests
 
       SaveAndLoadComments_Check(cfg);
 
+      // Test with a file.
       var filename = Path.GetTempFileName();
       try
       {
+        // Textual first
         cfg.SaveToFile(filename);
         cfg = Configuration.LoadFromFile(filename);
+        SaveAndLoadComments_Check(cfg);
+
+        // Now binary
+        cfg.SaveToBinaryFile(filename);
+        cfg = Configuration.LoadFromBinaryFile(filename);
         SaveAndLoadComments_Check(cfg);
       }
       finally
@@ -346,7 +353,59 @@ namespace Tests
       AssertArraysAreEqual(new[] { "4", "5", "6" }, section["SomeArrayField"].StringValueArray);
     }
 
+    [Test]
+    public void Chars()
+    {
+      var cfg = new Configuration();
+      var setting = cfg["Section"]["Setting"];
+
+      setting.CharValue = 'x';
+      Assert.AreEqual(setting.CharValue, 'x');
+
+      setting.CharValue = (char)190;
+      Assert.AreEqual(setting.CharValue, (char)190);
+
+      setting.CharValue = '\0';
+      Assert.AreEqual(setting.CharValue, '\0');
+
+      var chars = new char[] { 'a', 'b', '\0', '-', (char)160, (char)194, (char)240 };
+      setting.CharValueArray = chars;
+
+      AssertArraysAreEqual(chars, setting.CharValueArray);
+
+      // Test with a file.
+      var filename = Path.GetTempFileName();
+      try
+      {
+        // Textual first
+        cfg.SaveToFile(filename);
+        cfg = Configuration.LoadFromFile(filename);
+        setting = cfg["Section"]["Setting"];
+
+        AssertArraysAreEqual(chars, setting.CharValueArray);
+
+        // Now binary
+        cfg.SaveToBinaryFile(filename);
+        cfg = Configuration.LoadFromBinaryFile(filename);
+        setting = cfg["Section"]["Setting"];
+
+        AssertArraysAreEqual(chars, setting.CharValueArray);
+      }
+      finally
+      {
+        if (File.Exists(filename))
+          File.Delete(filename);
+      }
+    }
+
     private static void AssertArraysAreEqual(string[] expected, string[] actual)
+    {
+      Assert.AreEqual(expected.Length, actual.Length);
+      for (int i = 0; i < expected.Length; ++i)
+        Assert.AreEqual(expected[i], actual[i]);
+    }
+
+    private static void AssertArraysAreEqual(char[] expected, char[] actual)
     {
       Assert.AreEqual(expected.Length, actual.Length);
       for (int i = 0; i < expected.Length; ++i)
