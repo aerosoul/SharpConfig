@@ -75,7 +75,7 @@ namespace SharpConfig
 
     public override object ConvertFromString(string value, Type hint)
     {
-      return sbyte.Parse(value, Configuration.CultureInfo.NumberFormat);
+      return byte.Parse(value, Configuration.CultureInfo.NumberFormat);
     }
   }
 
