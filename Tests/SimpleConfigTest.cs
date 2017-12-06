@@ -219,9 +219,7 @@ namespace Tests
 
       SaveAndLoadComments_Check(cfg);
 
-      // Test with a file.
-      var filename = Path.GetTempFileName();
-      try
+      TestWithFile(cfg, filename =>
       {
         // Textual first
         cfg.SaveToFile(filename);
@@ -232,12 +230,7 @@ namespace Tests
         cfg.SaveToBinaryFile(filename);
         cfg = Configuration.LoadFromBinaryFile(filename);
         SaveAndLoadComments_Check(cfg);
-      }
-      finally
-      {
-        if (File.Exists(filename))
-          File.Delete(filename);
-      }
+      });
     }
 
     private static void SaveAndLoadComments_Check(Configuration cfg)
@@ -354,6 +347,177 @@ namespace Tests
     }
 
     [Test]
+    public void Floats()
+    {
+      var cfg = new Configuration();
+      var setting = cfg["Section"]["Setting"];
+
+      setting.FloatValue = 100.0f;
+      Assert.AreEqual(setting.FloatValue, 100.0f);
+
+      setting.FloatValue = -100.0f;
+      Assert.AreEqual(setting.FloatValue, -100.0f);
+
+      var floats = new float[] { 0.0f, 100.0f, -100.0f, 40000.0f, 20.4028f };
+      setting.FloatValueArray = floats;
+      AssertArraysAreEqual(setting.FloatValueArray, floats);
+
+      TestWithFile(cfg, filename =>
+      {
+        cfg.SaveToFile(filename);
+        cfg = Configuration.LoadFromFile(filename);
+        setting = cfg["Section"]["Setting"];
+
+        AssertArraysAreEqual(floats, setting.FloatValueArray);
+
+        cfg.SaveToBinaryFile(filename);
+        cfg = Configuration.LoadFromBinaryFile(filename);
+        setting = cfg["Section"]["Setting"];
+
+        AssertArraysAreEqual(floats, setting.FloatValueArray);
+      });
+    }
+
+    [Test]
+    public void Doubles()
+    {
+      var cfg = new Configuration();
+      var setting = cfg["Section"]["Setting"];
+
+      setting.DoubleValue = 100.0;
+      Assert.AreEqual(setting.DoubleValue, 100.0);
+
+      setting.DoubleValue = -100.0;
+      Assert.AreEqual(setting.DoubleValue, -100.0);
+
+      var doubles = new double[] { 0.0, 100.0, -100.0, 40000.0, 2004.40493028 };
+      setting.DoubleValueArray = doubles;
+      AssertArraysAreEqual(setting.DoubleValueArray, doubles);
+
+      TestWithFile(cfg, filename =>
+      {
+        cfg.SaveToFile(filename);
+        cfg = Configuration.LoadFromFile(filename);
+        setting = cfg["Section"]["Setting"];
+
+        AssertArraysAreEqual(doubles, setting.DoubleValueArray);
+
+        cfg.SaveToBinaryFile(filename);
+        cfg = Configuration.LoadFromBinaryFile(filename);
+        setting = cfg["Section"]["Setting"];
+
+        AssertArraysAreEqual(doubles, setting.DoubleValueArray);
+      });
+    }
+
+    [Test]
+    public void Decimals()
+    {
+      var cfg = new Configuration();
+      var setting = cfg["Section"]["Setting"];
+
+      setting.DecimalValue = 100.0m;
+      Assert.AreEqual(setting.DoubleValue, 100.0);
+
+      setting.DecimalValue = -100.0m;
+      Assert.AreEqual(setting.DoubleValue, -100.0);
+
+      var decimals = new decimal[] { 0.0m, 100.0m, -100.0m, 40000.0m, 2004.40493028m, decimal.MinValue, decimal.MaxValue };
+      setting.DecimalValueArray = decimals;
+      AssertArraysAreEqual(setting.DecimalValueArray, decimals);
+
+      TestWithFile(cfg, filename =>
+      {
+        cfg.SaveToFile(filename);
+        cfg = Configuration.LoadFromFile(filename);
+        setting = cfg["Section"]["Setting"];
+
+        AssertArraysAreEqual(decimals, setting.DecimalValueArray);
+
+        cfg.SaveToBinaryFile(filename);
+        cfg = Configuration.LoadFromBinaryFile(filename);
+        setting = cfg["Section"]["Setting"];
+
+        AssertArraysAreEqual(decimals, setting.DecimalValueArray);
+      });
+    }
+
+    [Test]
+    public void Bytes()
+    {
+      var cfg = new Configuration();
+      var setting = cfg["Section"]["Setting"];
+
+      setting.ByteValue = 100;
+      Assert.AreEqual(setting.ByteValue, (byte)100);
+
+      setting.ByteValue = 255;
+      Assert.AreEqual(setting.ByteValue, (byte)255);
+
+      var bytes = new byte[] { 0, 100, 255 };
+      setting.ByteValueArray = bytes;
+      AssertArraysAreEqual(setting.ByteValueArray, bytes);
+
+      TestWithFile(cfg, filename =>
+      {
+        // Textual first
+        cfg.SaveToFile(filename);
+        cfg = Configuration.LoadFromFile(filename);
+        setting = cfg["Section"]["Setting"];
+
+        AssertArraysAreEqual(bytes, setting.ByteValueArray);
+
+        // Now binary
+        cfg.SaveToBinaryFile(filename);
+        cfg = Configuration.LoadFromBinaryFile(filename);
+        setting = cfg["Section"]["Setting"];
+
+        AssertArraysAreEqual(bytes, setting.ByteValueArray);
+      });
+    }
+
+    [Test]
+    public void SBytes()
+    {
+      var cfg = new Configuration();
+      var setting = cfg["Section"]["Setting"];
+
+      setting.SByteValue = 100;
+      Assert.AreEqual(setting.SByteValue, (sbyte)100);
+
+      int value = 255;
+      setting.SByteValue = (sbyte)value;
+      Assert.AreEqual(setting.SByteValue, (sbyte)value);
+
+      setting.IntValue = 500;
+      Assert.Throws<SettingValueCastException>(() =>
+      {
+        sbyte value2 = setting.SByteValue;
+      });
+
+      var bytes = new sbyte[] { 0, 100, 120 };
+      setting.SByteValueArray = bytes;
+      AssertArraysAreEqual(setting.SByteValueArray, bytes);
+
+      TestWithFile(cfg, filename =>
+      {
+        // Textual first
+        cfg.SaveToFile(filename);
+        cfg = Configuration.LoadFromFile(filename);
+        setting = cfg["Section"]["Setting"];
+
+        AssertArraysAreEqual(bytes, setting.SByteValueArray);
+
+        // Now binary
+        cfg.SaveToBinaryFile(filename);
+        cfg = Configuration.LoadFromBinaryFile(filename);
+        setting = cfg["Section"]["Setting"];
+
+        AssertArraysAreEqual(bytes, setting.SByteValueArray);
+      });
+    }
+
+    [Test]
     public void Chars()
     {
       var cfg = new Configuration();
@@ -373,9 +537,7 @@ namespace Tests
 
       AssertArraysAreEqual(chars, setting.CharValueArray);
 
-      // Test with a file.
-      var filename = Path.GetTempFileName();
-      try
+      TestWithFile(cfg, filename =>
       {
         // Textual first
         cfg.SaveToFile(filename);
@@ -390,6 +552,15 @@ namespace Tests
         setting = cfg["Section"]["Setting"];
 
         AssertArraysAreEqual(chars, setting.CharValueArray);
+      });
+    }
+
+    private static void TestWithFile(Configuration cfg, Action<string> action)
+    {
+      var filename = Path.GetTempFileName();
+      try
+      {
+        action(filename);
       }
       finally
       {
@@ -398,14 +569,7 @@ namespace Tests
       }
     }
 
-    private static void AssertArraysAreEqual(string[] expected, string[] actual)
-    {
-      Assert.AreEqual(expected.Length, actual.Length);
-      for (int i = 0; i < expected.Length; ++i)
-        Assert.AreEqual(expected[i], actual[i]);
-    }
-
-    private static void AssertArraysAreEqual(char[] expected, char[] actual)
+    private static void AssertArraysAreEqual<T>(T[] expected, T[] actual)
     {
       Assert.AreEqual(expected.Length, actual.Length);
       for (int i = 0; i < expected.Length; ++i)
