@@ -94,8 +94,8 @@ namespace SharpConfig
         foreach (var setting in section)
         {
           writer.Write(setting.Name);
-          writer.Write(setting.StringValue);
-
+          writer.Write(setting.RawValue);
+          
           WriteCommentsBinary(writer, setting);
         }
       }
