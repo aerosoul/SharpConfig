@@ -2,6 +2,7 @@
 // https://github.com/cemdervis/SharpConfig
 
 using System;
+using System.Text;
 
 namespace SharpConfig
 {
@@ -55,7 +56,7 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets the value of this setting as a string, with quotes removed if present.
+    /// Gets the value of this setting as a <see cref="string"/>, with quotes removed if present.
     /// </summary>
     [Obsolete("Use StringValue instead")]
     public string StringValueTrimmed
@@ -72,7 +73,16 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as a string.
+    /// Gets or sets the raw value of this setting.
+    /// </summary>
+    public string RawValue
+    {
+      get { return mRawValue; }
+      set { mRawValue = value; }
+    }
+
+    /// <summary>
+    /// Gets or sets the value of this setting as a <see cref="string"/>.
     /// Note: this is a shortcut to GetValue and SetValue.
     /// </summary>
     public string StringValue
@@ -82,7 +92,7 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as a string array.
+    /// Gets or sets the value of this setting as a <see cref="string"/> array.
     /// Note: this is a shortcut to GetValueArray and SetValue.
     /// </summary>
     public string[] StringValueArray
@@ -92,7 +102,7 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as an int.
+    /// Gets or sets the value of this setting as an <see cref="int"/>.
     /// Note: this is a shortcut to GetValue and SetValue.
     /// </summary>
     public int IntValue
@@ -102,7 +112,7 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as an int array.
+    /// Gets or sets the value of this setting as an <see cref="int"/> array.
     /// Note: this is a shortcut to GetValueArray and SetValue.
     /// </summary>
     public int[] IntValueArray
@@ -112,7 +122,7 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as a float.
+    /// Gets or sets the value of this setting as a <see cref="float"/>.
     /// Note: this is a shortcut to GetValue and SetValue.
     /// </summary>
     public float FloatValue
@@ -122,7 +132,7 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as a float array.
+    /// Gets or sets the value of this setting as a <see cref="float"/> array.
     /// Note: this is a shortcut to GetValueArray and SetValue.
     /// </summary>
     public float[] FloatValueArray
@@ -132,7 +142,7 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as a double.
+    /// Gets or sets the value of this setting as a <see cref="double"/>.
     /// Note: this is a shortcut to GetValue and SetValue.
     /// </summary>
     public double DoubleValue
@@ -142,12 +152,32 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as a double array.
+    /// Gets or sets the value of this setting as a <see cref="double"/> array.
     /// Note: this is a shortcut to GetValueArray and SetValue.
     /// </summary>
     public double[] DoubleValueArray
     {
       get { return GetValueArray<double>(); }
+      set { SetValue(value); }
+    }
+
+    /// <summary>
+    /// Gets or sets the value of this setting as a <see cref="decimal"/>.
+    /// Note: this is a shortcut to GetValue and SetValue.
+    /// </summary>
+    public decimal DecimalValue
+    {
+      get { return GetValue<decimal>(); }
+      set { SetValue(value); }
+    }
+
+    /// <summary>
+    /// Gets or sets the value of this setting as a <see cref="decimal"/> array.
+    /// Note: this is a shortcut to GetValueArray and SetValue.
+    /// </summary>
+    public decimal[] DecimalValueArray
+    {
+      get { return GetValueArray<decimal>(); }
       set { SetValue(value); }
     }
 
@@ -189,6 +219,90 @@ namespace SharpConfig
     {
       get { return GetValueArray<DateTime>(); }
       set { SetValue(value); }
+    }
+
+    /// <summary>
+    /// Gets or sets the value of this setting as a <see cref="Byte"/>.
+    /// Note: this is a shortcut to GetValueArray and SetValue.
+    /// </summary>
+    public byte ByteValue
+    {
+      get { return GetValue<byte>(); }
+      set { SetValue(value); }
+    }
+
+    /// <summary>
+    /// Gets or sets the value of this setting as a <see cref="Byte"/> array.
+    /// Note: this is a shortcut to GetValueArray and SetValue.
+    /// </summary>
+    public byte[] ByteValueArray
+    {
+      get { return GetValueArray<byte>(); }
+      set { SetValue(value); }
+    }
+
+    /// <summary>
+    /// Gets or sets the value of this setting as a <see cref="SByte"/>.
+    /// Note: this is a shortcut to GetValueArray and SetValue.
+    /// </summary>
+    public sbyte SByteValue
+    {
+      get { return GetValue<sbyte>(); }
+      set { SetValue(value); }
+    }
+
+    /// <summary>
+    /// Gets or sets the value of this setting as a <see cref="SByte"/> array.
+    /// Note: this is a shortcut to GetValueArray and SetValue.
+    /// </summary>
+    public sbyte[] SByteValueArray
+    {
+      get { return GetValueArray<sbyte>(); }
+      set { SetValue(value); }
+    }
+
+    /// <summary>
+    /// Gets or sets the value of this setting as a <see cref="Char"/>.
+    /// Note: this is a shortcut to GetValueArray and SetValue.
+    /// </summary>
+    public char CharValue
+    {
+      get { return GetValue<char>(); }
+      set { SetValue(value); }
+    }
+
+    /// <summary>
+    /// Gets or sets the value of this setting as a <see cref="Char"/> array.
+    /// Note: this is a shortcut to GetValueArray and SetValue.
+    /// </summary>
+    public char[] CharValueArray
+    {
+      get
+      {
+        // Decode the bytes back to chars.
+        var bytes = ByteValueArray;
+        if (bytes != null)
+        {
+          return Encoding.UTF8.GetChars(ByteValueArray);
+        }
+        else
+        {
+          return null;
+        }
+      }
+      set
+      {
+        if (value != null)
+        {
+          // Encode the chars to bytes, because writing raw chars such as
+          // '\0' can mess up the configuration file and the parser.
+          ByteValueArray = Encoding.UTF8.GetBytes(value);
+        }
+        else
+        {
+          SetEmptyValue();
+        }
+      }
     }
 
     /// <summary>
