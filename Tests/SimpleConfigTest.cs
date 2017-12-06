@@ -270,7 +270,7 @@ namespace Tests
       Assert.AreEqual("InlineComment3", section2["Setting"].Comment);
 
       Assert.AreEqual("Value", section["Setting"].StringValue);
-      Assert.AreEqual("\"Val;#ue\"", section2["Setting"].StringValue);
+      Assert.AreEqual("Val;#ue", section2["Setting"].StringValue);
     }
 
     [Test]
@@ -297,7 +297,7 @@ namespace Tests
       AssertArraysAreEqual(new[] { "1", "2", "3" }, section["Setting2"].StringValueArray);
 
       Assert.IsFalse(section["Setting3"].IsArray);
-      Assert.AreEqual("d {1,2,3} d", section["Setting3"].StringValue);
+      Assert.AreEqual(" d {1,2,3} d ", section["Setting3"].StringValue);
 
       AssertArraysAreEqual(new[] { "1", "2", "3" }, section["Setting4"].StringValueArray);
       AssertArraysAreEqual(new[] { "123", "456", "789" }, section["Setting5"].StringValueArray);

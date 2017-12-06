@@ -87,7 +87,8 @@ namespace SharpConfig
         idx - mPrevElemIdxInString
         );
 
-      Current = Current.Trim(new[] { ' ', '\"' });
+      Current = Current.Trim(' '); // trim spaces first
+      Current = Current.Trim('\"'); // now the quote marks
       Current = Current.Replace("\\\"", "\"");
     }
 
