@@ -182,7 +182,7 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as a bool.
+    /// Gets or sets the value of this setting as a <see cref="bool"/>.
     /// Note: this is a shortcut to GetValue and SetValue.
     /// </summary>
     public bool BoolValue
@@ -192,7 +192,7 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as a bool array.
+    /// Gets or sets the value of this setting as a <see cref="bool"/> array.
     /// Note: this is a shortcut to GetValueArray and SetValue.
     /// </summary>
     public bool[] BoolValueArray
@@ -222,7 +222,7 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as a <see cref="Byte"/>.
+    /// Gets or sets the value of this setting as a <see cref="byte"/>.
     /// Note: this is a shortcut to GetValueArray and SetValue.
     /// </summary>
     public byte ByteValue
@@ -232,7 +232,7 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as a <see cref="Byte"/> array.
+    /// Gets or sets the value of this setting as a <see cref="byte"/> array.
     /// Note: this is a shortcut to GetValueArray and SetValue.
     /// </summary>
     public byte[] ByteValueArray
@@ -242,7 +242,7 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as a <see cref="SByte"/>.
+    /// Gets or sets the value of this setting as a <see cref="sbyte"/>.
     /// Note: this is a shortcut to GetValueArray and SetValue.
     /// </summary>
     public sbyte SByteValue
@@ -252,7 +252,7 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as a <see cref="SByte"/> array.
+    /// Gets or sets the value of this setting as a <see cref="sbyte"/> array.
     /// Note: this is a shortcut to GetValueArray and SetValue.
     /// </summary>
     public sbyte[] SByteValueArray
@@ -262,7 +262,7 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as a <see cref="Char"/>.
+    /// Gets or sets the value of this setting as a <see cref="char"/>.
     /// Note: this is a shortcut to GetValueArray and SetValue.
     /// </summary>
     public char CharValue
@@ -272,7 +272,7 @@ namespace SharpConfig
     }
 
     /// <summary>
-    /// Gets or sets the value of this setting as a <see cref="Char"/> array.
+    /// Gets or sets the value of this setting as a <see cref="char"/> array.
     /// Note: this is a shortcut to GetValueArray and SetValue.
     /// </summary>
     public char[] CharValueArray
