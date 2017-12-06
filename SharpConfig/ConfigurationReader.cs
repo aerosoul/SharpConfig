@@ -46,15 +46,19 @@ namespace SharpConfig
         int commentIndex = 0;
         var comment = ParseComment(line, out commentIndex);
 
-        if (!Configuration.IgnorePreComments && commentIndex == 0)
+        if (commentIndex == 0)
         {
-          // This is a comment line (pre-comment).
-          preCommentBuilder.AppendLine(comment);
+          // pre-comment
+          if (!Configuration.IgnorePreComments)
+          {
+            preCommentBuilder.AppendLine(comment);
+          }
+
           continue;
         }
-        else if (!Configuration.IgnoreInlineComments && commentIndex > 0)
+        else if (commentIndex > 0)
         {
-          // Strip away the comments of this line.
+          // inline comment
           line = line.Remove(commentIndex).Trim();
         }
 
@@ -196,7 +200,7 @@ namespace SharpConfig
       //      name may contain any char, including '='
 
       string settingName = null;
-      
+
       int equalSignIndex = -1;
 
       // Parse the name first.
@@ -244,7 +248,7 @@ namespace SharpConfig
       // Check if non-null name / value is given.
       if (string.IsNullOrEmpty(settingName))
         throw new ParserException("setting name expected.", lineNumber);
-      
+
       return new Setting(settingName, settingValue);
     }
 
