@@ -228,7 +228,7 @@ namespace SharpConfig
     private int CalculateArraySize()
     {
       int size = 0;
-      var enumerator = new SettingArrayEnumerator(mRawValue, false, false);
+      var enumerator = new SettingArrayEnumerator(mRawValue, false);
       while (enumerator.Next())
         ++size;
 
@@ -284,7 +284,7 @@ namespace SharpConfig
 
       if (myArraySize > 0)
       {
-        var enumerator = new SettingArrayEnumerator(mRawValue, true, false);
+        var enumerator = new SettingArrayEnumerator(mRawValue, true);
         int iElem = 0;
         while (enumerator.Next())
         {
@@ -341,7 +341,7 @@ namespace SharpConfig
 
       if (myArraySize > 0)
       {
-        var enumerator = new SettingArrayEnumerator(mRawValue, true, false);
+        var enumerator = new SettingArrayEnumerator(mRawValue, true);
         int iElem = 0;
         while (enumerator.Next())
         {
