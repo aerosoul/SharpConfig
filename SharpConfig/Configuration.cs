@@ -602,6 +602,7 @@ namespace SharpConfig
 
     /// <summary>
     /// Gets the array that contains all valid comment delimiting characters.
+    /// The current value is { '#', ';' }.
     /// </summary>
     public static char[] ValidCommentChars { get; private set; }
 
