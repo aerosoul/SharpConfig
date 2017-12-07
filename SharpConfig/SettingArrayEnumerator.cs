@@ -88,8 +88,14 @@ namespace SharpConfig
         );
 
       Current = Current.Trim(' '); // trim spaces first
-      Current = Current.Trim('\"'); // now the quote marks
-      Current = Current.Replace("\\\"", "\"");
+
+      // Now trim the quotes, but only the first and last, because
+      // the setting value itself can contain quotes.
+      if (Current[Current.Length - 1] == '\"')
+        Current = Current.Remove(Current.Length - 1, 1);
+
+      if (Current[0] == '\"')
+        Current = Current.Remove(0, 1);
     }
 
     public bool Next()
