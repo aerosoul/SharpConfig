@@ -291,7 +291,7 @@ namespace Tests
       section["Setting10"].StringValue = "{ {123}, 456, {{789}} }";
       section["Setting11"].StringValue = "{\"12,34\", 5678}";
       section["Setting12"].StringValue = "{\"{123}\", 456}";
-      section["Setting13"].StringValue = "{ \"\\\"first \\\"second\", \"third fourth\", fifth }";
+      section["Setting13"].StringValue = "{ \"first\"\"second\", \"\"\"third fourth\"\"\", fifth }";
 
       AssertArraysAreEqual(new[] { "1", "2", "3" }, section["Setting1"].StringValueArray);
       AssertArraysAreEqual(new[] { "1", "2", "3" }, section["Setting2"].StringValueArray);
@@ -314,7 +314,7 @@ namespace Tests
       AssertArraysAreEqual(new[] { "{123}", "456" }, section["Setting12"].StringValueArray);
 
       Assert.IsTrue(section["Setting13"].IsArray);
-      AssertArraysAreEqual(new[] { "\"first \"second", "third fourth", "fifth" }, section["Setting13"].StringValueArray);
+      AssertArraysAreEqual(new[] { "first\"\"second", "\"\"third fourth\"\"", "fifth" }, section["Setting13"].StringValueArray);
     }
 
     sealed class SectionTestObject
