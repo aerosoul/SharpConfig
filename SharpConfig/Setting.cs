@@ -87,8 +87,8 @@ namespace SharpConfig
     /// </summary>
     public string StringValue
     {
-      get { return GetValue<string>(); }
-      set { SetValue(value); }
+      get { return GetValue<string>().Trim('\"'); }
+      set { SetValue(value.Trim('\"')); }
     }
 
     /// <summary>
@@ -523,7 +523,7 @@ namespace SharpConfig
         {
           object elemValue = values.GetValue(i);
           var converter = Configuration.FindTypeStringConverter(elemValue.GetType());
-          strings[i] = string.Format("\"{0}\"", converter.ConvertToString(elemValue));
+          strings[i] = GetValueForOutput(converter.ConvertToString(elemValue));
         }
 
         mRawValue = string.Format("{{{0}}}", string.Join(Configuration.ArrayElementSeparator.ToString(), strings));
@@ -547,6 +547,24 @@ namespace SharpConfig
 
     #endregion
 
+    private static string GetValueForOutput(string rawValue)
+    {
+      if (rawValue.StartsWith("{") && rawValue.EndsWith("}"))
+        return rawValue;
+
+      if (rawValue.StartsWith("\"") && rawValue.EndsWith("\""))
+        return rawValue;
+
+      if (
+        rawValue.IndexOf(" ") >= 0 ||
+        rawValue.IndexOfAny(Configuration.ValidCommentChars) >= 0)
+      {
+        rawValue = "\"" + rawValue + "\"";
+      }
+
+      return rawValue;
+    }
+
     /// <summary>
     /// Gets the element's expression as a string.
     /// An example for a section would be "[Section]".
@@ -554,25 +572,7 @@ namespace SharpConfig
     /// <returns>The element's expression as a string.</returns>
     protected override string GetStringExpression()
     {
-      if (IsArray)
-      {
-        string str = Name + "={";
-
-        var enumerator = new SettingArrayEnumerator(mRawValue, true);
-        while (enumerator.Next())
-        {
-          str += "\"" + enumerator.Current + "\",";
-        }
-
-        str = str.Remove(str.Length - 1, 1);
-        str += "}";
-
-        return str;
-      }
-      else
-      {
-        return string.Format("{0}=\"{1}\"", Name, mRawValue);
-      }
+      return string.Format("{0}={1}", Name, GetValueForOutput(mRawValue));
     }
 
     private static ArgumentException CreateJaggedArraysNotSupportedEx(Type type)
