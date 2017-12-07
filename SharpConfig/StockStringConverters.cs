@@ -225,7 +225,7 @@ namespace SharpConfig
   {
     public override string ConvertToString(object value)
     {
-      return value.ToString().Trim('\"');
+      return value.ToString();
     }
 
     public override object ConvertFromString(string value, Type hint)
