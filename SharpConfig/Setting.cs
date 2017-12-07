@@ -554,7 +554,25 @@ namespace SharpConfig
     /// <returns>The element's expression as a string.</returns>
     protected override string GetStringExpression()
     {
-      return string.Format("{0}=\"{1}\"", Name, mRawValue);
+      if (IsArray)
+      {
+        string str = Name + "={";
+
+        var enumerator = new SettingArrayEnumerator(mRawValue, true);
+        while (enumerator.Next())
+        {
+          str += "\"" + enumerator.Current + "\",";
+        }
+
+        str = str.Remove(str.Length - 1, 1);
+        str += "}";
+
+        return str;
+      }
+      else
+      {
+        return string.Format("{0}=\"{1}\"", Name, mRawValue);
+      }
     }
 
     private static ArgumentException CreateJaggedArraysNotSupportedEx(Type type)
