@@ -523,7 +523,7 @@ namespace SharpConfig
         {
           object elemValue = values.GetValue(i);
           var converter = Configuration.FindTypeStringConverter(elemValue.GetType());
-          strings[i] = converter.ConvertToString(elemValue);
+          strings[i] = string.Format("\"{0}\"", converter.ConvertToString(elemValue));
         }
 
         mRawValue = string.Format("{{{0}}}", string.Join(Configuration.ArrayElementSeparator.ToString(), strings));
