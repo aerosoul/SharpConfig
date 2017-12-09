@@ -240,8 +240,8 @@ namespace SharpConfig
       var type = converter.ConvertibleType;
       if (mTypeStringConverters.ContainsKey(type))
         throw new InvalidOperationException(string.Format("A converter for type '{0}' is already registered.", type.FullName));
-      else
-        mTypeStringConverters.Add(type, converter);
+        
+      mTypeStringConverters.Add(type, converter);
     }
 
     /// <summary>
@@ -258,8 +258,8 @@ namespace SharpConfig
 
       if (!mTypeStringConverters.ContainsKey(type))
         throw new InvalidOperationException(string.Format("No converter is registered for type '{0}'.", type.FullName));
-      else
-        mTypeStringConverters.Remove(type);
+        
+      mTypeStringConverters.Remove(type);
     }
 
     internal static ITypeStringConverter FindTypeStringConverter(Type type)
