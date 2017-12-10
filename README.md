@@ -41,7 +41,6 @@ string[] someStringArray = section["SomeArray"].StringValueArray;
 DayOfWeek day = section["Day"].GetValue<DayOfWeek>();
 
 // Entire user-defined objects can be created from sections and vice versa.
-// See the wiki for more details.
 var person = config["Person"].ToObject<Person>();
 // ...
 ```
