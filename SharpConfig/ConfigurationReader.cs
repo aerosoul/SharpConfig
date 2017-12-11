@@ -56,15 +56,17 @@ namespace SharpConfig
 
           continue;
         }
-        else if (commentIndex > 0)
+
+        string lineWithoutComment = line;
+        if (commentIndex > 0)
         {
           // inline comment
-          line = line.Remove(commentIndex).Trim();
+          lineWithoutComment = line.Remove(commentIndex).Trim();
         }
 
-        if (line.StartsWith("[")) // Section
+        if (lineWithoutComment.StartsWith("[")) // Section
         {
-          currentSection = ParseSection(line, lineNumber);
+          currentSection = ParseSection(lineWithoutComment, lineNumber);
 
           if (!Configuration.IgnoreInlineComments)
             currentSection.Comment = comment;
@@ -81,7 +83,7 @@ namespace SharpConfig
         }
         else // Setting
         {
-          var setting = ParseSetting(line, lineNumber);
+          var setting = ParseSetting(Configuration.IgnoreInlineComments ? line : lineWithoutComment, lineNumber);
 
           if (!Configuration.IgnoreInlineComments)
             setting.Comment = comment;
@@ -177,11 +179,17 @@ namespace SharpConfig
       // See if there are unwanted chars after the closing bracket.
       if ((line.Length - 1) > closingBracketIndex)
       {
-        string unwantedToken = line.Substring(closingBracketIndex + 1);
+        // Get the part after the raw value to determien whether it's just an inline comment.
+        // If so, it's not an unwanted part; otherwise we should notify that it's something unexpected.
+        var endPart = line.Substring(closingBracketIndex + 1).Trim();
+        if (endPart.IndexOfAny(Configuration.ValidCommentChars) != 0)
+        {
+          string unwantedToken = line.Substring(closingBracketIndex + 1);
 
-        throw new ParserException(string.Format(
-            "unexpected token '{0}'", unwantedToken),
-            lineNumber);
+          throw new ParserException(string.Format(
+              "unexpected token '{0}'", unwantedToken),
+              lineNumber);
+        }
       }
 
       // Extract the section name, and trim all leading / trailing white-spaces.

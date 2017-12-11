@@ -183,3 +183,7 @@ UpgradeLog*.htm
 FakesAssemblies/
 /bin/Release
 /bin/Debug
+*.ide-wal
+*.ide-shm
+*.ide
+*.lock
