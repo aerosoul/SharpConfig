@@ -417,16 +417,10 @@
             </summary>
         </member>
         <member name="M:SharpConfig.ConfigurationElement.ToString">
-            <summary>
-            Gets the string representation of the element without its comments.
-            </summary>
-        </member>
-        <member name="M:SharpConfig.ConfigurationElement.ToString(System.Boolean)">
              <summary>
              Gets the string representation of the element.
              </summary>
             
-             <param name="includeComments">Specify true to include the comments in the string; false otherwise.</param>
         </member>
         <member name="M:SharpConfig.ConfigurationElement.GetStringExpression">
             <summary>
