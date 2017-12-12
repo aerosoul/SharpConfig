@@ -556,8 +556,9 @@ namespace SharpConfig
         return rawValue;
 
       if (
-        rawValue.IndexOf(" ") >= 0 ||
-        rawValue.IndexOfAny(Configuration.ValidCommentChars) >= 0)
+        rawValue.IndexOf(" ") >= 0 || (
+        rawValue.IndexOfAny(Configuration.ValidCommentChars) >= 0) &&
+        !Configuration.IgnoreInlineComments)
       {
         rawValue = "\"" + rawValue + "\"";
       }

@@ -37,55 +37,46 @@ namespace SharpConfig
     public string PreComment { get; set; }
 
     /// <summary>
-    /// Gets the string representation of the element without its comments.
-    /// </summary>
-    public override string ToString()
-    {
-      return ToString(false);
-    }
-
-    /// <summary>
     /// Gets the string representation of the element.
     /// </summary>
     ///
-    /// <param name="includeComments">Specify true to include the comments in the string; false otherwise.</param>
-    public string ToString(bool includeComments)
+    public override string ToString()
     {
       string stringExpr = GetStringExpression();
 
-      if (includeComments)
+      if (Comment != null && PreComment != null &&
+        !Configuration.IgnoreInlineComments && !Configuration.IgnorePreComments)
       {
-        if (Comment != null && PreComment != null)
-        {
-          // Include inline comment and pre-comments.
-          return string.Format("{0}{1}{2} {3}",
-              GetFormattedPreComment(),   // {0}
-              Environment.NewLine,        // {1}
-              stringExpr,                 // {2}
-              GetFormattedComment()       // {3}
-              );
-        }
-        else if (Comment != null)
-        {
-          // Include only the inline comment.
-          return string.Format("{0} {1}",
-              stringExpr,                 // {0}
-              GetFormattedComment()       // {1}
-              );
-        }
-        else if (PreComment != null)
-        {
-          // Include only the pre-comments.
-          return string.Format("{0}{1}{2}",
-              GetFormattedPreComment(),   // {0}
-              Environment.NewLine,        // {1}
-              stringExpr                  // {2}
-              );
-        }
+        // Include inline comment and pre-comments.
+        return string.Format("{0}{1}{2} {3}",
+            GetFormattedPreComment(),   // {0}
+            Environment.NewLine,        // {1}
+            stringExpr,                 // {2}
+            GetFormattedComment()       // {3}
+            );
       }
-
-      // In every other case, just return the expression.
-      return stringExpr;
+      else if (Comment != null && !Configuration.IgnoreInlineComments)
+      {
+        // Include only the inline comment.
+        return string.Format("{0} {1}",
+            stringExpr,                 // {0}
+            GetFormattedComment()       // {1}
+            );
+      }
+      else if (PreComment != null && !Configuration.IgnorePreComments)
+      {
+        // Include only the pre-comments.
+        return string.Format("{0}{1}{2}",
+            GetFormattedPreComment(),   // {0}
+            Environment.NewLine,        // {1}
+            stringExpr                  // {2}
+            );
+      }
+      else
+      {
+        // In every other case, just return the expression.
+        return stringExpr;
+      }
     }
 
     // Gets a formatted comment string that is ready to be written to a config file.

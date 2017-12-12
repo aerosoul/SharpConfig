@@ -52,11 +52,11 @@ namespace SharpConfig
         if (!isFirstSection && section.PreComment != null)
           sb.AppendLine();
 
-        sb.AppendLine(section.ToString(true));
+        sb.AppendLine(section.ToString());
 
         // Write all settings.
         foreach (var setting in section)
-          sb.AppendLine(setting.ToString(true));
+          sb.AppendLine(setting.ToString());
 
         isFirstSection = false;
       }
