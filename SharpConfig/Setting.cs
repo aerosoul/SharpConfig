@@ -15,8 +15,8 @@ namespace SharpConfig
     #region Fields
 
     private string mRawValue = string.Empty;
-    private int mCachedArraySize = 0;
-    private bool mShouldCalculateArraySize = false;
+    private int mCachedArraySize;
+    private bool mShouldCalculateArraySize;
     private char mCachedArrayElementSeparator;
 
     #endregion
@@ -50,12 +50,9 @@ namespace SharpConfig
     /// <summary>
     /// Gets a value indicating whether this setting's value is empty.
     /// </summary>
-    public bool IsEmpty
-    {
-      get { return string.IsNullOrEmpty(mRawValue); }
-    }
+    public bool IsEmpty => string.IsNullOrEmpty(mRawValue);
 
-    /// <summary>
+      /// <summary>
     /// Gets the value of this setting as a <see cref="string"/>, with quotes removed if present.
     /// </summary>
     [Obsolete("Use StringValue instead")]
@@ -77,8 +74,8 @@ namespace SharpConfig
     /// </summary>
     public string RawValue
     {
-      get { return mRawValue; }
-      set { mRawValue = value; }
+      get => mRawValue;
+      set => mRawValue = value;
     }
 
     /// <summary>
@@ -87,8 +84,8 @@ namespace SharpConfig
     /// </summary>
     public string StringValue
     {
-      get { return GetValue<string>().Trim('\"'); }
-      set { SetValue(value.Trim('\"')); }
+      get => GetValue<string>().Trim('\"');
+      set => SetValue(value.Trim('\"'));
     }
 
     /// <summary>
@@ -97,8 +94,8 @@ namespace SharpConfig
     /// </summary>
     public string[] StringValueArray
     {
-      get { return GetValueArray<string>(); }
-      set { SetValue(value); }
+      get => GetValueArray<string>();
+      set => SetValue(value);
     }
 
     /// <summary>
@@ -107,8 +104,8 @@ namespace SharpConfig
     /// </summary>
     public int IntValue
     {
-      get { return GetValue<int>(); }
-      set { SetValue(value); }
+      get => GetValue<int>();
+      set => SetValue(value);
     }
 
     /// <summary>
@@ -117,8 +114,8 @@ namespace SharpConfig
     /// </summary>
     public int[] IntValueArray
     {
-      get { return GetValueArray<int>(); }
-      set { SetValue(value); }
+      get => GetValueArray<int>();
+      set => SetValue(value);
     }
 
     /// <summary>
@@ -127,8 +124,8 @@ namespace SharpConfig
     /// </summary>
     public float FloatValue
     {
-      get { return GetValue<float>(); }
-      set { SetValue(value); }
+      get => GetValue<float>();
+      set => SetValue(value);
     }
 
     /// <summary>
@@ -137,8 +134,8 @@ namespace SharpConfig
     /// </summary>
     public float[] FloatValueArray
     {
-      get { return GetValueArray<float>(); }
-      set { SetValue(value); }
+        get => GetValueArray<float>();
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -147,8 +144,8 @@ namespace SharpConfig
     /// </summary>
     public double DoubleValue
     {
-      get { return GetValue<double>(); }
-      set { SetValue(value); }
+        get => GetValue<double>();
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -157,8 +154,8 @@ namespace SharpConfig
     /// </summary>
     public double[] DoubleValueArray
     {
-      get { return GetValueArray<double>(); }
-      set { SetValue(value); }
+        get => GetValueArray<double>();
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -167,8 +164,8 @@ namespace SharpConfig
     /// </summary>
     public decimal DecimalValue
     {
-      get { return GetValue<decimal>(); }
-      set { SetValue(value); }
+        get => GetValue<decimal>();
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -177,8 +174,8 @@ namespace SharpConfig
     /// </summary>
     public decimal[] DecimalValueArray
     {
-      get { return GetValueArray<decimal>(); }
-      set { SetValue(value); }
+        get => GetValueArray<decimal>();
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -187,8 +184,8 @@ namespace SharpConfig
     /// </summary>
     public bool BoolValue
     {
-      get { return GetValue<bool>(); }
-      set { SetValue(value); }
+        get => GetValue<bool>();
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -197,8 +194,8 @@ namespace SharpConfig
     /// </summary>
     public bool[] BoolValueArray
     {
-      get { return GetValueArray<bool>(); }
-      set { SetValue(value); }
+        get => GetValueArray<bool>();
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -207,8 +204,8 @@ namespace SharpConfig
     /// </summary>
     public DateTime DateTimeValue
     {
-      get { return GetValue<DateTime>(); }
-      set { SetValue(value); }
+        get => GetValue<DateTime>();
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -217,8 +214,8 @@ namespace SharpConfig
     /// </summary>
     public DateTime[] DateTimeValueArray
     {
-      get { return GetValueArray<DateTime>(); }
-      set { SetValue(value); }
+        get => GetValueArray<DateTime>();
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -227,8 +224,8 @@ namespace SharpConfig
     /// </summary>
     public byte ByteValue
     {
-      get { return GetValue<byte>(); }
-      set { SetValue(value); }
+        get => GetValue<byte>();
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -237,8 +234,8 @@ namespace SharpConfig
     /// </summary>
     public byte[] ByteValueArray
     {
-      get { return GetValueArray<byte>(); }
-      set { SetValue(value); }
+        get => GetValueArray<byte>();
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -247,8 +244,8 @@ namespace SharpConfig
     /// </summary>
     public sbyte SByteValue
     {
-      get { return GetValue<sbyte>(); }
-      set { SetValue(value); }
+        get => GetValue<sbyte>();
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -257,8 +254,8 @@ namespace SharpConfig
     /// </summary>
     public sbyte[] SByteValueArray
     {
-      get { return GetValueArray<sbyte>(); }
-      set { SetValue(value); }
+        get => GetValueArray<sbyte>();
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -267,8 +264,8 @@ namespace SharpConfig
     /// </summary>
     public char CharValue
     {
-      get { return GetValue<char>(); }
-      set { SetValue(value); }
+      get => GetValue<char>();
+        set => SetValue(value);
     }
 
     /// <summary>
@@ -308,12 +305,9 @@ namespace SharpConfig
     /// <summary>
     /// Gets a value indicating whether this setting is an array.
     /// </summary>
-    public bool IsArray
-    {
-      get { return (ArraySize >= 0); }
-    }
+    public bool IsArray => (ArraySize >= 0);
 
-    /// <summary>
+      /// <summary>
     /// Gets the size of the array that this setting represents.
     /// If this setting is not an array, -1 is returned.
     /// </summary>
@@ -513,22 +507,26 @@ namespace SharpConfig
       var type = value.GetType();
       if (type.IsArray)
       {
-        if (type.GetElementType().IsArray)
+          var elementType = type.GetElementType();
+          if (elementType != null && elementType.IsArray)
           throw CreateJaggedArraysNotSupportedEx(type.GetElementType());
 
         var values = value as Array;
-        var strings = new string[values.Length];
+          if (values != null)
+          {
+              var strings = new string[values.Length];
 
-        for (int i = 0; i < values.Length; i++)
-        {
-          object elemValue = values.GetValue(i);
-          var converter = Configuration.FindTypeStringConverter(elemValue.GetType());
-          strings[i] = GetValueForOutput(converter.ConvertToString(elemValue));
-        }
+              for (int i = 0; i < values.Length; i++)
+              {
+                  object elemValue = values.GetValue(i);
+                  var converter = Configuration.FindTypeStringConverter(elemValue.GetType());
+                  strings[i] = GetValueForOutput(converter.ConvertToString(elemValue));
+              }
 
-        mRawValue = string.Format("{{{0}}}", string.Join(Configuration.ArrayElementSeparator.ToString(), strings));
-        mCachedArraySize = values.Length;
-        mShouldCalculateArraySize = false;
+              mRawValue = $"{{{string.Join(Configuration.ArrayElementSeparator.ToString(), strings)}}}";
+          }
+          if (values != null) mCachedArraySize = values.Length;
+          mShouldCalculateArraySize = false;
       }
       else
       {
@@ -556,7 +554,7 @@ namespace SharpConfig
         return rawValue;
 
       if (
-        rawValue.IndexOf(" ") >= 0 || (
+        rawValue.IndexOf(" ", StringComparison.Ordinal) >= 0 || (
         rawValue.IndexOfAny(Configuration.ValidCommentChars) >= 0) &&
         !Configuration.IgnoreInlineComments)
       {
@@ -573,20 +571,18 @@ namespace SharpConfig
     /// <returns>The element's expression as a string.</returns>
     protected override string GetStringExpression()
     {
-      return string.Format("{0}={1}", Name, GetValueForOutput(mRawValue));
+      return $"{Name}={GetValueForOutput(mRawValue)}";
     }
 
     private static ArgumentException CreateJaggedArraysNotSupportedEx(Type type)
     {
       // Determine the underlying element type.
       Type elementType = type.GetElementType();
-      while (elementType.IsArray)
+      while (elementType != null && elementType.IsArray)
         elementType = elementType.GetElementType();
 
-      throw new ArgumentException(string.Format(
-          "Jagged arrays are not supported. The type you have specified is '{0}', but '{1}' was expected.",
-          type.Name, elementType.Name
-          ));
+      throw new ArgumentException(
+          $"Jagged arrays are not supported. The type you have specified is '{type.Name}', but '{elementType?.Name}' was expected.");
     }
   }
 }

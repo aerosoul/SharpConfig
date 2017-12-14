@@ -226,16 +226,18 @@ namespace SharpConfig
         {
           var settingArray = value as Array;
           var propArray = prop.GetValue(obj, null) as Array;
-          if (propArray == null || propArray.Length != settingArray.Length)
+          if (settingArray != null && (propArray == null || propArray.Length != settingArray.Length))
           {
             // (Re)create the property's array.
-            propArray = Array.CreateInstance(prop.PropertyType.GetElementType(), settingArray.Length);
+            propArray = Array.CreateInstance(prop.PropertyType.GetElementType(), length: settingArray.Length);
           }
 
           for (int i = 0; i < settingArray.Length; i++)
-            propArray.SetValue(settingArray.GetValue(i), i);
+          {
+              propArray?.SetValue(settingArray.GetValue(i), i);
+          }
 
-          prop.SetValue(obj, propArray, null);
+            prop.SetValue(obj, propArray, null);
         }
         else
         {
@@ -262,7 +264,7 @@ namespace SharpConfig
         {
           var settingArray = value as Array;
           var fieldArray = field.GetValue(obj) as Array;
-          if (fieldArray == null || fieldArray.Length != settingArray.Length)
+          if (settingArray != null && (fieldArray == null || fieldArray.Length != settingArray.Length))
           {
             // (Re)create the field's array.
             fieldArray = Array.CreateInstance(field.FieldType.GetElementType(), settingArray.Length);
@@ -341,12 +343,9 @@ namespace SharpConfig
     /// <param name="settingName">The name of the setting to add.</param>
     /// <returns>The added setting.</returns>
     /// <exception cref="ArgumentNullException">When <paramref name="settingName"/> is null or empty.</exception>
-    public Setting Add(string settingName)
-    {
-      return Add(settingName, string.Empty);
-    }
+    public Setting Add(string settingName) => Add(settingName, string.Empty);
 
-    /// <summary>
+      /// <summary>
     /// Adds a setting with a specific name and value to the section.
     /// </summary>
     /// <param name="settingName">The name of the setting to add.</param>
@@ -437,12 +436,9 @@ namespace SharpConfig
     /// <summary>
     /// Gets the number of settings that are in the section.
     /// </summary>
-    public int SettingCount
-    {
-      get { return mSettings.Count; }
-    }
+    public int SettingCount => mSettings.Count;
 
-    /// <summary>
+      /// <summary>
     /// Gets or sets a setting by index.
     /// </summary>
     /// <param name="index">The index of the setting in the section.</param>
@@ -530,7 +526,7 @@ namespace SharpConfig
     /// <returns>The element's expression as a string.</returns>
     protected override string GetStringExpression()
     {
-      return string.Format("[{0}]", Name);
+      return $"[{Name}]";
     }
   }
 }

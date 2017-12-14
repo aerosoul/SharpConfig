@@ -17,7 +17,7 @@ namespace SharpConfig
 
     internal static SettingValueCastException Create(string stringValue, Type dstType, Exception innerException)
     {
-      string msg = string.Format("Failed to convert value '{0}' to type {1}.", stringValue, dstType.FullName);
+      string msg = $"Failed to convert value '{stringValue}' to type {dstType.FullName}.";
       return new SettingValueCastException(msg, innerException);
     }
   }
