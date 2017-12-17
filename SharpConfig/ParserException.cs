@@ -17,7 +17,7 @@ namespace SharpConfig
     {
       Line = line;
     }
-    
+
     /// <summary>
     /// Gets the line in the configuration that caused the exception.
     /// </summary>

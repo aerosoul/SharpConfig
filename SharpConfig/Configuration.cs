@@ -154,7 +154,7 @@ namespace SharpConfig
     /// <returns>True if the section was removed; false otherwise.</returns>
     public bool Remove(Section section) => mSections.Remove(section);
 
-      /// <summary>
+    /// <summary>
     /// Removes all sections that have a specific name.
     /// </summary>
     /// <param name="sectionName">The case-sensitive name of the sections to remove.</param>
@@ -237,7 +237,7 @@ namespace SharpConfig
       var type = converter.ConvertibleType;
       if (mTypeStringConverters.ContainsKey(type))
         throw new InvalidOperationException($"A converter for type '{type.FullName}' is already registered.");
-        
+
       mTypeStringConverters.Add(type, converter);
     }
 
@@ -255,7 +255,7 @@ namespace SharpConfig
 
       if (!mTypeStringConverters.ContainsKey(type))
         throw new InvalidOperationException($"No converter is registered for type '{type.FullName}'.");
-        
+
       mTypeStringConverters.Remove(type);
     }
 
@@ -273,7 +273,7 @@ namespace SharpConfig
 
     internal static ITypeStringConverter FallbackConverter => mFallbackConverter;
 
-      #endregion
+    #endregion
 
     #region Load
 
@@ -585,7 +585,7 @@ namespace SharpConfig
     public static CultureInfo CultureInfo
     {
       get => mCultureInfo;
-        set => mCultureInfo = value ?? throw new ArgumentNullException("value");
+      set => mCultureInfo = value ?? throw new ArgumentNullException("value");
     }
 
     /// <summary>
@@ -603,7 +603,7 @@ namespace SharpConfig
     public static char PreferredCommentChar
     {
       get => mPreferredCommentChar;
-        set
+      set
       {
         if (!Array.Exists(ValidCommentChars, c => c == value))
           throw new ArgumentException("The specified char '" + value + "' is not allowed as a comment char.");
@@ -649,7 +649,7 @@ namespace SharpConfig
     /// </summary>
     public int SectionCount => mSections.Count;
 
-      /// <summary>
+    /// <summary>
     /// Gets or sets a section by index.
     /// </summary>
     /// <param name="index">The index of the section in the configuration.</param>

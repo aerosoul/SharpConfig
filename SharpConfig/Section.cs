@@ -234,10 +234,10 @@ namespace SharpConfig
 
           for (int i = 0; i < settingArray.Length; i++)
           {
-              propArray?.SetValue(settingArray.GetValue(i), i);
+            propArray?.SetValue(settingArray.GetValue(i), i);
           }
 
-            prop.SetValue(obj, propArray, null);
+          prop.SetValue(obj, propArray, null);
         }
         else
         {
@@ -345,7 +345,7 @@ namespace SharpConfig
     /// <exception cref="ArgumentNullException">When <paramref name="settingName"/> is null or empty.</exception>
     public Setting Add(string settingName) => Add(settingName, string.Empty);
 
-      /// <summary>
+    /// <summary>
     /// Adds a setting with a specific name and value to the section.
     /// </summary>
     /// <param name="settingName">The name of the setting to add.</param>
@@ -438,7 +438,7 @@ namespace SharpConfig
     /// </summary>
     public int SettingCount => mSettings.Count;
 
-      /// <summary>
+    /// <summary>
     /// Gets or sets a setting by index.
     /// </summary>
     /// <param name="index">The index of the setting in the section.</param>
