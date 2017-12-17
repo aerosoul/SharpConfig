@@ -95,7 +95,7 @@ namespace SharpConfig
         {
           writer.Write(setting.Name);
           writer.Write(setting.RawValue);
-          
+
           WriteCommentsBinary(writer, setting);
         }
       }

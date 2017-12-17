@@ -31,10 +31,7 @@ namespace SharpConfig
       }
     }
 
-    public Type ConvertibleType
-    {
-      get { return null; }
-    }
+    public Type ConvertibleType => null;
   }
 
   internal sealed class BoolStringConverter : TypeStringConverter<bool>

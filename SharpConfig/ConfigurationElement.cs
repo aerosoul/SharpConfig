@@ -24,7 +24,7 @@ namespace SharpConfig
     /// <summary>
     /// Gets the name of this element.
     /// </summary>
-    public string Name { get; private set; }
+    public string Name { get; }
 
     /// <summary>
     /// Gets or sets the comment of this element.
@@ -48,29 +48,17 @@ namespace SharpConfig
         !Configuration.IgnoreInlineComments && !Configuration.IgnorePreComments)
       {
         // Include inline comment and pre-comments.
-        return string.Format("{0}{1}{2} {3}",
-            GetFormattedPreComment(),   // {0}
-            Environment.NewLine,        // {1}
-            stringExpr,                 // {2}
-            GetFormattedComment()       // {3}
-            );
+        return $"{GetFormattedPreComment()}{Environment.NewLine}{stringExpr} {GetFormattedComment()}";
       }
       else if (Comment != null && !Configuration.IgnoreInlineComments)
       {
         // Include only the inline comment.
-        return string.Format("{0} {1}",
-            stringExpr,                 // {0}
-            GetFormattedComment()       // {1}
-            );
+        return $"{stringExpr} {GetFormattedComment()}";
       }
       else if (PreComment != null && !Configuration.IgnorePreComments)
       {
         // Include only the pre-comments.
-        return string.Format("{0}{1}{2}",
-            GetFormattedPreComment(),   // {0}
-            Environment.NewLine,        // {1}
-            stringExpr                  // {2}
-            );
+        return $"{GetFormattedPreComment()}{Environment.NewLine}{stringExpr}";
       }
       else
       {

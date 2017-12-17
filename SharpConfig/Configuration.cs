@@ -152,10 +152,7 @@ namespace SharpConfig
     /// </summary>
     /// <param name="section">The section to remove.</param>
     /// <returns>True if the section was removed; false otherwise.</returns>
-    public bool Remove(Section section)
-    {
-      return mSections.Remove(section);
-    }
+    public bool Remove(Section section) => mSections.Remove(section);
 
     /// <summary>
     /// Removes all sections that have a specific name.
@@ -239,8 +236,8 @@ namespace SharpConfig
 
       var type = converter.ConvertibleType;
       if (mTypeStringConverters.ContainsKey(type))
-        throw new InvalidOperationException(string.Format("A converter for type '{0}' is already registered.", type.FullName));
-        
+        throw new InvalidOperationException($"A converter for type '{type.FullName}' is already registered.");
+
       mTypeStringConverters.Add(type, converter);
     }
 
@@ -257,8 +254,8 @@ namespace SharpConfig
         throw new ArgumentNullException("type");
 
       if (!mTypeStringConverters.ContainsKey(type))
-        throw new InvalidOperationException(string.Format("No converter is registered for type '{0}'.", type.FullName));
-        
+        throw new InvalidOperationException($"No converter is registered for type '{type.FullName}'.");
+
       mTypeStringConverters.Remove(type);
     }
 
@@ -274,10 +271,7 @@ namespace SharpConfig
       return converter;
     }
 
-    internal static ITypeStringConverter FallbackConverter
-    {
-      get { return mFallbackConverter; }
-    }
+    internal static ITypeStringConverter FallbackConverter => mFallbackConverter;
 
     #endregion
 
@@ -590,14 +584,8 @@ namespace SharpConfig
     /// <exception cref="ArgumentNullException">When a null reference is set.</exception>
     public static CultureInfo CultureInfo
     {
-      get { return mCultureInfo; }
-      set
-      {
-        if (value == null)
-          throw new ArgumentNullException("value");
-
-        mCultureInfo = value;
-      }
+      get => mCultureInfo;
+      set => mCultureInfo = value ?? throw new ArgumentNullException("value");
     }
 
     /// <summary>
@@ -614,7 +602,7 @@ namespace SharpConfig
     /// <exception cref="ArgumentException">When an invalid character is set.</exception>
     public static char PreferredCommentChar
     {
-      get { return mPreferredCommentChar; }
+      get => mPreferredCommentChar;
       set
       {
         if (!Array.Exists(ValidCommentChars, c => c == value))
@@ -659,10 +647,7 @@ namespace SharpConfig
     /// <summary>
     /// Gets the number of sections that are in the configuration.
     /// </summary>
-    public int SectionCount
-    {
-      get { return mSections.Count; }
-    }
+    public int SectionCount => mSections.Count;
 
     /// <summary>
     /// Gets or sets a section by index.

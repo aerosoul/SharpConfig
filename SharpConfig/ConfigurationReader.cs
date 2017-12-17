@@ -283,8 +283,10 @@ namespace SharpConfig
 
         for (int j = 0; j < settingCount; j++)
         {
-          var setting = new Setting(reader.ReadString());
-          setting.RawValue = reader.ReadString();
+          var setting = new Setting(reader.ReadString())
+          {
+            RawValue = reader.ReadString()
+          };
 
           ReadCommentsBinary(reader, setting);
 
