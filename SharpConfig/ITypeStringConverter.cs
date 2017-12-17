@@ -67,9 +67,6 @@ namespace SharpConfig
     /// <summary>
     /// The type that this converter is able to convert to and from a string.
     /// </summary>
-    public Type ConvertibleType
-    {
-      get { return typeof(T); }
-    }
+    public Type ConvertibleType => typeof(T);
   }
 }

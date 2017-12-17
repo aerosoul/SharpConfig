@@ -13,7 +13,7 @@ namespace SharpConfig
   public sealed class ParserException : Exception
   {
     internal ParserException(string message, int line)
-        : base(string.Format("Line {0}: {1}", line, message))
+        : base($"Line {line}: {message}")
     {
       Line = line;
     }
