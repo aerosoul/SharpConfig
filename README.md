@@ -80,6 +80,17 @@ string[] formats = myConfig["Video"]["Formats"].StringValueArray;
 // ...
 ```
 
+Loading a Configuration
+---
+
+```csharp
+Configuration.LoadFromFile("myConfig.cfg");        // Load from a text-based file.
+Configuration.LoadFromStream(myStream);            // Load from a text-based stream.
+Configuration.LoadFromString(myString);            // Load from text (source code).
+Configuration.LoadFromBinaryFile("myConfig.cfg");  // Load from a binary file.
+Configuration.LoadFromBinaryStream(myStream);      // Load from a binary stream.
+```
+
 Saving a Configuration
 ---
 
@@ -105,16 +116,19 @@ The following properties are the current ones:
 
 * char **Configuration.PreferredCommentChar** { get; set; }
   * Gets or sets the preferred comment char when saving configurations. The default value is '#'.
-  
+
 * char **Configuration.ArrayElementSeparator** { get; set; }
   * Gets or sets the array element separator character for settings. The default value is ','.
   * **Remember** that after you change this value while **Setting** instances exist, to expect their ArraySize and other array-related values to return different values.
-  
+
 * bool **Configuration.IgnoreInlineComments** { get; set; }
   * Gets or sets a value indicating whether inline-comments should be ignored when parsing a configuration.
-  
+
 * bool **Configuration.IgnorePreComments** { get; set; }
   * Gets or sets a value indicating whether pre-comments should be ignored when parsing a configuration.
+
+* bool **Configuration.SpaceBetweenEquals** { get; set; }
+  * Gets or sets a value indicating whether space between equals should be added when creating a configuration.
 
 Ignoring properties, fields and types
 ---
@@ -189,7 +203,7 @@ public class PersonStringConverter : TypeStringConverter<Person>
         var person = (Person)value;
         return string.Format("[{0};{1}]", person.Name, person.Age);
     }
-    
+
     // This method is responsible for converting a string to a Person object.
     public override object ConvertFromString(string value, Type hint)
     {
