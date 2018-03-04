@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <AssemblyName>SharpConfig</AssemblyName>
+    <RootNamespace>SharpConfig</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\bin\DotNetCore\Debug\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\bin\DotNetCore\Release\</OutputPath>
+    <DocumentationFile>..\bin\DotNetCore\Release\netcoreapp2.0\SharpConfig.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <Import Project="..\SharpConfigShared\SharpConfigShared.projitems" Label="Shared" />
+
+</Project>
