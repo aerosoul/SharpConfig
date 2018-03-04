@@ -571,7 +571,10 @@ namespace SharpConfig
     /// <returns>The element's expression as a string.</returns>
     protected override string GetStringExpression()
     {
-      return $"{Name}={GetValueForOutput(mRawValue)}";
+      if (Configuration.SpaceBetweenEquals)
+        return $"{Name} = {GetValueForOutput(mRawValue)}";
+      else
+        return $"{Name}={GetValueForOutput(mRawValue)}";
     }
 
     private static ArgumentException CreateJaggedArraysNotSupportedEx(Type type)

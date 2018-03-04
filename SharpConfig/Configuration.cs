@@ -70,6 +70,7 @@ namespace SharpConfig
 
       IgnoreInlineComments = false;
       IgnorePreComments = false;
+      SpaceBetweenEquals = false;
     }
 
     /// <summary>
@@ -643,6 +644,12 @@ namespace SharpConfig
     /// should be ignored when parsing a configuration.
     /// </summary>
     public static bool IgnorePreComments { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether space between
+    /// equals should be added when creating a configuration.
+    /// </summary>
+    public static bool SpaceBetweenEquals { get; set; }
 
     /// <summary>
     /// Gets the number of sections that are in the configuration.
