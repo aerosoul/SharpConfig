@@ -353,6 +353,12 @@
             should be ignored when parsing a configuration.
             </summary>
         </member>
+        <member name="P:SharpConfig.Configuration.SpaceBetweenEquals">
+            <summary>
+            Gets or sets a value indicating whether space between
+            equals should be added when creating a configuration.
+            </summary>
+        </member>
         <member name="P:SharpConfig.Configuration.SectionCount">
             <summary>
             Gets the number of sections that are in the configuration.
