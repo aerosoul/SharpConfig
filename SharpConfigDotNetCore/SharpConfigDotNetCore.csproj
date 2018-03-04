@@ -4,6 +4,11 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <AssemblyName>SharpConfig</AssemblyName>
     <RootNamespace>SharpConfig</RootNamespace>
+    <Version>3.2.6</Version>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Company>Cemalettin Dervis</Company>
+    <Authors>Cemalettin Dervis</Authors>
+    <Copyright>Copyright © Cemalettin Dervis 2013-2018</Copyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
