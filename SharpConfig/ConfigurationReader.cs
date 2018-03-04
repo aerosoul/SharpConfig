@@ -152,7 +152,10 @@ namespace SharpConfig
 
         // If the char before the comment is a backslash, it's not a comment.
         if (commentIndex > 0 && line[commentIndex - 1] == '\\')
+        {
+          commentIndex = -1;
           return null;
+        }
 
         if (IsInQuoteMarks(line, commentIndex))
           continue;
