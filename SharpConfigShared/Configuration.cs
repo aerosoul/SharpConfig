@@ -71,6 +71,7 @@ namespace SharpConfig
       IgnoreInlineComments = false;
       IgnorePreComments = false;
       SpaceBetweenEquals = false;
+      OutputRawStringValues = false;
     }
 
     /// <summary>
@@ -637,7 +638,7 @@ namespace SharpConfig
     /// Gets or sets a value indicating whether space is allowed
     /// inside values without using quotes
     /// </summary>
-    public static bool SpaceInValueWithoutQuotes { get; set; }
+    public static bool OutputRawStringValues { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether inline-comments
