@@ -634,6 +634,12 @@ namespace SharpConfig
     }
 
     /// <summary>
+    /// Gets or sets a value indicating whether space is allowed
+    /// inside values without using quotes
+    /// </summary>
+    public static bool SpaceInValueWithoutQuotes { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether inline-comments
     /// should be ignored when parsing a configuration.
     /// </summary>
