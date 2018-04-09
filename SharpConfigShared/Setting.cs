@@ -547,6 +547,9 @@ namespace SharpConfig
 
     private static string GetValueForOutput(string rawValue)
     {
+      if (Configuration.OutputRawStringValues)
+        return rawValue;
+
       if (rawValue.StartsWith("{") && rawValue.EndsWith("}"))
         return rawValue;
 
