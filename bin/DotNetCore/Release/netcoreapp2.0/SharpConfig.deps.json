@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v2.0": {
-      "SharpConfig/3.2.6": {
+      "SharpConfig/3.2.8": {
         "runtime": {
           "SharpConfig.dll": {}
         }
@@ -14,7 +14,7 @@
     }
   },
   "libraries": {
-    "SharpConfig/3.2.6": {
+    "SharpConfig/3.2.8": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
