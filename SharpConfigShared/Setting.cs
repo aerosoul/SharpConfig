@@ -460,6 +460,34 @@ namespace SharpConfig
 
       return values;
     }
+    
+    /// <summary>
+    /// Gets this setting's value as a specific type, or a specified default value
+    /// if casting the setting to the type fails.
+    /// </summary>
+    /// <param name="def">
+    /// Default value if casting the setting to the specified type fails.
+    /// </param>
+    /// <param name="setDef">
+    /// If true, and casting the setting to the specified type fails, <paramref name="def"/> is set
+    /// as this setting's new value.
+    /// </param>
+    /// <typeparam name="T">The type of the object to retrieve.</typeparam>
+    public T GetOrDefault<T>(T def, bool setDef = false)
+    {
+      var type = typeof(T);
+      
+      if (type.IsArray)
+        throw new InvalidOperationException("GetOrDefault<T> cannot be used with arrays.");
+
+      if (this.IsArray)
+        throw new InvalidOperationException("The setting represents an array. Use GetValueArray() to obtain its value.");
+
+      var result = CreateObjectFromString(mRawValue, type, true);
+      if (result != null) return (T)result;
+      if (setDef) SetValue(def);
+      return def;
+    }
 
     // Converts the value of a single element to a desired type.
     private static object CreateObjectFromString(string value, Type dstType, bool tryConvert = false)
