@@ -33,6 +33,20 @@ namespace Tests
 
       return person;
     }
+
+    // This method attempts to convert the value to a Person object.
+    // It is used instead when Setting.GetOrDefault<T> is called.
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      try
+      {
+        return ConvertFromString(value, hint);
+      }
+      catch
+      {
+        return null;
+      }
+    }
   }
 
   [TestFixture]
