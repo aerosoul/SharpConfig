@@ -462,7 +462,7 @@ namespace SharpConfig
     }
 
     // Converts the value of a single element to a desired type.
-    private static object CreateObjectFromString(string value, Type dstType)
+    private static object CreateObjectFromString(string value, Type dstType, bool tryConvert = false)
     {
       var underlyingType = Nullable.GetUnderlyingType(dstType);
       if (underlyingType != null)
@@ -477,6 +477,11 @@ namespace SharpConfig
 
       var converter = Configuration.FindTypeStringConverter(dstType);
 
+      if (tryConvert)
+      {
+        return converter.TryConvertFromString(value, dstType);
+      }
+      
       try
       {
         return converter.ConvertFromString(value, dstType);
