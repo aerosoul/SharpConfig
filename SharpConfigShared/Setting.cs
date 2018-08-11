@@ -572,7 +572,7 @@ namespace SharpConfig
     private void SetEmptyValue()
     {
       mRawValue = string.Empty;
-      mCachedArraySize = 0;
+      mCachedArraySize = -1;
       mShouldCalculateArraySize = false;
     }
 
