@@ -314,7 +314,7 @@ namespace Tests
       AssertArraysAreEqual(new[] { "{123}", "456" }, section["Setting12"].StringValueArray);
 
       Assert.IsTrue(section["Setting13"].IsArray);
-      AssertArraysAreEqual(new[] { "first\"\"second", "\"\"third fourth\"\"", "fifth" }, section["Setting13"].StringValueArray);
+      AssertArraysAreEqual(new[] { "first\"\"second", "third fourth", "fifth" }, section["Setting13"].StringValueArray);
     }
 
     sealed class SectionTestObject
