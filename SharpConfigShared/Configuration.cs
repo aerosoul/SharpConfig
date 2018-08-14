@@ -266,8 +266,7 @@ namespace SharpConfig
       if (type.IsEnum)
         type = typeof(Enum);
 
-      ITypeStringConverter converter = null;
-      if (!mTypeStringConverters.TryGetValue(type, out converter))
+      if (!mTypeStringConverters.TryGetValue(type, out ITypeStringConverter converter))
         converter = mFallbackConverter;
 
       return converter;

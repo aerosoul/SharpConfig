@@ -124,11 +124,13 @@ namespace Example
       var cfg = new Configuration();
 
       // Create an object.
-      var p = new SomeClass();
-      p.SomeString = "foobar";
-      p.SomeInt = 2000;
-      p.SomeInts = new[] { 1, 2, 3 };
-      p.SomeDate = DateTime.Now;
+      var p = new SomeClass
+      {
+        SomeString = "foobar",
+        SomeInt = 2000,
+        SomeInts = new[] { 1, 2, 3 },
+        SomeDate = DateTime.Now
+      };
 
       // Now create a section from it.
       cfg.Add(Section.FromObject("SomeStructure", p));

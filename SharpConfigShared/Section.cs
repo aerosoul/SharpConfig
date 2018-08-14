@@ -291,13 +291,11 @@ namespace SharpConfig
       }
       else
       {
-        var prop = member as PropertyInfo;
-        if (prop != null)
-          return prop.PropertyType.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0;
+        if (member as PropertyInfo != null)
+          return (member as PropertyInfo).PropertyType.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0;
 
-        var field = member as FieldInfo;
-        if (field != null)
-          return field.FieldType.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0;
+        if (member as FieldInfo != null)
+          return (member as FieldInfo).FieldType.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0;
       }
 
       return false;
