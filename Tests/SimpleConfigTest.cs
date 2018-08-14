@@ -556,7 +556,7 @@ namespace Tests
     }
 
     [Test]
-    public void GetOrDefault()
+    public void GetValueOrDefault()
     {
       var cfg = new Configuration();
       var setting = cfg["Section"]["Setting"];
@@ -570,30 +570,30 @@ namespace Tests
       #region Bool
       
       setting.BoolValue = true; // valid value
-      Assert.AreEqual(setting.GetOrDefault<bool>(false), true);
+      Assert.AreEqual(setting.GetValueOrDefault<bool>(false), true);
       setting.SetValue("invalid value"); // invalid value
-      Assert.AreEqual(setting.GetOrDefault<bool>(false), false);
-      setting.GetOrDefault<bool>(false, true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<bool>(false), false);
+      setting.GetValueOrDefault<bool>(false, true); // test setDef
       Assert.AreEqual(setting.BoolValue, false);
       
       #endregion
       #region Byte
       
       setting.ByteValue = 100; // valid value
-      Assert.AreEqual(setting.GetOrDefault<byte>(200), 100);
+      Assert.AreEqual(setting.GetValueOrDefault<byte>(200), 100);
       setting.SetValue("invalid value"); // invalid value
-      Assert.AreEqual(setting.GetOrDefault<byte>(200), 200);
-      setting.GetOrDefault<byte>(200, true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<byte>(200), 200);
+      setting.GetValueOrDefault<byte>(200, true); // test setDef
       Assert.AreEqual(setting.ByteValue, 200);
       
       #endregion
       #region Char
       
       setting.CharValue = 'c'; // valid value
-      Assert.AreEqual(setting.GetOrDefault<char>('f'), 'c');
+      Assert.AreEqual(setting.GetValueOrDefault<char>('f'), 'c');
       setting.SetValue("invalid value"); // invalid value
-      Assert.AreEqual(setting.GetOrDefault<char>('f'), 'f');
-      setting.GetOrDefault<char>('f', true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<char>('f'), 'f');
+      setting.GetValueOrDefault<char>('f', true); // test setDef
       Assert.AreEqual(setting.CharValue, 'f');
       
       #endregion
@@ -601,30 +601,30 @@ namespace Tests
       
       // Some problems with DateTime.ToString omitting milliseconds when DateTime.Now was used as test value.
       setting.DateTimeValue = DateTime.Today; // valid value
-      Assert.AreEqual(setting.GetOrDefault<DateTime>(DateTime.MinValue), DateTime.Today);
+      Assert.AreEqual(setting.GetValueOrDefault<DateTime>(DateTime.MinValue), DateTime.Today);
       setting.SetValue("invalid value"); // invalid value
-      Assert.AreEqual(setting.GetOrDefault<DateTime>(DateTime.MinValue), DateTime.MinValue);
-      setting.GetOrDefault<DateTime>(DateTime.MinValue, true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<DateTime>(DateTime.MinValue), DateTime.MinValue);
+      setting.GetValueOrDefault<DateTime>(DateTime.MinValue, true); // test setDef
       Assert.AreEqual(setting.DateTimeValue, DateTime.MinValue);
       
       #endregion
       #region Decimal
       
       setting.DecimalValue = 2004.40493028m; // valid value
-      Assert.AreEqual(setting.GetOrDefault<decimal>(1000.2028m), 2004.40493028m);
+      Assert.AreEqual(setting.GetValueOrDefault<decimal>(1000.2028m), 2004.40493028m);
       setting.SetValue("invalid value"); // invalid value
-      Assert.AreEqual(setting.GetOrDefault<decimal>(1000.2028m), 1000.2028m);
-      setting.GetOrDefault<decimal>(1000.2028m, true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<decimal>(1000.2028m), 1000.2028m);
+      setting.GetValueOrDefault<decimal>(1000.2028m, true); // test setDef
       Assert.AreEqual(setting.DecimalValue, 1000.2028m);
       
       #endregion
       #region Double
       
       setting.DoubleValue = 404.404; // valid value
-      Assert.AreEqual(setting.GetOrDefault<double>(123.456), 404.404);
+      Assert.AreEqual(setting.GetValueOrDefault<double>(123.456), 404.404);
       setting.SetValue("invalid value"); // invalid value
-      Assert.AreEqual(setting.GetOrDefault<double>(123.456), 123.456);
-      setting.GetOrDefault<double>(123.456, true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<double>(123.456), 123.456);
+      setting.GetValueOrDefault<double>(123.456, true); // test setDef
       Assert.AreEqual(setting.DoubleValue, 123.456);
       
       #endregion
@@ -632,60 +632,60 @@ namespace Tests
 
       // Chose a random enum
       setting.SetValue(GCNotificationStatus.NotApplicable); // valid value
-      Assert.AreEqual(setting.GetOrDefault<GCNotificationStatus>(GCNotificationStatus.Succeeded), GCNotificationStatus.NotApplicable);
+      Assert.AreEqual(setting.GetValueOrDefault<GCNotificationStatus>(GCNotificationStatus.Succeeded), GCNotificationStatus.NotApplicable);
       setting.SetValue("invalid value"); // invalid value
-      Assert.AreEqual(setting.GetOrDefault<GCNotificationStatus>(GCNotificationStatus.Succeeded), GCNotificationStatus.Succeeded);
-      setting.GetOrDefault<GCNotificationStatus>(GCNotificationStatus.Succeeded, true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<GCNotificationStatus>(GCNotificationStatus.Succeeded), GCNotificationStatus.Succeeded);
+      setting.GetValueOrDefault<GCNotificationStatus>(GCNotificationStatus.Succeeded, true); // test setDef
       Assert.AreEqual(setting.GetValue(typeof(GCNotificationStatus)), GCNotificationStatus.Succeeded);
       
       #endregion
       #region Int16
 
       setting.SetValue((short)123); // valid value
-      Assert.AreEqual(setting.GetOrDefault<short>(456), 123);
+      Assert.AreEqual(setting.GetValueOrDefault<short>(456), 123);
       setting.SetValue("invalid value"); // invalid value
-      Assert.AreEqual(setting.GetOrDefault<short>(456), 456);
-      setting.GetOrDefault<short>(456, true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<short>(456), 456);
+      setting.GetValueOrDefault<short>(456, true); // test setDef
       Assert.AreEqual(setting.GetValue(typeof(short)), 456);
       
       #endregion
       #region Int32
 
       setting.IntValue = 4567; // valid value
-      Assert.AreEqual(setting.GetOrDefault<int>(1010), 4567);
+      Assert.AreEqual(setting.GetValueOrDefault<int>(1010), 4567);
       setting.SetValue("invalid value"); // invalid value
-      Assert.AreEqual(setting.GetOrDefault<int>(1010), 1010);
-      setting.GetOrDefault<int>(1010, true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<int>(1010), 1010);
+      setting.GetValueOrDefault<int>(1010, true); // test setDef
       Assert.AreEqual(setting.IntValue, 1010);
       
       #endregion
       #region Int64
 
       setting.SetValue((long)75467456); // valid value
-      Assert.AreEqual(setting.GetOrDefault<long>(14623146), 75467456);
+      Assert.AreEqual(setting.GetValueOrDefault<long>(14623146), 75467456);
       setting.SetValue("invalid value"); // invalid value
-      Assert.AreEqual(setting.GetOrDefault<long>(14623146), 14623146);
-      setting.GetOrDefault<long>(14623146, true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<long>(14623146), 14623146);
+      setting.GetValueOrDefault<long>(14623146, true); // test setDef
       Assert.AreEqual(setting.GetValue(typeof(long)), 14623146);
       
       #endregion
       #region SByte
 
       setting.SByteValue = 123; // valid value
-      Assert.AreEqual(setting.GetOrDefault<sbyte>(-123), 123);
+      Assert.AreEqual(setting.GetValueOrDefault<sbyte>(-123), 123);
       setting.SetValue("invalid value"); // invalid value
-      Assert.AreEqual(setting.GetOrDefault<sbyte>(-123), -123);
-      setting.GetOrDefault<sbyte>(-123, true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<sbyte>(-123), -123);
+      setting.GetValueOrDefault<sbyte>(-123, true); // test setDef
       Assert.AreEqual(setting.SByteValue, -123);
       
       #endregion
       #region Single
 
       setting.FloatValue = 123.456f; // valid value
-      Assert.AreEqual(setting.GetOrDefault<float>(-456.123f), 123.456f);
+      Assert.AreEqual(setting.GetValueOrDefault<float>(-456.123f), 123.456f);
       setting.SetValue("invalid value"); // invalid value
-      Assert.AreEqual(setting.GetOrDefault<float>(-456.123f), -456.123f);
-      setting.GetOrDefault<float>(-456.123f, true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<float>(-456.123f), -456.123f);
+      setting.GetValueOrDefault<float>(-456.123f, true); // test setDef
       Assert.AreEqual(setting.FloatValue, -456.123f);
       
       #endregion
@@ -693,40 +693,40 @@ namespace Tests
 
       // Test that double quotation marks are trimmed properly
       setting.StringValue = "\"string\"";
-      Assert.AreEqual(setting.GetOrDefault<string>("default"), "string");
+      Assert.AreEqual(setting.GetValueOrDefault<string>("default"), "string");
       setting.StringValue = "\"\"\"Triple quotes\"\"\"";
-      Assert.AreEqual(setting.GetOrDefault<string>("default"), "Triple quotes");
-      setting.GetOrDefault<string>("\"\"\"Triple quotes\"\"\"", true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<string>("default"), "Triple quotes");
+      setting.GetValueOrDefault<string>("\"\"\"Triple quotes\"\"\"", true); // test setDef
       Assert.AreEqual(setting.StringValue, "Triple quotes");
       
       #endregion
       #region UInt16
 
       setting.SetValue((ushort)1000); // valid value
-      Assert.AreEqual(setting.GetOrDefault<ushort>(2000), 1000);
+      Assert.AreEqual(setting.GetValueOrDefault<ushort>(2000), 1000);
       setting.SetValue("invalid value"); // invalid value
-      Assert.AreEqual(setting.GetOrDefault<ushort>(2000), 2000);
-      setting.GetOrDefault<ushort>(2000, true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<ushort>(2000), 2000);
+      setting.GetValueOrDefault<ushort>(2000, true); // test setDef
       Assert.AreEqual(setting.GetValue(typeof(ushort)), 2000);
       
       #endregion
       #region UInt32
 
       setting.SetValue((uint)12345); // valid value
-      Assert.AreEqual(setting.GetOrDefault<uint>(54321), 12345);
+      Assert.AreEqual(setting.GetValueOrDefault<uint>(54321), 12345);
       setting.SetValue("invalid value"); // invalid value
-      Assert.AreEqual(setting.GetOrDefault<uint>(54321), 54321);
-      setting.GetOrDefault<uint>(54321, true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<uint>(54321), 54321);
+      setting.GetValueOrDefault<uint>(54321, true); // test setDef
       Assert.AreEqual(setting.GetValue(typeof(uint)), 54321);
       
       #endregion
       #region UInt64
 
       setting.SetValue((ulong)1234567); // valid value
-      Assert.AreEqual(setting.GetOrDefault<ulong>(7654321), 1234567);
+      Assert.AreEqual(setting.GetValueOrDefault<ulong>(7654321), 1234567);
       setting.SetValue("invalid value"); // invalid value
-      Assert.AreEqual(setting.GetOrDefault<ulong>(7654321), 7654321);
-      setting.GetOrDefault<ulong>(7654321, true); // test setDef
+      Assert.AreEqual(setting.GetValueOrDefault<ulong>(7654321), 7654321);
+      setting.GetValueOrDefault<ulong>(7654321, true); // test setDef
       Assert.AreEqual(setting.GetValue(typeof(ulong)), 7654321);
       
       #endregion
