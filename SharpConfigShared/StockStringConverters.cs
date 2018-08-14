@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace SharpConfig
 {
@@ -32,6 +33,12 @@ namespace SharpConfig
     }
 
     public Type ConvertibleType => null;
+
+    public object TryConvertFromString(string value, Type hint)
+    {
+      // Just call ConvertFromString since implementation is already in a try-catch block.
+      return ConvertFromString(value, hint);
+    }
   }
 
   internal sealed class BoolStringConverter : TypeStringConverter<bool>
@@ -42,6 +49,11 @@ namespace SharpConfig
     }
 
     public override object ConvertFromString(string value, Type hint)
+    {
+      return TryConvertFromString(value, hint) ?? throw SettingValueCastException.Create(value, hint, null);
+    }
+    
+    public override object TryConvertFromString(string value, Type hint)
     {
       switch (value.ToLowerInvariant())
       {
@@ -57,9 +69,9 @@ namespace SharpConfig
         case "y":
         case "1":
           return true;
+        default:
+          return null;
       }
-
-      throw SettingValueCastException.Create(value, hint, null);
     }
   }
 
@@ -74,6 +86,13 @@ namespace SharpConfig
     {
       return byte.Parse(value, Configuration.CultureInfo.NumberFormat);
     }
+    
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      if (!byte.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
+        return null;
+      return result;
+    }
   }
 
   internal sealed class CharStringConverter : TypeStringConverter<char>
@@ -86,6 +105,13 @@ namespace SharpConfig
     public override object ConvertFromString(string value, Type hint)
     {
       return char.Parse(value);
+    }
+    
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      if (!char.TryParse(value, out var result))
+        return null;
+      return result;
     }
   }
 
@@ -100,6 +126,13 @@ namespace SharpConfig
     {
       return DateTime.Parse(value, Configuration.CultureInfo.DateTimeFormat);
     }
+    
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      if (!DateTime.TryParse(value, Configuration.CultureInfo.DateTimeFormat, DateTimeStyles.None, out var result))
+        return null;
+      return result;
+    }
   }
 
   internal sealed class DecimalStringConverter : TypeStringConverter<decimal>
@@ -112,6 +145,13 @@ namespace SharpConfig
     public override object ConvertFromString(string value, Type hint)
     {
       return decimal.Parse(value, Configuration.CultureInfo.NumberFormat);
+    }
+    
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      if (!decimal.TryParse(value, NumberStyles.Number, Configuration.CultureInfo.NumberFormat, out var result))
+        return null;
+      return result;
     }
   }
 
@@ -126,6 +166,13 @@ namespace SharpConfig
     {
       return double.Parse(value, Configuration.CultureInfo.NumberFormat);
     }
+    
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      if (!double.TryParse(value, NumberStyles.Float | NumberStyles.AllowThousands, Configuration.CultureInfo.NumberFormat, out var result))
+        return null;
+      return result;
+    }
   }
 
   internal sealed class EnumStringConverter : TypeStringConverter<Enum>
@@ -137,19 +184,33 @@ namespace SharpConfig
 
     public override object ConvertFromString(string value, Type hint)
     {
-      // It's possible that the value is something like:
-      // UriFormat.Unescaped
-      // We, and especially Enum.Parse do not want this format.
-      // Instead, it wants the clean name like:
-      // Unescaped
-      //
-      // Because of that, let's get rid of unwanted type names.
-      int indexOfLastDot = value.LastIndexOf('.');
+      value = RemoveTypeNames(value);
+      return Enum.Parse(hint, value);
+    }
+    
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      value = RemoveTypeNames(value);
+      return Enum.IsDefined(hint, value) ? Enum.Parse(hint, value) : null;
+    }
 
+    /// <summary>
+    /// Removes possible type names from a string value.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    /// <remarks>
+    /// It's possible that the value is something like:
+    /// UriFormat.Unescaped
+    /// We, and especially Enum.Parse do not want this format. Instead, it wants the clean name like:
+    /// Unescaped
+    /// </remarks>
+    private static string RemoveTypeNames(string value)
+    {
+      var indexOfLastDot = value.LastIndexOf('.');
       if (indexOfLastDot >= 0)
         value = value.Substring(indexOfLastDot + 1, value.Length - indexOfLastDot - 1).Trim();
-
-      return Enum.Parse(hint, value);
+      return value;
     }
   }
 
@@ -164,6 +225,13 @@ namespace SharpConfig
     {
       return short.Parse(value, Configuration.CultureInfo.NumberFormat);
     }
+    
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      if (!short.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
+        return null;
+      return result;
+    }
   }
 
   internal sealed class Int32StringConverter : TypeStringConverter<int>
@@ -176,6 +244,13 @@ namespace SharpConfig
     public override object ConvertFromString(string value, Type hint)
     {
       return int.Parse(value, Configuration.CultureInfo.NumberFormat);
+    }
+    
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      if (!int.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
+        return null;
+      return result;
     }
   }
 
@@ -190,6 +265,13 @@ namespace SharpConfig
     {
       return long.Parse(value, Configuration.CultureInfo.NumberFormat);
     }
+    
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      if (!long.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
+        return null;
+      return result;
+    }
   }
 
   internal sealed class SByteStringConverter : TypeStringConverter<sbyte>
@@ -202,6 +284,13 @@ namespace SharpConfig
     public override object ConvertFromString(string value, Type hint)
     {
       return sbyte.Parse(value, Configuration.CultureInfo.NumberFormat);
+    }
+    
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      if (!sbyte.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
+        return null;
+      return result;
     }
   }
 
@@ -216,6 +305,13 @@ namespace SharpConfig
     {
       return float.Parse(value, Configuration.CultureInfo.NumberFormat);
     }
+    
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      if (!float.TryParse(value, NumberStyles.Float | NumberStyles.AllowThousands, Configuration.CultureInfo.NumberFormat, out var result))
+        return null;
+      return result;
+    }
   }
 
   internal sealed class StringStringConverter : TypeStringConverter<string>
@@ -228,6 +324,11 @@ namespace SharpConfig
     public override object ConvertFromString(string value, Type hint)
     {
       return value.Trim('\"');
+    }
+    
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      return ConvertFromString(value, hint);
     }
   }
 
@@ -242,6 +343,13 @@ namespace SharpConfig
     {
       return ushort.Parse(value, Configuration.CultureInfo.NumberFormat);
     }
+    
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      if (!ushort.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
+        return null;
+      return result;
+    }
   }
 
   internal sealed class UInt32StringConverter : TypeStringConverter<uint>
@@ -255,6 +363,13 @@ namespace SharpConfig
     {
       return uint.Parse(value, Configuration.CultureInfo.NumberFormat);
     }
+    
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      if (!uint.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
+        return null;
+      return result;
+    }
   }
 
   internal sealed class UInt64StringConverter : TypeStringConverter<ulong>
@@ -267,6 +382,13 @@ namespace SharpConfig
     public override object ConvertFromString(string value, Type hint)
     {
       return ulong.Parse(value, Configuration.CultureInfo.NumberFormat);
+    }
+    
+    public override object TryConvertFromString(string value, Type hint)
+    {
+      if (!ulong.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
+        return null;
+      return result;
     }
   }
 }
