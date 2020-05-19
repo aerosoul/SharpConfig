@@ -19,19 +19,6 @@ namespace SharpConfig
     string ConvertToString(object value);
 
     /// <summary>
-    /// Converts a string value to an object of this converter's type.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="hint">
-    ///     A type hint. This is used rarely, such as in the enum converter.
-    ///     The enum converter's official type is Enum, whereas the type hint
-    ///     represents the underlying enum type.
-    ///     This parameter can be safely ignored for custom converters.
-    /// </param>
-    /// <returns>The converted object.</returns>
-    object ConvertFromString(string value, Type hint);
-
-    /// <summary>
     /// The type that this converter is able to convert to and from a string.
     /// </summary>
     Type ConvertibleType { get; }
@@ -63,19 +50,6 @@ namespace SharpConfig
     /// <param name="value">The value to convert.</param>
     /// <returns>The object's string representation.</returns>
     public abstract string ConvertToString(object value);
-
-    /// <summary>
-    /// Converts a string value to an object of this converter's type.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <param name="hint">
-    ///     A type hint. This is used rarely, such as in the enum converter.
-    ///     The enum converter's official type is Enum, whereas the type hint
-    ///     represents the underlying enum type.
-    ///     This parameter can be safely ignored for custom converters.
-    /// </param>
-    /// <returns>The converted object.</returns>
-    public abstract object ConvertFromString(string value, Type hint);
 
     /// <summary>
     /// The type that this converter is able to convert to and from a string.

@@ -25,7 +25,6 @@ namespace SharpConfig
     private static CultureInfo mCultureInfo;
     private static char mPreferredCommentChar;
     private static char mArrayElementSeparator;
-    private static ITypeStringConverter mFallbackConverter;
     private static Dictionary<Type, ITypeStringConverter> mTypeStringConverters;
 
     internal readonly List<Section> mSections;
@@ -45,7 +44,7 @@ namespace SharpConfig
       mPreferredCommentChar = '#';
       mArrayElementSeparator = ',';
 
-      mFallbackConverter = new FallbackStringConverter();
+      FallbackConverter = new FallbackStringConverter();
 
       // Add all stock converters.
       mTypeStringConverters = new Dictionary<Type, ITypeStringConverter>()
@@ -267,12 +266,12 @@ namespace SharpConfig
         type = typeof(Enum);
 
       if (!mTypeStringConverters.TryGetValue(type, out ITypeStringConverter converter))
-        converter = mFallbackConverter;
+        converter = FallbackConverter;
 
       return converter;
     }
 
-    internal static ITypeStringConverter FallbackConverter => mFallbackConverter;
+    internal static ITypeStringConverter FallbackConverter { get; private set; }
 
     #endregion
 
@@ -716,6 +715,8 @@ namespace SharpConfig
         return section;
       }
     }
+
+    public Section DefaultSection => this[Section.DefaultSectionName];
 
     /// <summary>
     /// Gets all sections that have a specific name.

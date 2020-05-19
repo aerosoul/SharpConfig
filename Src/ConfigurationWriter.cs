@@ -52,7 +52,8 @@ namespace SharpConfig
         if (!isFirstSection && section.PreComment != null)
           sb.AppendLine();
 
-        sb.AppendLine(section.ToString());
+        if (section.Name != Section.DefaultSectionName)
+          sb.AppendLine(section.ToString());
 
         // Write all settings.
         foreach (var setting in section)

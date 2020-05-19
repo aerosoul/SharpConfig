@@ -510,19 +510,12 @@ namespace SharpConfig
 
       var converter = Configuration.FindTypeStringConverter(dstType);
 
-      if (tryConvert)
-      {
-        return converter.TryConvertFromString(value, dstType);
-      }
+      var obj = converter.TryConvertFromString(value, dstType);
 
-      try
-      {
-        return converter.ConvertFromString(value, dstType);
-      }
-      catch (Exception ex)
-      {
-        throw SettingValueCastException.Create(value, dstType, ex);
-      }
+      if (obj == null && !tryConvert)
+        throw SettingValueCastException.Create(value, dstType, null);
+
+      return obj;
     }
 
     #endregion

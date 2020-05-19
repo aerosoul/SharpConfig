@@ -23,13 +23,13 @@ namespace SharpConfig
 
     private static void Parse(StringReader reader, Configuration config)
     {
-      Section currentSection = null;
+      Section currentSection = new Section(Section.DefaultSectionName);
       var preCommentBuilder = new StringBuilder();
 
       int newlineLength = Environment.NewLine.Length;
-
-      string line = null;
       int lineNumber = 0;
+
+      string line;
 
       // Read until EOF.
       while ((line = reader.ReadLine()) != null)
@@ -43,8 +43,7 @@ namespace SharpConfig
         if (string.IsNullOrEmpty(line))
           continue;
 
-        int commentIndex = 0;
-        var comment = ParseComment(line, out commentIndex);
+        var comment = ParseComment(line, out int commentIndex);
 
         if (commentIndex == 0)
         {
@@ -66,6 +65,9 @@ namespace SharpConfig
 
         if (lineWithoutComment.StartsWith("[")) // Section
         {
+          if (currentSection != null && currentSection.Name == Section.DefaultSectionName)
+            config.mSections.Add(currentSection);
+
           currentSection = ParseSection(lineWithoutComment, lineNumber);
 
           if (!Configuration.IgnoreInlineComments)
@@ -212,11 +214,10 @@ namespace SharpConfig
 
       string settingName = null;
 
-      int equalSignIndex = -1;
-
       // Parse the name first.
       bool isQuotedName = line.StartsWith("\"");
 
+      int equalSignIndex;
       if (isQuotedName)
       {
         // Format 2

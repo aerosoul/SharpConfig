@@ -22,25 +22,19 @@ namespace Tests
       return string.Format("[{0};{1}]", person.Name, person.Age);
     }
 
-    // This method is responsible for converting a string to a Person object.
-    public override object ConvertFromString(string value, Type hint)
-    {
-      var split = value.Trim('[', ']').Split(';');
-
-      var person = new Person();
-      person.Name = split[0];
-      person.Age = int.Parse(split[1]);
-
-      return person;
-    }
-
     // This method attempts to convert the value to a Person object.
     // It is used instead when Setting.GetOrDefault<T> is called.
     public override object TryConvertFromString(string value, Type hint)
     {
       try
       {
-        return ConvertFromString(value, hint);
+        var split = value.Trim('[', ']').Split(';');
+
+        var person = new Person();
+        person.Name = split[0];
+        person.Age = int.Parse(split[1]);
+
+        return person;
       }
       catch
       {

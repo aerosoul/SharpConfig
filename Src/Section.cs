@@ -13,6 +13,8 @@ namespace SharpConfig
   /// </summary>
   public sealed class Section : ConfigurationElement, IEnumerable<Setting>
   {
+    public const string DefaultSectionName = "$SharpConfigDefaultSection";
+
     private readonly List<Setting> mSettings;
 
     /// <summary>

@@ -48,15 +48,11 @@ namespace SharpConfig
       return value.ToString();
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      return TryConvertFromString(value, hint) ?? throw SettingValueCastException.Create(value, hint, null);
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
       switch (value.ToLowerInvariant())
       {
+        case "":
         case "false":
         case "off":
         case "no":
@@ -82,15 +78,14 @@ namespace SharpConfig
       return value.ToString();
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      return byte.Parse(value, Configuration.CultureInfo.NumberFormat);
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
+      if (value == string.Empty)
+        return default(byte);
+
       if (!byte.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
         return null;
+
       return result;
     }
   }
@@ -102,15 +97,14 @@ namespace SharpConfig
       return value.ToString();
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      return char.Parse(value);
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
+      if (value == string.Empty)
+        return default(char);
+
       if (!char.TryParse(value, out var result))
         return null;
+
       return result;
     }
   }
@@ -122,15 +116,14 @@ namespace SharpConfig
       return ((DateTime)value).ToString(Configuration.CultureInfo.DateTimeFormat);
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      return DateTime.Parse(value, Configuration.CultureInfo.DateTimeFormat);
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
+      if (value == string.Empty)
+        return default(DateTime);
+
       if (!DateTime.TryParse(value, Configuration.CultureInfo.DateTimeFormat, DateTimeStyles.None, out var result))
         return null;
+
       return result;
     }
   }
@@ -142,15 +135,14 @@ namespace SharpConfig
       return ((decimal)value).ToString(Configuration.CultureInfo.NumberFormat);
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      return decimal.Parse(value, Configuration.CultureInfo.NumberFormat);
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
+      if (value == string.Empty)
+        return default(decimal);
+
       if (!decimal.TryParse(value, NumberStyles.Number, Configuration.CultureInfo.NumberFormat, out var result))
         return null;
+
       return result;
     }
   }
@@ -162,15 +154,14 @@ namespace SharpConfig
       return ((double)value).ToString(Configuration.CultureInfo.NumberFormat);
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      return double.Parse(value, Configuration.CultureInfo.NumberFormat);
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
+      if (value == string.Empty)
+        return default(double);
+
       if (!double.TryParse(value, NumberStyles.Float | NumberStyles.AllowThousands, Configuration.CultureInfo.NumberFormat, out var result))
         return null;
+
       return result;
     }
   }
@@ -182,14 +173,11 @@ namespace SharpConfig
       return value.ToString();
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      value = RemoveTypeNames(value);
-      return Enum.Parse(hint, value);
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
+      if (value == string.Empty)
+        return default(double);
+
       value = RemoveTypeNames(value);
       return Enum.IsDefined(hint, value) ? Enum.Parse(hint, value) : null;
     }
@@ -221,15 +209,14 @@ namespace SharpConfig
       return ((short)value).ToString(Configuration.CultureInfo.NumberFormat);
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      return short.Parse(value, Configuration.CultureInfo.NumberFormat);
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
+      if (value == string.Empty)
+        return default(short);
+
       if (!short.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
         return null;
+
       return result;
     }
   }
@@ -241,15 +228,14 @@ namespace SharpConfig
       return ((int)value).ToString(Configuration.CultureInfo.NumberFormat);
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      return int.Parse(value, Configuration.CultureInfo.NumberFormat);
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
+      if (value == string.Empty)
+        return default(int);
+
       if (!int.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
         return null;
+
       return result;
     }
   }
@@ -261,15 +247,14 @@ namespace SharpConfig
       return ((long)value).ToString(Configuration.CultureInfo.NumberFormat);
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      return long.Parse(value, Configuration.CultureInfo.NumberFormat);
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
+      if (value == string.Empty)
+        return default(long);
+
       if (!long.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
         return null;
+
       return result;
     }
   }
@@ -281,15 +266,14 @@ namespace SharpConfig
       return ((sbyte)value).ToString(Configuration.CultureInfo.NumberFormat);
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      return sbyte.Parse(value, Configuration.CultureInfo.NumberFormat);
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
+      if (value == string.Empty)
+        return default(sbyte);
+
       if (!sbyte.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
         return null;
+
       return result;
     }
   }
@@ -301,15 +285,14 @@ namespace SharpConfig
       return ((float)value).ToString(Configuration.CultureInfo.NumberFormat);
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      return float.Parse(value, Configuration.CultureInfo.NumberFormat);
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
+      if (value == string.Empty)
+        return default(float);
+
       if (!float.TryParse(value, NumberStyles.Float | NumberStyles.AllowThousands, Configuration.CultureInfo.NumberFormat, out var result))
         return null;
+
       return result;
     }
   }
@@ -321,14 +304,9 @@ namespace SharpConfig
       return value.ToString().Trim('\"');
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      return value.Trim('\"');
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
-      return ConvertFromString(value, hint);
+      return value.Trim('\"');
     }
   }
 
@@ -339,15 +317,14 @@ namespace SharpConfig
       return ((ushort)value).ToString(Configuration.CultureInfo.NumberFormat);
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      return ushort.Parse(value, Configuration.CultureInfo.NumberFormat);
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
+      if (value == string.Empty)
+        return default(ushort);
+
       if (!ushort.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
         return null;
+
       return result;
     }
   }
@@ -359,15 +336,14 @@ namespace SharpConfig
       return ((uint)value).ToString(Configuration.CultureInfo.NumberFormat);
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      return uint.Parse(value, Configuration.CultureInfo.NumberFormat);
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
+      if (value == string.Empty)
+        return default(uint);
+
       if (!uint.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
         return null;
+
       return result;
     }
   }
@@ -379,15 +355,14 @@ namespace SharpConfig
       return ((ulong)value).ToString(Configuration.CultureInfo.NumberFormat);
     }
 
-    public override object ConvertFromString(string value, Type hint)
-    {
-      return ulong.Parse(value, Configuration.CultureInfo.NumberFormat);
-    }
-    
     public override object TryConvertFromString(string value, Type hint)
     {
+      if (value == string.Empty)
+        return default(ulong);
+
       if (!ulong.TryParse(value, NumberStyles.Integer, Configuration.CultureInfo.NumberFormat, out var result))
         return null;
+
       return result;
     }
   }
