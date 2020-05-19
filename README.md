@@ -1,5 +1,8 @@
 ![sharpconfig_logo.png](SharpConfigLogo.png)
 
+[![NuGet version](https://buildstats.info/nuget/sharpconfig)](https://www.nuget.org/packages/sharpconfig)
+[![Build status](https://img.shields.io/appveyor/ci/cemdervis/SharpConfig/master.svg)](https://ci.appveyor.com/project/cemdervis/SharpConfig)
+
 SharpConfig is an easy to use CFG/INI configuration library for .NET.
 
 You can use SharpConfig to read, modify and save configuration files and streams, in either text or binary format.
