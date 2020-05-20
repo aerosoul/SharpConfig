@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2017 Cemalettin Dervis, MIT License.
+﻿// Copyright (c) 2013-2018 Cemalettin Dervis, MIT License.
 // https://github.com/cemdervis/SharpConfig
 
 using System;
@@ -52,7 +52,8 @@ namespace SharpConfig
         if (!isFirstSection && section.PreComment != null)
           sb.AppendLine();
 
-        sb.AppendLine(section.ToString());
+        if (section.Name != Section.DefaultSectionName)
+          sb.AppendLine(section.ToString());
 
         // Write all settings.
         foreach (var setting in section)

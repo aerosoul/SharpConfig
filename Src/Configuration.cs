@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2017 Cemalettin Dervis, MIT License.
+﻿// Copyright (c) 2013-2018 Cemalettin Dervis, MIT License.
 // https://github.com/cemdervis/SharpConfig
 
 using System;
@@ -25,7 +25,6 @@ namespace SharpConfig
     private static CultureInfo mCultureInfo;
     private static char mPreferredCommentChar;
     private static char mArrayElementSeparator;
-    private static ITypeStringConverter mFallbackConverter;
     private static Dictionary<Type, ITypeStringConverter> mTypeStringConverters;
 
     internal readonly List<Section> mSections;
@@ -45,7 +44,7 @@ namespace SharpConfig
       mPreferredCommentChar = '#';
       mArrayElementSeparator = ',';
 
-      mFallbackConverter = new FallbackStringConverter();
+      FallbackConverter = new FallbackStringConverter();
 
       // Add all stock converters.
       mTypeStringConverters = new Dictionary<Type, ITypeStringConverter>()
@@ -71,6 +70,7 @@ namespace SharpConfig
       IgnoreInlineComments = false;
       IgnorePreComments = false;
       SpaceBetweenEquals = false;
+      OutputRawStringValues = false;
     }
 
     /// <summary>
@@ -265,14 +265,13 @@ namespace SharpConfig
       if (type.IsEnum)
         type = typeof(Enum);
 
-      ITypeStringConverter converter = null;
-      if (!mTypeStringConverters.TryGetValue(type, out converter))
-        converter = mFallbackConverter;
+      if (!mTypeStringConverters.TryGetValue(type, out ITypeStringConverter converter))
+        converter = FallbackConverter;
 
       return converter;
     }
 
-    internal static ITypeStringConverter FallbackConverter => mFallbackConverter;
+    internal static ITypeStringConverter FallbackConverter { get; private set; }
 
     #endregion
 
@@ -634,6 +633,17 @@ namespace SharpConfig
     }
 
     /// <summary>
+    /// Gets or sets a value indicating whether string values are written
+    /// without quotes, but including everything in between.
+    /// Example:
+    /// The following setting value
+    ///     MySetting=" Example value"
+    /// is written to a file in the following manner
+    ///     MySetting= Example value
+    /// </summary>
+    public static bool OutputRawStringValues { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether inline-comments
     /// should be ignored when parsing a configuration.
     /// </summary>
@@ -705,6 +715,8 @@ namespace SharpConfig
         return section;
       }
     }
+
+    public Section DefaultSection => this[Section.DefaultSectionName];
 
     /// <summary>
     /// Gets all sections that have a specific name.

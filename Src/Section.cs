@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2013-2017 Cemalettin Dervis, MIT License.
+﻿// Copyright (c) 2013-2018 Cemalettin Dervis, MIT License.
 // https://github.com/cemdervis/SharpConfig
 
 using System;
@@ -13,6 +13,8 @@ namespace SharpConfig
   /// </summary>
   public sealed class Section : ConfigurationElement, IEnumerable<Setting>
   {
+    public const string DefaultSectionName = "$SharpConfigDefaultSection";
+
     private readonly List<Setting> mSettings;
 
     /// <summary>
@@ -291,13 +293,11 @@ namespace SharpConfig
       }
       else
       {
-        var prop = member as PropertyInfo;
-        if (prop != null)
-          return prop.PropertyType.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0;
+        if (member as PropertyInfo != null)
+          return (member as PropertyInfo).PropertyType.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0;
 
-        var field = member as FieldInfo;
-        if (field != null)
-          return field.FieldType.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0;
+        if (member as FieldInfo != null)
+          return (member as FieldInfo).FieldType.GetCustomAttributes(typeof(IgnoreAttribute), false).Length > 0;
       }
 
       return false;

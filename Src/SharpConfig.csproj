@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net20;net35;net40;net45;net461;netstandard2.0</TargetFrameworks>
+    <Description>An easy to use CFG/INI configuration library for .NET.</Description>
+    <Copyright>Copyright 2013-2020 Cemalettin Dervis</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <AssemblyVersion>3.2.9.0</AssemblyVersion>
+    <FileVersion>3.2.9.0</FileVersion>
+    <PackageIcon>SharpConfigLogo.png</PackageIcon>
+    <PackageLicenseFile></PackageLicenseFile>
+    <Version>3.2.9</Version>
+    <Authors>SharpConfig</Authors>
+    <PackageProjectUrl>https://github.com/cemdervis/SharpConfig</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/cemdervis/SharpConfig.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>sharpconfig config c# csharp cfg ini configuration library</PackageTags>
+    <PackageReleaseNotes>Please see the project URL for the latest release notes.</PackageReleaseNotes>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\SharpConfigLogo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

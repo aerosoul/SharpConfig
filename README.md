@@ -1,10 +1,13 @@
 ![sharpconfig_logo.png](SharpConfigLogo.png)
 
+[![NuGet version](https://buildstats.info/nuget/sharpconfig)](https://www.nuget.org/packages/sharpconfig)
+[![Build status](https://img.shields.io/appveyor/ci/cemdervis/SharpConfig/master.svg)](https://ci.appveyor.com/project/cemdervis/SharpConfig)
+
 SharpConfig is an easy to use CFG/INI configuration library for .NET.
 
 You can use SharpConfig to read, modify and save configuration files and streams, in either text or binary format.
 
-The library is fully compatible with .NET 2.0 and higher, and the Mono Framework.
+The library is fully compatible with .NET, .NET Core and the Mono Framework.
 
 > SharpConfig is also available at [NuGet](https://www.nuget.org/packages/sharpconfig/)! Just search for `sharpconfig`. 
 
@@ -129,6 +132,11 @@ The following properties are the current ones:
 
 * bool **Configuration.SpaceBetweenEquals** { get; set; }
   * Gets or sets a value indicating whether space between equals should be added when creating a configuration.
+  
+* bool **Configuration.OutputRawStringValues** { get; set; }
+  * Gets or sets a value indicating whether string values are written without quotes, but including everything in between. Example:
+    * The setting `MySetting=" Example value"` is written to a file in as `MySetting= Example value`
+    
 
 Ignoring properties, fields and types
 ---
