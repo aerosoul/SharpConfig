@@ -310,13 +310,13 @@ namespace SharpConfig
     /// Gets an enumerator that iterates through the section.
     /// </summary>
     public IEnumerator<Setting> GetEnumerator()
-      => return mSettings.GetEnumerator();
+      => mSettings.GetEnumerator();
 
     /// <summary>
     /// Gets an enumerator that iterates through the section.
     /// </summary>
     IEnumerator IEnumerable.GetEnumerator()
-      => return GetEnumerator();
+      => GetEnumerator();
 
     /// <summary>
     /// Adds a setting to the section.
@@ -382,7 +382,7 @@ namespace SharpConfig
     /// <param name="setting">The setting to remove.</param>
     /// <returns>True if the setting was removed; false otherwise.</returns>
     public bool Remove(Setting setting)
-      => return mSettings.Remove(setting);
+      => mSettings.Remove(setting);
 
     /// <summary>
     /// Removes all settings that have a specific name.
@@ -410,7 +410,7 @@ namespace SharpConfig
     /// <param name="setting">The setting to check for containment.</param>
     /// <returns>True if the setting is contained in the section; false otherwise.</returns>
     public bool Contains(Setting setting)
-      => return mSettings.Contains(setting);
+      => mSettings.Contains(setting);
 
     /// <summary>
     /// Determines whether a specifically named setting is contained in the section.

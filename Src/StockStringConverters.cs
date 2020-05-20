@@ -89,7 +89,7 @@ namespace SharpConfig
   internal sealed class CharStringConverter : TypeStringConverter<char>
   {
     public override string ConvertToString(object value)
-      => return value.ToString();
+      => value.ToString();
 
     public override object TryConvertFromString(string value, Type hint)
     {
