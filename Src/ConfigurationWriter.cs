@@ -35,35 +35,9 @@ namespace SharpConfig
         throw new ArgumentNullException("stream");
 
       if (encoding == null)
-        encoding = new UTF8Encoding();
+        encoding = Encoding.UTF8;
 
-      var sb = new StringBuilder();
-
-      // Write all sections.
-      bool isFirstSection = true;
-
-      foreach (var section in cfg)
-      {
-        if (!isFirstSection)
-          sb.AppendLine();
-
-        // Leave some space between this section and the element that is above,
-        // if this section has pre-comments and isn't the first section in the configuration.
-        if (!isFirstSection && section.PreComment != null)
-          sb.AppendLine();
-
-        if (section.Name != Section.DefaultSectionName)
-          sb.AppendLine(section.ToString());
-
-        // Write all settings.
-        foreach (var setting in section)
-          sb.AppendLine(setting.ToString());
-
-        if (section.Name != Section.DefaultSectionName || section.SettingCount > 0)
-          isFirstSection = false;
-      }
-
-      string str = sb.ToString();
+      var str = cfg.GetAsString();
 
       // Encode & write the string.
       var byteBuffer = new byte[encoding.GetByteCount(str)];

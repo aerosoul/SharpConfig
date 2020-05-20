@@ -224,6 +224,52 @@ namespace SharpConfig
     }
 
     /// <summary>
+    /// Gets the string representation of the configuration. It represents the same contents
+    /// as if the configuration was saved to a file or stream.
+    /// </summary>
+    public string GetAsString()
+    {
+      var sb = new StringBuilder();
+
+      // Write all sections.
+      bool isFirstSection = true;
+
+      void WriteSection(Section section)
+      {
+        if (!isFirstSection)
+          sb.AppendLine();
+
+        // Leave some space between this section and the element that is above,
+        // if this section has pre-comments and isn't the first section in the configuration.
+        if (!isFirstSection && section.PreComment != null)
+          sb.AppendLine();
+
+        if (section.Name != Section.DefaultSectionName)
+          sb.AppendLine(section.ToString());
+
+        // Write all settings.
+        foreach (var setting in section)
+          sb.AppendLine(setting.ToString());
+
+        if (section.Name != Section.DefaultSectionName || section.SettingCount > 0)
+          isFirstSection = false;
+      }
+
+      // Write the default section first.
+      var defaultSection = DefaultSection;
+
+      if (defaultSection.SettingCount > 0)
+        WriteSection(DefaultSection);
+
+      // Now the rest.
+      foreach (var section in mSections)
+        if (section != defaultSection)
+          WriteSection(section);
+
+      return sb.ToString();
+    }
+
+    /// <summary>
     /// Registers a type converter to be used for setting value conversions.
     /// </summary>
     /// <param name="converter">The converter to register.</param>
@@ -495,9 +541,7 @@ namespace SharpConfig
     ///
     /// <param name="stream">The stream to save the configuration to.</param>
     public void SaveToStream(Stream stream)
-    {
-      SaveToStream(stream, null);
-    }
+      => SaveToStream(stream, null);
 
     /// <summary>
     /// Saves the configuration to a stream.
@@ -716,6 +760,9 @@ namespace SharpConfig
       }
     }
 
+    /// <summary>
+    /// Gets the default, hidden section.
+    /// </summary>
     public Section DefaultSection => this[Section.DefaultSectionName];
 
     /// <summary>

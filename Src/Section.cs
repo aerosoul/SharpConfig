@@ -13,6 +13,9 @@ namespace SharpConfig
   /// </summary>
   public sealed class Section : ConfigurationElement, IEnumerable<Setting>
   {
+    /// <summary>
+    /// The name of the default, hidden section.
+    /// </summary>
     public const string DefaultSectionName = "$SharpConfigDefaultSection";
 
     private readonly List<Setting> mSettings;
