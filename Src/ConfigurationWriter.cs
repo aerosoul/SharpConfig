@@ -59,7 +59,8 @@ namespace SharpConfig
         foreach (var setting in section)
           sb.AppendLine(setting.ToString());
 
-        isFirstSection = false;
+        if (section.Name != Section.DefaultSectionName || section.SettingCount > 0)
+          isFirstSection = false;
       }
 
       string str = sb.ToString();
