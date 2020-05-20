@@ -14,7 +14,6 @@ namespace SharpConfig
   {
     #region Fields
 
-    private string mRawValue = string.Empty;
     private int mCachedArraySize;
     private bool mShouldCalculateArraySize;
     private char mCachedArrayElementSeparator;
@@ -50,7 +49,8 @@ namespace SharpConfig
     /// <summary>
     /// Gets a value indicating whether this setting's value is empty.
     /// </summary>
-    public bool IsEmpty => string.IsNullOrEmpty(mRawValue);
+    public bool IsEmpty
+      => string.IsNullOrEmpty(RawValue);
 
     /// <summary>
     /// Gets the value of this setting as a <see cref="string"/>, with quotes removed if present.
@@ -72,11 +72,7 @@ namespace SharpConfig
     /// <summary>
     /// Gets or sets the raw value of this setting.
     /// </summary>
-    public string RawValue
-    {
-      get => mRawValue;
-      set => mRawValue = value;
-    }
+    public string RawValue { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the value of this setting as a <see cref="string"/>.
@@ -279,13 +275,9 @@ namespace SharpConfig
         // Decode the bytes back to chars.
         var bytes = ByteValueArray;
         if (bytes != null)
-        {
           return Encoding.UTF8.GetChars(ByteValueArray);
-        }
         else
-        {
           return null;
-        }
       }
       set
       {
@@ -296,16 +288,15 @@ namespace SharpConfig
           ByteValueArray = Encoding.UTF8.GetBytes(value);
         }
         else
-        {
           SetEmptyValue();
-        }
       }
     }
 
     /// <summary>
     /// Gets a value indicating whether this setting is an array.
     /// </summary>
-    public bool IsArray => (ArraySize >= 0);
+    public bool IsArray
+      => (ArraySize >= 0);
 
     /// <summary>
     /// Gets the size of the array that this setting represents.
@@ -336,7 +327,7 @@ namespace SharpConfig
     private int CalculateArraySize()
     {
       int size = 0;
-      var enumerator = new SettingArrayEnumerator(mRawValue, false);
+      var enumerator = new SettingArrayEnumerator(RawValue, false);
       while (enumerator.Next())
         ++size;
 
@@ -367,7 +358,7 @@ namespace SharpConfig
       if (this.IsArray)
         throw new InvalidOperationException("The setting represents an array. Use GetValueArray() to obtain its value.");
 
-      return CreateObjectFromString(mRawValue, type);
+      return CreateObjectFromString(RawValue, type);
     }
 
     /// <summary>
@@ -392,7 +383,7 @@ namespace SharpConfig
 
       if (myArraySize > 0)
       {
-        var enumerator = new SettingArrayEnumerator(mRawValue, true);
+        var enumerator = new SettingArrayEnumerator(RawValue, true);
         int iElem = 0;
         while (enumerator.Next())
         {
@@ -419,10 +410,10 @@ namespace SharpConfig
       if (type.IsArray)
         throw new InvalidOperationException("To obtain an array value, use GetValueArray() instead of GetValue().");
 
-      if (this.IsArray)
+      if (IsArray)
         throw new InvalidOperationException("The setting represents an array. Use GetValueArray() to obtain its value.");
 
-      return (T)CreateObjectFromString(mRawValue, type);
+      return (T)CreateObjectFromString(RawValue, type);
     }
 
     /// <summary>
@@ -441,7 +432,7 @@ namespace SharpConfig
       if (type.IsArray)
         throw CreateJaggedArraysNotSupportedEx(type);
 
-      int myArraySize = this.ArraySize;
+      int myArraySize = ArraySize;
       if (myArraySize < 0)
         return null;
 
@@ -449,7 +440,7 @@ namespace SharpConfig
 
       if (myArraySize > 0)
       {
-        var enumerator = new SettingArrayEnumerator(mRawValue, true);
+        var enumerator = new SettingArrayEnumerator(RawValue, true);
         int iElem = 0;
         while (enumerator.Next())
         {
@@ -483,7 +474,7 @@ namespace SharpConfig
       if (IsArray)
         throw new InvalidOperationException("The setting represents an array. Use GetValueArray() to obtain its value.");
 
-      var result = CreateObjectFromString(mRawValue, type, true);
+      var result = CreateObjectFromString(RawValue, type, true);
 
       if (result != null)
         return (T)result;
@@ -554,7 +545,7 @@ namespace SharpConfig
             strings[i] = GetValueForOutput(converter.ConvertToString(elemValue));
           }
 
-          mRawValue = $"{{{string.Join(Configuration.ArrayElementSeparator.ToString(), strings)}}}";
+          RawValue = $"{{{string.Join(Configuration.ArrayElementSeparator.ToString(), strings)}}}";
         }
         if (values != null) mCachedArraySize = values.Length;
         mShouldCalculateArraySize = false;
@@ -562,14 +553,14 @@ namespace SharpConfig
       else
       {
         var converter = Configuration.FindTypeStringConverter(type);
-        mRawValue = converter.ConvertToString(value);
+        RawValue = converter.ConvertToString(value);
         mShouldCalculateArraySize = true;
       }
     }
 
     private void SetEmptyValue()
     {
-      mRawValue = string.Empty;
+      RawValue = string.Empty;
       mCachedArraySize = -1;
       mShouldCalculateArraySize = false;
     }
@@ -606,9 +597,9 @@ namespace SharpConfig
     protected override string GetStringExpression()
     {
       if (Configuration.SpaceBetweenEquals)
-        return $"{Name} = {GetValueForOutput(mRawValue)}";
+        return $"{Name} = {GetValueForOutput(RawValue)}";
       else
-        return $"{Name}={GetValueForOutput(mRawValue)}";
+        return $"{Name}={GetValueForOutput(RawValue)}";
     }
 
     private static ArgumentException CreateJaggedArraysNotSupportedEx(Type type)

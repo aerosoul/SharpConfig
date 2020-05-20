@@ -89,17 +89,13 @@ namespace SharpConfig
     /// Gets an enumerator that iterates through the configuration.
     /// </summary>
     public IEnumerator<Section> GetEnumerator()
-    {
-      return mSections.GetEnumerator();
-    }
+      => mSections.GetEnumerator();
 
     /// <summary>
     /// Gets an enumerator that iterates through the configuration.
     /// </summary>
     IEnumerator IEnumerable.GetEnumerator()
-    {
-      return GetEnumerator();
-    }
+      => GetEnumerator();
 
     /// <summary>
     /// Adds a section to the configuration.
@@ -153,7 +149,8 @@ namespace SharpConfig
     /// </summary>
     /// <param name="section">The section to remove.</param>
     /// <returns>True if the section was removed; false otherwise.</returns>
-    public bool Remove(Section section) => mSections.Remove(section);
+    public bool Remove(Section section)
+      => mSections.Remove(section);
 
     /// <summary>
     /// Removes all sections that have a specific name.
@@ -173,9 +170,7 @@ namespace SharpConfig
     /// Clears the configuration of all sections.
     /// </summary>
     public void Clear()
-    {
-      mSections.Clear();
-    }
+      => mSections.Clear();
 
     /// <summary>
     /// Determines whether a specified section is contained in the configuration.
@@ -183,9 +178,7 @@ namespace SharpConfig
     /// <param name="section">The section to check for containment.</param>
     /// <returns>True if the section is contained in the configuration; false otherwise.</returns>
     public bool Contains(Section section)
-    {
-      return mSections.Contains(section);
-    }
+      => mSections.Contains(section);
 
     /// <summary>
     /// Determines whether a specifically named section is contained in the configuration.
@@ -227,46 +220,49 @@ namespace SharpConfig
     /// Gets the string representation of the configuration. It represents the same contents
     /// as if the configuration was saved to a file or stream.
     /// </summary>
-    public string GetAsString()
+    public string StringRepresentation
     {
-      var sb = new StringBuilder();
-
-      // Write all sections.
-      bool isFirstSection = true;
-
-      void WriteSection(Section section)
+      get
       {
-        if (!isFirstSection)
-          sb.AppendLine();
+        var sb = new StringBuilder();
 
-        // Leave some space between this section and the element that is above,
-        // if this section has pre-comments and isn't the first section in the configuration.
-        if (!isFirstSection && section.PreComment != null)
-          sb.AppendLine();
+        // Write all sections.
+        bool isFirstSection = true;
 
-        if (section.Name != Section.DefaultSectionName)
-          sb.AppendLine(section.ToString());
+        void WriteSection(Section section)
+        {
+          if (!isFirstSection)
+            sb.AppendLine();
 
-        // Write all settings.
-        foreach (var setting in section)
-          sb.AppendLine(setting.ToString());
+          // Leave some space between this section and the element that is above,
+          // if this section has pre-comments and isn't the first section in the configuration.
+          if (!isFirstSection && section.PreComment != null)
+            sb.AppendLine();
 
-        if (section.Name != Section.DefaultSectionName || section.SettingCount > 0)
-          isFirstSection = false;
+          if (section.Name != Section.DefaultSectionName)
+            sb.AppendLine(section.ToString());
+
+          // Write all settings.
+          foreach (var setting in section)
+            sb.AppendLine(setting.ToString());
+
+          if (section.Name != Section.DefaultSectionName || section.SettingCount > 0)
+            isFirstSection = false;
+        }
+
+        // Write the default section first.
+        var defaultSection = DefaultSection;
+
+        if (defaultSection.SettingCount > 0)
+          WriteSection(DefaultSection);
+
+        // Now the rest.
+        foreach (var section in mSections)
+          if (section != defaultSection)
+            WriteSection(section);
+
+        return sb.ToString();
       }
-
-      // Write the default section first.
-      var defaultSection = DefaultSection;
-
-      if (defaultSection.SettingCount > 0)
-        WriteSection(DefaultSection);
-
-      // Now the rest.
-      foreach (var section in mSections)
-        if (section != defaultSection)
-          WriteSection(section);
-
-      return sb.ToString();
     }
 
     /// <summary>
@@ -514,9 +510,7 @@ namespace SharpConfig
     ///
     /// <param name="filename">The location of the configuration file.</param>
     public void SaveToFile(string filename)
-    {
-      SaveToFile(filename, null);
-    }
+      => SaveToFile(filename, null);
 
     /// <summary>
     /// Saves the configuration to a file.
@@ -569,9 +563,7 @@ namespace SharpConfig
     ///
     /// <param name="filename">The location of the configuration file.</param>
     public void SaveToBinaryFile(string filename)
-    {
-      SaveToBinaryFile(filename, null);
-    }
+      => SaveToBinaryFile(filename, null);
 
     /// <summary>
     /// Saves the configuration to a binary file, using a specific <see cref="BinaryWriter"/>.
@@ -596,9 +588,7 @@ namespace SharpConfig
     ///
     /// <param name="stream">The stream to save the configuration to.</param>
     public void SaveToBinaryStream(Stream stream)
-    {
-      SaveToBinaryStream(stream, null);
-    }
+      => SaveToBinaryStream(stream, null);
 
     /// <summary>
     /// Saves the configuration to a binary file, using a specific <see cref="BinaryWriter"/>.
@@ -763,7 +753,8 @@ namespace SharpConfig
     /// <summary>
     /// Gets the default, hidden section.
     /// </summary>
-    public Section DefaultSection => this[Section.DefaultSectionName];
+    public Section DefaultSection
+      => this[Section.DefaultSectionName];
 
     /// <summary>
     /// Gets all sections that have a specific name.
