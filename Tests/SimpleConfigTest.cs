@@ -235,7 +235,7 @@ namespace Tests
 
     private static void SaveAndLoadComments_Check(Configuration cfg)
     {
-      Assert.AreEqual(3, cfg.SectionCount);
+      Assert.AreEqual(2, cfg.SectionCount);
       Assert.IsTrue(cfg.Contains("Section"));
       Assert.IsTrue(cfg.Contains("Section2"));
       Assert.IsTrue(cfg.Contains("Section", "Setting"));
