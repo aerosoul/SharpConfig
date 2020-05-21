@@ -44,9 +44,7 @@ namespace SharpConfig
   internal sealed class BoolStringConverter : TypeStringConverter<bool>
   {
     public override string ConvertToString(object value)
-    {
-      return value.ToString();
-    }
+      => value.ToString();
 
     public override object TryConvertFromString(string value, Type hint)
     {
@@ -74,9 +72,7 @@ namespace SharpConfig
   internal sealed class ByteStringConverter : TypeStringConverter<byte>
   {
     public override string ConvertToString(object value)
-    {
-      return value.ToString();
-    }
+      => value.ToString();
 
     public override object TryConvertFromString(string value, Type hint)
     {
@@ -93,9 +89,7 @@ namespace SharpConfig
   internal sealed class CharStringConverter : TypeStringConverter<char>
   {
     public override string ConvertToString(object value)
-    {
-      return value.ToString();
-    }
+      => value.ToString();
 
     public override object TryConvertFromString(string value, Type hint)
     {
@@ -112,9 +106,7 @@ namespace SharpConfig
   internal sealed class DateTimeStringConverter : TypeStringConverter<DateTime>
   {
     public override string ConvertToString(object value)
-    {
-      return ((DateTime)value).ToString(Configuration.CultureInfo.DateTimeFormat);
-    }
+      => ((DateTime)value).ToString(Configuration.CultureInfo.DateTimeFormat);
 
     public override object TryConvertFromString(string value, Type hint)
     {
@@ -131,9 +123,7 @@ namespace SharpConfig
   internal sealed class DecimalStringConverter : TypeStringConverter<decimal>
   {
     public override string ConvertToString(object value)
-    {
-      return ((decimal)value).ToString(Configuration.CultureInfo.NumberFormat);
-    }
+      => ((decimal)value).ToString(Configuration.CultureInfo.NumberFormat);
 
     public override object TryConvertFromString(string value, Type hint)
     {
@@ -150,9 +140,7 @@ namespace SharpConfig
   internal sealed class DoubleStringConverter : TypeStringConverter<double>
   {
     public override string ConvertToString(object value)
-    {
-      return ((double)value).ToString(Configuration.CultureInfo.NumberFormat);
-    }
+      => ((double)value).ToString(Configuration.CultureInfo.NumberFormat);
 
     public override object TryConvertFromString(string value, Type hint)
     {
@@ -169,9 +157,7 @@ namespace SharpConfig
   internal sealed class EnumStringConverter : TypeStringConverter<Enum>
   {
     public override string ConvertToString(object value)
-    {
-      return value.ToString();
-    }
+      => value.ToString();
 
     public override object TryConvertFromString(string value, Type hint)
     {
@@ -205,9 +191,7 @@ namespace SharpConfig
   internal sealed class Int16StringConverter : TypeStringConverter<short>
   {
     public override string ConvertToString(object value)
-    {
-      return ((short)value).ToString(Configuration.CultureInfo.NumberFormat);
-    }
+      => ((short)value).ToString(Configuration.CultureInfo.NumberFormat);
 
     public override object TryConvertFromString(string value, Type hint)
     {
@@ -224,9 +208,7 @@ namespace SharpConfig
   internal sealed class Int32StringConverter : TypeStringConverter<int>
   {
     public override string ConvertToString(object value)
-    {
-      return ((int)value).ToString(Configuration.CultureInfo.NumberFormat);
-    }
+      => ((int)value).ToString(Configuration.CultureInfo.NumberFormat);
 
     public override object TryConvertFromString(string value, Type hint)
     {
@@ -243,9 +225,7 @@ namespace SharpConfig
   internal sealed class Int64StringConverter : TypeStringConverter<long>
   {
     public override string ConvertToString(object value)
-    {
-      return ((long)value).ToString(Configuration.CultureInfo.NumberFormat);
-    }
+      => ((long)value).ToString(Configuration.CultureInfo.NumberFormat);
 
     public override object TryConvertFromString(string value, Type hint)
     {
@@ -262,9 +242,7 @@ namespace SharpConfig
   internal sealed class SByteStringConverter : TypeStringConverter<sbyte>
   {
     public override string ConvertToString(object value)
-    {
-      return ((sbyte)value).ToString(Configuration.CultureInfo.NumberFormat);
-    }
+      => ((sbyte)value).ToString(Configuration.CultureInfo.NumberFormat);
 
     public override object TryConvertFromString(string value, Type hint)
     {
@@ -281,9 +259,7 @@ namespace SharpConfig
   internal sealed class SingleStringConverter : TypeStringConverter<float>
   {
     public override string ConvertToString(object value)
-    {
-      return ((float)value).ToString(Configuration.CultureInfo.NumberFormat);
-    }
+      => ((float)value).ToString(Configuration.CultureInfo.NumberFormat);
 
     public override object TryConvertFromString(string value, Type hint)
     {
@@ -300,22 +276,16 @@ namespace SharpConfig
   internal sealed class StringStringConverter : TypeStringConverter<string>
   {
     public override string ConvertToString(object value)
-    {
-      return value.ToString().Trim('\"');
-    }
+      => value.ToString().Trim('\"');
 
     public override object TryConvertFromString(string value, Type hint)
-    {
-      return value.Trim('\"');
-    }
+      => value.Trim('\"');
   }
 
   internal sealed class UInt16StringConverter : TypeStringConverter<ushort>
   {
     public override string ConvertToString(object value)
-    {
-      return ((ushort)value).ToString(Configuration.CultureInfo.NumberFormat);
-    }
+      => ((ushort)value).ToString(Configuration.CultureInfo.NumberFormat);
 
     public override object TryConvertFromString(string value, Type hint)
     {
@@ -332,9 +302,7 @@ namespace SharpConfig
   internal sealed class UInt32StringConverter : TypeStringConverter<uint>
   {
     public override string ConvertToString(object value)
-    {
-      return ((uint)value).ToString(Configuration.CultureInfo.NumberFormat);
-    }
+      => ((uint)value).ToString(Configuration.CultureInfo.NumberFormat);
 
     public override object TryConvertFromString(string value, Type hint)
     {
@@ -351,9 +319,7 @@ namespace SharpConfig
   internal sealed class UInt64StringConverter : TypeStringConverter<ulong>
   {
     public override string ConvertToString(object value)
-    {
-      return ((ulong)value).ToString(Configuration.CultureInfo.NumberFormat);
-    }
+      => ((ulong)value).ToString(Configuration.CultureInfo.NumberFormat);
 
     public override object TryConvertFromString(string value, Type hint)
     {

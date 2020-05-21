@@ -6,11 +6,11 @@
     <Copyright>Copyright 2013-2020 Cemalettin Dervis</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <AssemblyVersion>3.2.9.0</AssemblyVersion>
-    <FileVersion>3.2.9.0</FileVersion>
+    <AssemblyVersion>3.2.9.1</AssemblyVersion>
+    <FileVersion>3.2.9.1</FileVersion>
     <PackageIcon>SharpConfigLogo.png</PackageIcon>
     <PackageLicenseFile></PackageLicenseFile>
-    <Version>3.2.9</Version>
+    <Version>3.2.9.1</Version>
     <Authors>SharpConfig</Authors>
     <PackageProjectUrl>https://github.com/cemdervis/SharpConfig</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cemdervis/SharpConfig.git</RepositoryUrl>

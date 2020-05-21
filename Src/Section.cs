@@ -13,6 +13,9 @@ namespace SharpConfig
   /// </summary>
   public sealed class Section : ConfigurationElement, IEnumerable<Setting>
   {
+    /// <summary>
+    /// The name of the default, hidden section.
+    /// </summary>
     public const string DefaultSectionName = "$SharpConfigDefaultSection";
 
     private readonly List<Setting> mSettings;
@@ -307,17 +310,13 @@ namespace SharpConfig
     /// Gets an enumerator that iterates through the section.
     /// </summary>
     public IEnumerator<Setting> GetEnumerator()
-    {
-      return mSettings.GetEnumerator();
-    }
+      => mSettings.GetEnumerator();
 
     /// <summary>
     /// Gets an enumerator that iterates through the section.
     /// </summary>
     IEnumerator IEnumerable.GetEnumerator()
-    {
-      return GetEnumerator();
-    }
+      => GetEnumerator();
 
     /// <summary>
     /// Adds a setting to the section.
@@ -343,7 +342,8 @@ namespace SharpConfig
     /// <param name="settingName">The name of the setting to add.</param>
     /// <returns>The added setting.</returns>
     /// <exception cref="ArgumentNullException">When <paramref name="settingName"/> is null or empty.</exception>
-    public Setting Add(string settingName) => Add(settingName, string.Empty);
+    public Setting Add(string settingName)
+      => Add(settingName, string.Empty);
 
     /// <summary>
     /// Adds a setting with a specific name and value to the section.
@@ -382,9 +382,7 @@ namespace SharpConfig
     /// <param name="setting">The setting to remove.</param>
     /// <returns>True if the setting was removed; false otherwise.</returns>
     public bool Remove(Setting setting)
-    {
-      return mSettings.Remove(setting);
-    }
+      => mSettings.Remove(setting);
 
     /// <summary>
     /// Removes all settings that have a specific name.
@@ -404,9 +402,7 @@ namespace SharpConfig
     /// Clears the section of all settings.
     /// </summary>
     public void Clear()
-    {
-      mSettings.Clear();
-    }
+      => mSettings.Clear();
 
     /// <summary>
     /// Determines whether a specified setting is contained in the section.
@@ -414,9 +410,7 @@ namespace SharpConfig
     /// <param name="setting">The setting to check for containment.</param>
     /// <returns>True if the setting is contained in the section; false otherwise.</returns>
     public bool Contains(Setting setting)
-    {
-      return mSettings.Contains(setting);
-    }
+      => mSettings.Contains(setting);
 
     /// <summary>
     /// Determines whether a specifically named setting is contained in the section.
@@ -436,7 +430,8 @@ namespace SharpConfig
     /// <summary>
     /// Gets the number of settings that are in the section.
     /// </summary>
-    public int SettingCount => mSettings.Count;
+    public int SettingCount
+      => mSettings.Count;
 
     /// <summary>
     /// Gets or sets a setting by index.
@@ -525,8 +520,6 @@ namespace SharpConfig
     /// </summary>
     /// <returns>The element's expression as a string.</returns>
     protected override string GetStringExpression()
-    {
-      return $"[{Name}]";
-    }
+      => $"[{Name}]";
   }
 }
