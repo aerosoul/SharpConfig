@@ -213,7 +213,10 @@ namespace Tests
           "## ###" + Environment.NewLine +
           ";Line4" + Environment.NewLine +
           "[Section2]" + Environment.NewLine +
-          "Setting=\"Val;#ue\"# InlineComment3";
+          "Setting=\"Val;#ue\"# InlineComment3" + Environment.NewLine +
+          "ValidUglySetting1 = \"this is # not a comment\" # this is a comment \"with a quote\" inside" + Environment.NewLine +
+          "ValidUglySetting2 = this is \\# not a comment # this is a comment" + Environment.NewLine +
+          "ValidUglySetting3 = { first, \"second # still, second\" } # comment \"with a quote\" and a closing brace }";
 
       var cfg = Configuration.LoadFromString(cfgStr);
 
@@ -240,6 +243,9 @@ namespace Tests
       Assert.IsTrue(cfg.Contains("Section2"));
       Assert.IsTrue(cfg.Contains("Section", "Setting"));
       Assert.IsTrue(cfg.Contains("Section2", "Setting"));
+      Assert.IsTrue(cfg.Contains("Section2", "ValidUglySetting1"));
+      Assert.IsTrue(cfg.Contains("Section2", "ValidUglySetting2"));
+      Assert.IsTrue(cfg.Contains("Section2", "ValidUglySetting3"));
 
       var section = cfg["Section"];
       var section2 = cfg["Section2"];
@@ -268,9 +274,19 @@ namespace Tests
 
       Assert.IsNull(section2.Comment);
       Assert.AreEqual("InlineComment3", section2["Setting"].Comment);
+      Assert.AreEqual("this is a comment \"with a quote\" inside", section2["ValidUglySetting1"].Comment);
+      Assert.AreEqual("this is a comment", section2["ValidUglySetting2"].Comment);
+      Assert.AreEqual("comment \"with a quote\" and a closing brace }", section2["ValidUglySetting3"].Comment);
 
       Assert.AreEqual("Value", section["Setting"].StringValue);
       Assert.AreEqual("Val;#ue", section2["Setting"].StringValue);
+      Assert.AreEqual("this is # not a comment", section2["ValidUglySetting1"].StringValue);
+      Assert.AreEqual("this is \\# not a comment", section2["ValidUglySetting2"].StringValue);
+      Assert.IsTrue(section2["ValidUglySetting3"].IsArray);
+      Assert.AreEqual(2, section2["ValidUglySetting3"].ArraySize);
+      Assert.AreEqual("first", section2["ValidUglySetting3"].StringValueArray[0]);
+      Assert.AreEqual("second # still, second", section2["ValidUglySetting3"].StringValueArray[1]);
+      
     }
 
     [Test]
