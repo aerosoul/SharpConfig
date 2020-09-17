@@ -110,63 +110,45 @@ namespace SharpConfig
       }
     }
 
-    private static bool IsInQuoteMarks(string line, int startIndex)
+    private static string ParseComment(string line, out int commentCharIndex)
     {
-      // Check for quote marks.
-      // Note: the way it's done here is pretty primitive.
-      // It will only check if there are quote marks to the left and right.
-      // If so, it presumes that it's a comment symbol inside quote marks and thus, it's not a comment.
-      int i = startIndex;
-      bool left = false;
+      // A comment starts with a valid comment character that:
+      // 1. is not within a quote (eg. "this is # not a comment"), and
+      // 2. is not escaped (eg. this is \# not a comment either).
+      //
+      // A quote has two quotation marks, neither of which is escaped.
+      // For example: "this is a quote \" with an escaped quotation mark inside of it"
 
-      while (--i >= 0)
-      {
-        if (line[i] == '\"')
-        {
-          left = true;
-          break;
-        }
-      }
-
-      bool right = (line.IndexOf('\"', startIndex) > 0);
-
-      return (left && right);
-    }
-
-    private static string ParseComment(string line, out int commentIndex)
-    {
       string comment = null;
-      commentIndex = -1;
+      commentCharIndex = -1;
 
-      do
+      var index = 0;
+      var quoteCount = 0;
+      while (line.Length > index) // traverse line from left to right
       {
-        commentIndex = line.IndexOfAny(Configuration.ValidCommentChars, commentIndex + 1);
+        var isValidCommentChar = Array.IndexOf(Configuration.ValidCommentChars, line[index]) > -1;
+        var isQuotationMark = line[index] == '\"';
+        var isCharWithinQuotes = quoteCount % 2 == 1;
+        var isCharEscaped = index > 0 && line[index - 1] == '\\';
 
-        if (commentIndex < 0)
-          break;
+        if (isValidCommentChar && !isCharWithinQuotes && !isCharEscaped)
+          break; // a comment has started
 
-        // Tip from MarkAJones:
-        // Database connection strings can contain semicolons, which should not be
-        // treated as comments, but rather separators.
-        // To avoid this, we have to check for two things:
-        // 1. Is the comment inside a string? If so, ignore.
-        // 2. Is the comment symbol backslashed (an escaping value)? If so, ignore also.
+        if (isQuotationMark && !isCharEscaped)
+          quoteCount++; // a non-escaped quotation mark has been found
 
-        // If the char before the comment is a backslash, it's not a comment.
-        if (commentIndex > 0 && line[commentIndex - 1] == '\\')
-        {
-          commentIndex = -1;
-          return null;
-        }
-
-        if (IsInQuoteMarks(line, commentIndex))
-          continue;
-
-        comment = line.Substring(commentIndex + 1).Trim();
-
-        break;
+        index++;
       }
-      while (commentIndex >= 0);
+
+      if (index < line.Length)
+      {
+        // The end of the string has not been reached => index points to a valid comment character.
+        commentCharIndex = index;
+
+        // If it's not the last character, extract the comment.
+        if (line.Length > index + 1)
+          comment = line.Substring(index + 1).TrimStart();
+      }
 
       return comment;
     }
