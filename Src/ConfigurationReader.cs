@@ -130,10 +130,7 @@ namespace SharpConfig
       {
         // The end of the string has not been reached => index points to a valid comment character.
         commentCharIndex = index;
-
-        // If it's not the last character, extract the comment.
-        if (line.Length > index + 1)
-          comment = line.Substring(index + 1).TrimStart();
+        comment = line.Substring(index + 1).TrimStart();
       }
 
       return comment;
