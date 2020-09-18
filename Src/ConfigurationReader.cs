@@ -23,10 +23,9 @@ namespace SharpConfig
 
     private static void Parse(StringReader reader, Configuration config)
     {
-      Section currentSection = new Section(Section.DefaultSectionName);
+      var currentSection = new Section(Section.DefaultSectionName);
       var preCommentBuilder = new StringBuilder();
 
-      int newlineLength = Environment.NewLine.Length;
       int lineNumber = 0;
 
       string line;
@@ -39,7 +38,7 @@ namespace SharpConfig
         // Remove all leading/trailing white-spaces.
         line = line.Trim();
 
-        // Skip empty lines.
+        // Do not process empty lines.
         if (string.IsNullOrEmpty(line))
           continue;
 
@@ -49,23 +48,19 @@ namespace SharpConfig
         {
           // pre-comment
           if (!Configuration.IgnorePreComments)
-          {
             preCommentBuilder.AppendLine(comment);
-          }
 
           continue;
         }
 
         string lineWithoutComment = line;
         if (commentIndex > 0)
-        {
-          // inline comment
-          lineWithoutComment = line.Remove(commentIndex).Trim();
-        }
+          lineWithoutComment = line.Remove(commentIndex).Trim(); // remove inline comment
 
         if (lineWithoutComment.StartsWith("[")) // Section
         {
-          if (currentSection != null && currentSection.Name == Section.DefaultSectionName && currentSection.SettingCount > 0)
+          // If the first section has been found but settings already exist, add them to the default section.
+          if (currentSection.Name == Section.DefaultSectionName && currentSection.SettingCount > 0)
             config.mSections.Add(currentSection);
 
           currentSection = ParseSection(lineWithoutComment, lineNumber);
@@ -75,10 +70,9 @@ namespace SharpConfig
 
           if (!Configuration.IgnorePreComments && preCommentBuilder.Length > 0)
           {
-            // Remove the last line.
-            preCommentBuilder.Remove(preCommentBuilder.Length - newlineLength, newlineLength);
-            currentSection.PreComment = preCommentBuilder.ToString();
-            preCommentBuilder.Length = 0; // Clear the SB
+            // Set the current section's pre-comment, removing the last newline character.
+            currentSection.PreComment = preCommentBuilder.ToString().TrimEnd(Environment.NewLine.ToCharArray());
+            preCommentBuilder.Length = 0; // Clear the SB - With .NET >= 4.0: preCommentBuilder.Clear()
           }
 
           config.mSections.Add(currentSection);
@@ -90,19 +84,11 @@ namespace SharpConfig
           if (!Configuration.IgnoreInlineComments)
             setting.Comment = comment;
 
-          if (currentSection == null)
-          {
-            throw new ParserException(string.Format(
-                "The setting '{0}' has to be in a section.",
-                setting.Name), lineNumber);
-          }
-
           if (!Configuration.IgnorePreComments && preCommentBuilder.Length > 0)
           {
-            // Remove the last line.
-            preCommentBuilder.Remove(preCommentBuilder.Length - newlineLength, newlineLength);
-            setting.PreComment = preCommentBuilder.ToString();
-            preCommentBuilder.Length = 0; // Clear the SB
+            // Set the setting's pre-comment, removing the last newline character.
+            setting.PreComment = preCommentBuilder.ToString().TrimEnd(Environment.NewLine.ToCharArray());
+            preCommentBuilder.Length = 0; // Clear the SB - With .NET >= 4.0: preCommentBuilder.Clear()
           }
 
           currentSection.Add(setting);
@@ -157,32 +143,23 @@ namespace SharpConfig
     {
       // Format(s) of a section:
       // 1) [<name>]
-      //      name may contain any char, including '[' and ']'
+      //      <name> may contain any char, including '[', ']', and a valid comment delimiter character
 
       int closingBracketIndex = line.LastIndexOf(']');
       if (closingBracketIndex < 0)
         throw new ParserException("closing bracket missing.", lineNumber);
 
-      // See if there are unwanted chars after the closing bracket.
-      if ((line.Length - 1) > closingBracketIndex)
-      {
-        // Get the part after the raw value to determien whether it's just an inline comment.
-        // If so, it's not an unwanted part; otherwise we should notify that it's something unexpected.
-        var endPart = line.Substring(closingBracketIndex + 1).Trim();
-        if (endPart.IndexOfAny(Configuration.ValidCommentChars) != 0)
-        {
-          string unwantedToken = line.Substring(closingBracketIndex + 1);
+      string sectionName = line.Substring(1, closingBracketIndex - 1).Trim();
 
-          throw new ParserException(string.Format(
-              "unexpected token '{0}'", unwantedToken),
-              lineNumber);
-        }
+      // Anything after the (last) closing bracket must be whitespace.
+      if (line.Length > closingBracketIndex + 1)
+      {
+        var endPart = line.Substring(closingBracketIndex + 1).Trim();
+
+        if (endPart.Length > 0)
+          throw new ParserException($"unexpected token: '{endPart}'", lineNumber);
       }
 
-      // Extract the section name, and trim all leading / trailing white-spaces.
-      string sectionName = line.Substring(1, line.Length - 2).Trim();
-
-      // Otherwise, return a fresh section.
       return new Section(sectionName);
     }
 
@@ -190,35 +167,32 @@ namespace SharpConfig
     {
       // Format(s) of a setting:
       // 1) <name> = <value>
-      //      name may not contain a '='
+      //      <name> may not contain a '='
       // 2) "<name>" = <value>
-      //      name may contain any char, including '='
+      //      <name> may contain any char, including '='
 
       string settingName = null;
+      int equalSignIndex;
 
       // Parse the name first.
       bool isQuotedName = line.StartsWith("\"");
-
-      int equalSignIndex;
       if (isQuotedName)
       {
         // Format 2
-        int index = 0;
+        int closingQuoteIndex = 0;
         do
         {
-          index = line.IndexOf('\"', index + 1);
+          closingQuoteIndex = line.IndexOf('\"', closingQuoteIndex + 1);
         }
-        while (index > 0 && line[index - 1] == '\\');
+        while (closingQuoteIndex > 0 && line[closingQuoteIndex - 1] == '\\');
 
-        if (index < 0)
-        {
+        if (closingQuoteIndex < 0)
           throw new ParserException("closing quote mark expected.", lineNumber);
-        }
 
         // Don't trim the name. Quoted names should be taken verbatim.
-        settingName = line.Substring(1, index - 1);
+        settingName = line.Substring(1, closingQuoteIndex - 1);
 
-        equalSignIndex = line.IndexOf('=', index + 1);
+        equalSignIndex = line.IndexOf('=', closingQuoteIndex + 1);
       }
       else
       {
@@ -226,22 +200,16 @@ namespace SharpConfig
         equalSignIndex = line.IndexOf('=');
       }
 
-      // Find the assignment operator.
       if (equalSignIndex < 0)
         throw new ParserException("setting assignment expected.", lineNumber);
 
       if (!isQuotedName)
-      {
         settingName = line.Substring(0, equalSignIndex).Trim();
-      }
 
-      // Trim the setting name and value.
-      string settingValue = line.Substring(equalSignIndex + 1);
-      settingValue = settingValue.Trim();
-
-      // Check if non-null name / value is given.
       if (string.IsNullOrEmpty(settingName))
         throw new ParserException("setting name expected.", lineNumber);
+
+      var settingValue = line.Substring(equalSignIndex + 1).Trim();
 
       return new Setting(settingName, settingValue);
     }
